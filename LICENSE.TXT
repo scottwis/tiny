@@ -1,0 +1,9 @@
+Unless specified below, all contents here are distrubted under the MIT license.
+See MIT.TXT for details.
+
+Exceptions
+-------------------
+
+docs/ECMA-335.pdf is Copyright (C) 2010 Ecma International and is distrubted under it's own license. Please see the document for details.
+
+docs/pecoff_v8.docx is Copyright (C) 2010 Microsoft Coproporation and is distrubted under it's own license. Please see the document for details.
