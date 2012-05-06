@@ -163,6 +163,11 @@ namespace Tiny.Decompiler.Metadata
         public DataDirectory * CLRRuntimeHeader {
             get { return GetDataDirectory(14); }
         }
+
+        public bool Verify(byte * pData, uint fileSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

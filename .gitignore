@@ -1,3 +1,5 @@
 docs/.~lock.pecoff_v8.docx#
 *~
 *.userprefs
+bin
+*.pidb

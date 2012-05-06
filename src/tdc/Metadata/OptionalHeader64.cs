@@ -1,5 +1,5 @@
 // 
-// OptionalHeader32.cs
+// OptionalHeader64.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -14,7 +14,7 @@
 // furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of     the Software.
+// all copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,12 +27,12 @@ using System;
 
 namespace Tiny.Decompiler.Metadata
 {
-    //# An implementation of [OptionalHeader] for [FileFormat.PE32][PE32] format files.
-    sealed unsafe class OptionalHeader32 : OptionalHeader
+    //# An implementation of [OptionalHeader] for [FileFormat.PE32_PLUS][PE32_PLUS] format files.
+    sealed unsafe class OptionalHeader64 : OptionalHeader
     {
-        private OptionalHeaderLayout32 * m_pLayout;
+        private OptionalHeaderLayout64 * m_pLayout;
 
-        public OptionalHeader32(OptionalHeaderLayout32 * pLayout)
+        public OptionalHeader64(OptionalHeaderLayout64 * pLayout)
         {
             m_pLayout = pLayout;
         }

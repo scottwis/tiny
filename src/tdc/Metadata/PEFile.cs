@@ -43,8 +43,9 @@ namespace Tiny.Decompiler.Metadata
         }
 
         byte * m_pData;
-        int m_fileSize;
+        uint m_fileSize;
         private PEHeader * m_peHeader;
+        private OptionalHeader m_optionalHeader;
 
         private PEHeader * PEHeader {
             get {
@@ -54,7 +55,7 @@ namespace Tiny.Decompiler.Metadata
 
         public PEFile(String fileName)
         {
-            m_pData = NativePlatform.MapFile(fileName, out m_fileSize);
+            m_pData = (byte *)NativePlatform.Default.MapFile(fileName, out m_fileSize);
             if (! (VerifyPEHeader() && VerifyOptionalHeader())) {
                 throw new ArgumentException("The provided file is not a valid managed executable.");
             }
@@ -105,7 +106,7 @@ namespace Tiny.Decompiler.Metadata
             }
 
             //4. Check to see if the PE Header is valid. This checks a bunch of stuff.
-            if (! PEHeader->Vaidate(m_pData, m_fileSize)) {
+            if (! PEHeader->Validate(m_pData, m_fileSize)) {
                 return false;
             }
 
@@ -122,7 +123,7 @@ namespace Tiny.Decompiler.Metadata
                 //BUT, byt the time this function executes we should have verified that the
                 //OptionalHeader is large enough to handle the 32bit image type, so we can
                 //just go ahead and create the optioanl header 32.
-                m_optionalHeader = new OptionalHeader32((byte *)(PEHeader + 1));
+                m_optionalHeader = new OptionalHeader32((OptionalHeaderLayout32 *)(PEHeader + 1));
             }
             else if (FileFormat == FileFormat.PE32_PLUS) {
                 //For 64 bit images, the optional header size needs to be a little bit larger (than it is for 32 bit
@@ -138,8 +139,10 @@ namespace Tiny.Decompiler.Metadata
                 if (PEHeader->OptionalHeaderSize < 240) {
                     return false;
                 }
-                m_optionalHeader = new OptionalHeader64((byte *)(PEHeader + 1));
+                m_optionalHeader = new OptionalHeader64((OptionalHeaderLayout64 *)(PEHeader + 1));
             }
+
+            return m_optionalHeader.Verify(m_pData, m_fileSize);
         }
     }
 }

@@ -75,70 +75,68 @@ namespace Tiny.Decompiler.Metadata
         [FieldOffset(18)]
         public readonly ImageCharacteristics Characteristics;
 
-        public bool Validate(byte * pFileBase, int fileSize) {
-            fileSize.assumeGTZ();
-            Util.Assume(this >= pFileBase && this < checked(pFileBase + fileSize));
-            Util.Assume(fileSize - (this - pFileBase) >= sizeof(PEHeader));
+        public bool Validate(byte * pFileBase, uint fileSize) {
+            fileSize.AssumeGTZ();
+            fixed(PEHeader * pThis = &this) {
+                Util.Assume(pThis >= pFileBase && pThis < checked(pFileBase + fileSize));
+                Util.Assume(fileSize - (pThis - pFileBase) >= sizeof(PEHeader));
 
-            try {
-                //We also check the following critera:
-                //
+                try {
+                    //NOTE: This code could be made more consise using compound conditionals, but this orginization makes
+                    //the code much easier to debug.
 
-                //
+                    //1. There should be a null symbol table pointer (Partion II, Section 25.2.2 ECMA-335 V 5).
+                    if (PointerToSymbolTable != 0) {
+                        return false;
+                    }
 
-                //NOTE: This code could be made more consise using compound conditionals, but this orginization makes
-                //the code much easier to debug.
+                    //2. Therefore, there should be 0 symbols (Partion II, Section 25.2.2 ECMA-335 V 5).
+                    if (NumberOfSymbols != 0) {
+                        return false;
+                    }
 
-                //1. There should be a null symbol table pointer (Partion II, Section 25.2.2 ECMA-335 V 5).
-                if (PointerToSymbolTable != 0) {
+                    //3. An optional header should be present, and it size should be at least 224 BYTES.
+                    //On 64 bit systems it should be at least 240 bytes, but we won't check that until
+                    //we identify the image type when we process the "Optional Header".
+                    if (OptionalHeaderSize < 224) {
+                        return false;
+                    }
+
+                    //4. The optional header should be within the bounds of the file.
+
+                    if (checked(((byte *)pThis + sizeof(PEHeader) + OptionalHeaderSize) >= pFileBase + fileSize)) {
+                        return false;
+                    }
+
+                    //5. Is the machine type equal to IMAGE_FILE_MACHINE_UNKNOWN, IMAGE_FILE_MACHINE_I386 or IMAGE_FILE_MACHINE_AMD64?
+                    if (! (
+                        Machine == MachineType.IMAGE_FILE_MACHINE_UNKNOWN
+                        || Machine == MachineType.IMAGE_FILE_MACHINE_I386
+                        || Machine == MachineType.IMAGE_FILE_MACHINE_AMD64
+                    )) {
+                        return false;
+                    }
+
+                    //6. Has the image been marked by a linker as being "complete"
+                    if (
+                        (Characteristics & ImageCharacteristics.IMAGE_FILE_EXECUTABLE_IMAGE)
+                        != ImageCharacteristics.IMAGE_FILE_EXECUTABLE_IMAGE
+                    ) {
+                        return false;
+                    }
+
+                    //7. Are all unsupported flags set to 0? We are overly conservative in the images we accept. If
+                    //   something looks like it does not belong in a managed executable we reject it, even if we could
+                    //   get away with ignoring it. We should only allow these if real cases come up that require them.
+                    if ((Characteristics & s_disallowedImageCharacteristics) != 0) {
+                        return false;
+                    }
+
+                    return true;
+                }
+                catch (OverflowException) {
                     return false;
                 }
-
-                //2. Therefore, there should be 0 symbols (Partion II, Section 25.2.2 ECMA-335 V 5).
-                if (NumberOfSymbols != 0) {
-                    return false;
-                }
-
-                //3. An optional header should be present, and it size should be at least 224 BYTES.
-                //On 64 bit systems it should be at least 240 bytes, but we won't check that until
-                //we identify the image type when we process the "Optional Header".
-                if (OptionalHeaderSize < 224) {
-                    return false;
-                }
-
-                //4. The optional header should be within the bounds of the file.
-                if (checked(((byte *)this + sizeof(PEHeader) + OptionalHeaderSize) >= pFileBase + fileSize)) {
-                    return false;
-                }
-
-                //5. Is the machine type equal to IMAGE_FILE_MACHINE_UNKNOWN, IMAGE_FILE_MACHINE_I386 or IMAGE_FILE_MACHINE_AMD64?
-                if (! (
-                    Machine == MachineType.IMAGE_FILE_MACHINE_UNKNOWN
-                    || Machine == MachineType.IMAGE_FILE_MACHINE_I386
-                    || Machine == MachineType.IMAGE_FILE_MACHINE_AMD64
-                )) {
-                    return false;
-                }
-
-                //6. Has the image been marked by a linker as being "complete"
-                if (
-                    (Characteristics & ImageCharacteristics.IMAGE_FILE_EXECUTABLE_IMAGE)
-                    != ImageCharacteristics.IMAGE_FILE_EXECUTABLE_IMAGE
-                ) {
-                    return false;
-                }
-
-                //7. Are all unsupported flags set to 0? We are overly conservative in the images we accept. If
-                //   something looks like it does not belong in a managed executable we reject it, even if we could
-                //   get away with ignoring it. We should only allow these if real cases come up that require them.
-                if ((Characteristics & s_disallowedImageCharacteristics) != 0) {
-                    return false;
-                }
-
-                return true;
-            }
-            catch (OverflowException) {
-                return false;
             }
         }
     }
