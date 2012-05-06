@@ -24,11 +24,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.IO;
+using System.IO.MemoryMappedFiles;
+using Microsoft.Win32.SafeHandles;
 
 namespace Tiny.Decompiler.Metadata
 {
     sealed unsafe class PEFile : IDisposable
     {
+        public const int MSDosStubSize = 128;
         private static readonly int s_peSignature;
 
         static PEFile()
@@ -42,10 +46,43 @@ namespace Tiny.Decompiler.Metadata
 
         }
 
+        MemoryMappedFile m_memoryMappedFile;
+        MemoryMappedViewAccessor m_viewAccessor;
+        SafeMemoryMappedViewHandle m_viewHandle;
+
         byte * m_pData;
         uint m_fileSize;
         private PEHeader * m_peHeader;
         private OptionalHeader m_optionalHeader;
+
+        public PEFile(String fileName)
+        {
+            try {
+                m_memoryMappedFile = MemoryMappedFile.CreateFromFile(fileName,FileMode.Open);
+                m_viewAccessor = m_memoryMappedFile.CreateViewAccessor();
+                m_viewHandle = m_viewAccessor.SafeMemoryMappedViewHandle;
+                m_viewHandle.AcquirePointer(ref m_pData);
+                try {
+                    m_fileSize = checked((uint)m_viewAccessor.Capacity);
+                }
+                catch (OverflowException) {
+                    throw new FileLoadException("The assembly is too large.", fileName);
+                }
+
+                if (! (VerifyPEHeader() && VerifyOptionalHeader())) {
+                    throw new FileLoadException("The provided file is not a managed executable, or is not supported by tdc.");
+                }
+            }
+            catch (Exception ex) {
+                Dispose();
+                if (ex is FileLoadException) {
+                    throw;
+                }
+                else {
+                    throw new FileLoadException("Unable to load assembly.", fileName, ex);
+                }
+            }
+        }
 
         private PEHeader * PEHeader {
             get {
@@ -53,25 +90,30 @@ namespace Tiny.Decompiler.Metadata
             }
         }
 
-        public PEFile(String fileName)
-        {
-            m_pData = (byte *)NativePlatform.Default.MapFile(fileName, out m_fileSize);
-            if (! (VerifyPEHeader() && VerifyOptionalHeader())) {
-                throw new ArgumentException("The provided file is not a valid managed executable.");
-            }
-        }
-
-        ~PEFile()
-        {
-            Dispose();
-        }
-
         public void Dispose()
         {
-            if (m_pData != null) {
-                NativePlatform.Default.UnmapFile(m_pData);
-                m_pData = null;
+            if (m_pData != null && m_viewHandle != null) {
+                m_viewHandle.ReleasePointer();
             }
+
+            if (m_viewHandle != null) {
+                m_viewHandle.Dispose();
+            }
+
+            if (m_viewAccessor != null) {
+                m_viewAccessor.Dispose();
+            }
+
+            if (m_memoryMappedFile != null) {
+                m_memoryMappedFile.Dispose();
+            }
+
+            m_memoryMappedFile = null;
+            m_viewAccessor = null;
+            m_viewHandle = null;
+            m_pData = null;
+            m_peHeader = null;
+            m_optionalHeader = null;
         }
 
         private int * PESignature
@@ -132,7 +174,7 @@ namespace Tiny.Decompiler.Metadata
                 //part of the PE header, but isdocumented as part of the optional header. We don't read the optional
                 //header (which succeeds the PEHeader) until we know the PEHeader is valid, which at a minimum
                 //means there must be 224 bytes in the optional header. If the PEHEader is not valid, then we can't
-                //read the Optional Header, because it might not exist. In any case, once we know we can reader the
+                //read the Optional Header, because it might not exist. In any case, once we know we can reade the
                 //file format, we do. If it turns out we have a 64 bit image, then we have to do another length check
                 //on the OptionalHeaderSize here. Note that we would have already verified the optional header
                 //size against the file size, so we don't need to repeat that check.
@@ -140,6 +182,9 @@ namespace Tiny.Decompiler.Metadata
                     return false;
                 }
                 m_optionalHeader = new OptionalHeader64((OptionalHeaderLayout64 *)(PEHeader + 1));
+            }
+            else {
+                return false;
             }
 
             return m_optionalHeader.Verify(m_pData, m_fileSize);

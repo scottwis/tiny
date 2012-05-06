@@ -5,20 +5,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tdc", "tdc\tdc.csproj", "{3
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug-Windows|Any CPU = Debug-Windows|Any CPU
-		Release-Windows|Any CPU = Release-Windows|Any CPU
-		Debug-Posix|Any CPU = Debug-Posix|Any CPU
-		Release-Posix|Any CPU = Release-Posix|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug-Posix|Any CPU.ActiveCfg = Debug-Posix|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug-Posix|Any CPU.Build.0 = Debug-Posix|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug-Windows|Any CPU.ActiveCfg = Debug-Windows|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug-Windows|Any CPU.Build.0 = Debug-Windows|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release-Posix|Any CPU.ActiveCfg = Release-Posix|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release-Posix|Any CPU.Build.0 = Release-Posix|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release-Windows|Any CPU.ActiveCfg = Release-Windows|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release-Windows|Any CPU.Build.0 = Release-Windows|Any CPU
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = tdc\tdc.csproj

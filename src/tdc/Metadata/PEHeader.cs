@@ -35,9 +35,7 @@ namespace Tiny.Decompiler.Metadata
     {
         //# The set of bits in the image characteristics map that tdc does not support
         private const ImageCharacteristics s_disallowedImageCharacteristics = 
-            ImageCharacteristics.IMAGE_FILE_LINE_NUMS_STRIPPED
-            | ImageCharacteristics.IMAGE_FILE_LOCAL_SYMS_STRIPPED
-            | ImageCharacteristics.IMAGE_FILE_BYTES_REVERSED_LO
+            ImageCharacteristics.IMAGE_FILE_BYTES_REVERSED_LO
             | ImageCharacteristics.IMAGE_FILE_SYSTEM
             | ImageCharacteristics.IMAGE_FILE_UP_SYSTEM_ONLY
             | ImageCharacteristics.IMAGE_FILE_BYTES_REVERSED_HI;

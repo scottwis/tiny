@@ -34,7 +34,7 @@ namespace Tiny.Decompiler.Metadata
     //# 2. [OptionalHeader64] describes files with a [MagicNumber] of [FileFormat.PE32_PLUS]
     abstract unsafe class OptionalHeader
     {
-        //# A "magic number" identifying the file format of the PE. Only PE32 and PE32_PLUS
+        //# A "magic number" identifying the file format of the PE. Only [PE32] and [PE32_PLUS]
         //# are supported by tdc.
         public abstract FileFormat MagicNumber{ get; }
         public abstract byte MajorLinkerVersion { get; }
@@ -71,11 +71,11 @@ namespace Tiny.Decompiler.Metadata
         public abstract uint FileAlignment { get; }
 
         //# The major version number of the minimum required operating system. The ECMA-335 spec says this should be
-        //# 5, but that it can be ignored on read. The tiny decompiler will reject any image with a value < 5.
+        //# 5, but that it can be ignored on read. The tiny decompiler ingores this vlaue.
         public abstract ushort MajorOSVersion { get; }
 
         //# The minor version number of the minimum required operating system. The ECMA-335 specs says this value
-        //# should be 0, but that it can be ignored on read. The tiny decompiler will accept any value.
+        //# should be 0, but that it can be ignored on read. The tiny decompiler ingores this vlaue.
         public abstract ushort MinorOSVersion { get; }
 
         //# The major version number of the image. The tiny decompiler will accept any arbitrary value for this field.
@@ -150,6 +150,9 @@ namespace Tiny.Decompiler.Metadata
         //# We verify that the each entry
         public abstract DataDirectory * DataDirectories { get; }
 
+        protected abstract uint LAYOUT_SIZE { get; }
+        protected abstract ulong SIZE_MAX { get; }
+
         private DataDirectory * GetDataDirectory(int index)
         {
             if (index >= 0 && index < NumberOfDataDirectories) {
@@ -166,7 +169,130 @@ namespace Tiny.Decompiler.Metadata
 
         public bool Verify(byte * pData, uint fileSize)
         {
-            throw new NotImplementedException();
+            if (CodeSize > ImageSize) {
+                return false;
+            }
+
+            if (InitializedDataSize > ImageSize) {
+                return false;
+            }
+
+            if (UninitializedDataSize > ImageSize) {
+                return false;
+            }
+
+            try {
+                if (checked(CodeSize + InitializedDataSize + UninitializedDataSize) > ImageSize) {
+                    return false;
+                }
+            }
+            catch (OverflowException) {
+                return false;
+            }
+
+            if (AddressOfEntryPoint != 0 && AddressOfEntryPoint < BaseOfCode) {
+                return false;
+            }
+
+            if (SectionAlignment < FileAlignment) {
+                return false;
+            }
+
+            if (FileAlignment < 512 || FileAlignment > 0x10000) {
+                return false;
+            }
+
+            //Is file alignment a power of 2?
+            if (((FileAlignment) & (FileAlignment - 1)) != 0) {
+                return false;
+            }
+
+            if (Win32VersionValue != 0) {
+                return false;
+            }
+
+            //Is the header size a multiple of the file alignment?
+            if ((HeaderSize & (FileAlignment - 1)) != 0) {
+                return false;
+            }
+
+            if (HeaderSize > fileSize) {
+                return false;
+            }
+
+            try {
+                //Is the reported header large enough to actually hold all the headers?
+                if (
+                    HeaderSize < checked(
+                        LAYOUT_SIZE
+                        + (NumberOfDataDirectories * sizeof(DataDirectory))
+                        + sizeof(PEHeader)
+                        + PEFile.MSDosStubSize
+                    )
+                ) {
+                    return false;
+                }
+            }
+            catch (OverflowException) {
+                return false;
+            }
+
+            if (
+                Subsystem != ImageSubsystem.IMAGE_SUBSYSTEM_WINDOWS_CUI
+                && Subsystem != ImageSubsystem.IMAGE_SUBSYSTEM_WINDOWS_GUI
+            ) {
+                return false;
+            }
+
+            if ((DllCharacteristics.RESERVED_BITS & DllCharacteristics) != 0) {
+                return false;
+            }
+
+            if ((DllCharacteristics & DllCharacteristics.IMAGE_DLLCHARACTERISTICS_WDM_DRIVER) != 0) {
+                return false;
+            }
+
+            if (StackReserveSize < StackCommitSize) {
+                return false;
+            }
+
+            StackReserveSize.AssumeLTE(SIZE_MAX);
+            StackCommitSize.AssumeLTE(SIZE_MAX);
+
+            if (HeapReserveSize < HeapCommitSize) {
+                return false;
+            }
+
+            HeapReserveSize.AssumeLTE(SIZE_MAX);
+            HeapCommitSize.AssumeLTE(SIZE_MAX);
+
+            if (LoaderFlags != 0) {
+                return false;
+            }
+
+            if (NumberOfDataDirectories < 16) {
+                return false;
+            }
+
+            if (! DataDirectories[15].IsZero()) {
+                return false;
+            }
+
+            if (CLRRuntimeHeader->IsZero()) {
+                return false;
+            }
+
+            for (int i = 0; i < NumberOfDataDirectories; ++i) {
+                if (DataDirectories[i].RVA > ImageSize) {
+                    return false;
+                }
+
+                if (! DataDirectories[i].IsConsistent()) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

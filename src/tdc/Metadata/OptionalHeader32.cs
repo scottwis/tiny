@@ -153,6 +153,12 @@ namespace Tiny.Decompiler.Metadata
         {
             get { return (DataDirectory *)(m_pLayout + 1); }
         }
+        protected override uint LAYOUT_SIZE {
+            get { return (uint)sizeof(OptionalHeaderLayout32); }
+        }
+        protected override ulong SIZE_MAX {
+            get { return uint.MaxValue; }
+        }
     }
 }
 

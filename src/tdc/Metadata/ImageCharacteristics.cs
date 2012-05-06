@@ -43,11 +43,11 @@ namespace Tiny.Decompiler.Metadata
         //# The tiny decompiler will reject an image that does not have this bit set to 1.
         IMAGE_FILE_EXECUTABLE_IMAGE=0x0002,
         //# Indicates that COFF line numbers have been removed from the image. The flag is deprecated, and relates to
-        //# an obselete native debugging format that has never been used for managed executables. The tiny decompiler
-        //# will conservatively reject any image that does not have this bit set to 0.
+        //# an obselete native debugging format that is not used for managed executables. The tiny decompiler will
+        //# ignore this flag.
         IMAGE_FILE_LINE_NUMS_STRIPPED=0x0004,
         //# Indicates that COFF symbol table entries for local symbols have been removed from the image. This flag is
-        //# deprecated and relates to an obsolete native debugging format that has never been used for managed
+        //# deprecated and relates to an obsolete native debugging format that is not used for managed
         //# executables. The tiny decompiler will conservatively reject any image that does not have this bit set to 0.
         IMAGE_FILE_LOCAL_SYMS_STRIPPED=0x0008,
         //# Instruct the pre-windows 2000 loader to aggressively trim working set. This flag is deprecated for

@@ -37,6 +37,16 @@ namespace Tiny.Decompiler.Metadata
         public readonly uint RVA;
         [FieldOffset(4)]
         public readonly uint Size;
+
+        public bool IsZero()
+        {
+            return RVA == 0 && Size == 0;
+        }
+
+        public bool IsConsistent()
+        {
+            return (RVA == 0) == (Size == 0);
+        }
     }
 }
 

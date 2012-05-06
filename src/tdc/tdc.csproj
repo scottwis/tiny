@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug-Windows</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -10,55 +10,26 @@
     <RootNamespace>Tiny.Decompiler</RootNamespace>
     <AssemblyName>tdc</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-Windows|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Win32\Debug</OutputPath>
-    <DefineConstants>DEBUG;WIN32</DefineConstants>
+    <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <OS>Windows</OS>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug-Posix|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Posix\Debug</OutputPath>
-    <DefineConstants>DEBUG;POSIX</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <OS>Posix</OS>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-Windows|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Win32\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>WIN32</DefineConstants>
-    <OS>Windows</OS>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release-Posix|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Posix\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Externalconsole>true</Externalconsole>
-    <DefineConstants>POSIX</DefineConstants>
-    <OS>Posix</OS>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(OS)' == 'Posix' ">
-    <Reference Include="Mono.Posix" />
-  </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -66,6 +37,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Metadata\" />
+    <Folder Include="Interop\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Metadata\PEFile.cs" />
@@ -79,7 +51,6 @@
     <Compile Include="Metadata\DataDirectory.cs" />
     <Compile Include="Metadata\OptionalHeader32Layout.cs" />
     <Compile Include="Metadata\OptionalHeader32.cs" />
-    <Compile Include="NativePlatform.cs" />
     <Compile Include="Metadata\OptionalHeaderLayout64.cs" />
     <Compile Include="Metadata\OptionalHeader64.cs" />
     <Compile Include="Util.cs" />

@@ -31,10 +31,17 @@ namespace Tiny.Decompiler
     {
         public static uint AssumeGTZ(this uint x)
         {
-            if (x <= 0) {
+            if (x == 0) {
                 throw new InternalErrorException("Expected a value > 0");
             }
             return x;
+        }
+
+        public static ulong AssumeLTE(this ulong lhs, ulong rhs) {
+            if (lhs > rhs) {
+                throw new InternalErrorException(String.Format("Expected a value <= {0}.", rhs));
+            }
+            return lhs;
         }
 
         public static void Assume(bool condition)

@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using Tiny.Decompiler.Metadata;
 
 namespace Tiny.Decompiler
 {
@@ -31,6 +32,9 @@ namespace Tiny.Decompiler
     {
         public static int Main(string[] argv)
         {
+            String filePath = new Uri(System.Reflection.Assembly.GetCallingAssembly().CodeBase).LocalPath;
+            using (var peFile = new PEFile(filePath)) {
+            }
             return 0;
         }
     }
