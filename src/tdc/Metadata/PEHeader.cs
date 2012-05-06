@@ -79,7 +79,7 @@ namespace Tiny.Decompiler.Metadata
             fileSize.AssumeGTZ();
             fixed(PEHeader * pThis = &this) {
                 Util.Assume(pThis >= pFileBase && pThis < checked(pFileBase + fileSize));
-                Util.Assume(fileSize - (pThis - pFileBase) >= sizeof(PEHeader));
+                Util.Assume(fileSize - ((byte *)pThis - pFileBase) >= sizeof(PEHeader));
 
                 try {
                     //NOTE: This code could be made more consise using compound conditionals, but this orginization makes

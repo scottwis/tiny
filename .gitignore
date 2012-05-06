@@ -3,3 +3,6 @@ docs/.~lock.pecoff_v8.docx#
 *.userprefs
 bin
 *.pidb
+_ReSharper.*
+obj
+*.suo
