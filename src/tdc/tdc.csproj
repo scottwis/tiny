@@ -47,6 +47,8 @@
     <Compile Include="Metadata\ImageSubsystem.cs" />
     <Compile Include="Metadata\DllCharacteristics.cs" />
     <Compile Include="Metadata\DataDirectory.cs" />
+    <Compile Include="Metadata\OptionalHeader32Layout.cs" />
+    <Compile Include="Metadata\OptionalHeader32.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.txt" />

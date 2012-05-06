@@ -40,13 +40,13 @@ namespace Tiny.Decompiler.Metadata
         public abstract byte MajorLinkerVersion { get; }
         public abstract byte MinorLinkerVersion { get; }
         //# The total size of all code sections in the executable.
-        public abstract uint SizeOfCode { get; }
+        public abstract uint CodeSize { get; }
 
         //# The total size of all initialized data sections in the executable.
-        public abstract uint SizeOfInitializedData { get; }
+        public abstract uint InitializedDataSize { get; }
 
         //# The total size of all unintialized data sections in the executable.
-        public abstract uint SizeOfUnInitializedData { get; }
+        public abstract uint UninitializedDataSize { get; }
 
         //# The RVA of the entry point of the executable. This is an offset relative to the ACTUAL base address of the
         //# image when it is loaded into memory.
@@ -72,11 +72,11 @@ namespace Tiny.Decompiler.Metadata
 
         //# The major version number of the minimum required operating system. The ECMA-335 spec says this should be
         //# 5, but that it can be ignored on read. The tiny decompiler will reject any image with a value < 5.
-        public abstract ushort MajorOperatingSystemVersion { get; }
+        public abstract ushort MajorOSVersion { get; }
 
         //# The minor version number of the minimum required operating system. The ECMA-335 specs says this value
         //# should be 0, but that it can be ignored on read. The tiny decompiler will accept any value.
-        public abstract ushort MinorOperatingSystemVersion { get; }
+        public abstract ushort MinorOSVersion { get; }
 
         //# The major version number of the image. The tiny decompiler will accept any arbitrary value for this field.
         public abstract ushort MajorImageVersion { get; }
@@ -103,7 +103,7 @@ namespace Tiny.Decompiler.Metadata
         public abstract uint HeaderSize { get; }
 
         //# A checksum for the image file. This is ignored by the tiny decompiler.
-        public abstract uint CheckSum { get; }
+        public abstract uint Checksum { get; }
 
         //# The Windows Subsystem required to run the image. Only [IMAGE_SUBSYSTEM_WINDOWS_CUI] and
         //# [IMAGE_SUBSYSTEM_WINDOWS_GUI] are supported by tdc.
