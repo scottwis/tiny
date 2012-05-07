@@ -187,7 +187,7 @@ namespace Tiny.Decompiler.Metadata
                 return false;
             }
 
-            return m_optionalHeader.Verify(m_pData, m_fileSize);
+            return m_optionalHeader.Verify(m_fileSize, PEHeader);
         }
     }
 }

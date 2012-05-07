@@ -1,5 +1,5 @@
 // 
-// Util.cs
+// SectionHeader.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -24,40 +24,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Runtime.InteropServices;
 
-namespace Tiny.Decompiler
+namespace Tiny.Decompiler.Metadata
 {
-    static class Util
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct SectionHeader
     {
-        public static uint AssumeGTZ(this uint x)
-        {
-            if (x == 0) {
-                throw new InternalErrorException("Expected a value > 0");
-            }
-            return x;
-        }
+        [FieldOffset(0)]
+        public fixed byte Name[8];
 
-        public static ulong AssumeLTE(this ulong lhs, ulong rhs) {
-            if (lhs > rhs) {
-                throw new InternalErrorException(String.Format("Expected a value <= {0}.", rhs));
-            }
-            return lhs;
-        }
+        [FieldOffset(8)]
+        public readonly uint VirtualSize;
 
-        public static void Assume(bool condition)
-        {
-            if (! condition) {
-                throw new InternalErrorException("Unexpected assertion failure");
-            }
-        }
+        [FieldOffset(12)]
+        public readonly uint VirtualAddress;
 
-        public static unsafe void * AssumeNotNull(void * pValue)
-        {
-            if (pValue == null) {
-                throw new InternalErrorException("Unexpected null value.");
-            }
-            return pValue;
-        }
+        [FieldOffset(16)]
+        public readonly uint SizeOfRawData;
+
+        [FieldOffset(20)]
+        public readonly uint PointerToRawData;
+
+        [FieldOffset(24)]
+        public readonly uint PointerToRelocations;
+
+        [FieldOffset(28)]
+        public readonly uint PointerToLineNumbers;
+
+        [FieldOffset(32)]
+        public readonly ushort NumberOfRelocations;
+
+        [FieldOffset(34)]
+        public readonly ushort NumberOfLineNumbers;
+
+        [FieldOffset(36)]
+        public SectionCharacteristics Characteristics;
     }
 }
 

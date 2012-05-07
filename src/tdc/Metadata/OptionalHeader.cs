@@ -167,8 +167,9 @@ namespace Tiny.Decompiler.Metadata
             get { return GetDataDirectory(14); }
         }
 
-        public bool Verify(byte * pData, uint fileSize)
+        public bool Verify(uint fileSize, PEHeader * pPEHeader)
         {
+            Util.AssumeNotNull(pPEHeader);
             if (CodeSize > ImageSize) {
                 return false;
             }
@@ -228,6 +229,7 @@ namespace Tiny.Decompiler.Metadata
                         + (NumberOfDataDirectories * sizeof(DataDirectory))
                         + sizeof(PEHeader)
                         + PEFile.MSDosStubSize
+                        + (pPEHeader->NumberOfSections * sizeof(SectionHeader))
                     )
                 ) {
                     return false;

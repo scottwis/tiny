@@ -1,5 +1,5 @@
 // 
-// Util.cs
+// SectionCharacteristics.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -25,39 +25,11 @@
 // THE SOFTWARE.
 using System;
 
-namespace Tiny.Decompiler
+namespace Tiny.Decompiler.Metadata
 {
-    static class Util
+    enum SectionCharacteristics : uint
     {
-        public static uint AssumeGTZ(this uint x)
-        {
-            if (x == 0) {
-                throw new InternalErrorException("Expected a value > 0");
-            }
-            return x;
-        }
-
-        public static ulong AssumeLTE(this ulong lhs, ulong rhs) {
-            if (lhs > rhs) {
-                throw new InternalErrorException(String.Format("Expected a value <= {0}.", rhs));
-            }
-            return lhs;
-        }
-
-        public static void Assume(bool condition)
-        {
-            if (! condition) {
-                throw new InternalErrorException("Unexpected assertion failure");
-            }
-        }
-
-        public static unsafe void * AssumeNotNull(void * pValue)
-        {
-            if (pValue == null) {
-                throw new InternalErrorException("Unexpected null value.");
-            }
-            return pValue;
-        }
+        #error "Define this"
     }
 }
 
