@@ -29,7 +29,7 @@ namespace Tiny.Decompiler.Metadata
 {
     enum SectionCharacteristics : uint
     {
-        #error "Define this"
+        //#error "Define this"
     }
 }
 

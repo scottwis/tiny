@@ -32,7 +32,7 @@ namespace Tiny.Decompiler
     {
         public static int Main(string[] argv)
         {
-            String filePath = new Uri(System.Reflection.Assembly.GetCallingAssembly().CodeBase).LocalPath;
+            String filePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
             using (var peFile = new PEFile(filePath)) {
             }
             return 0;

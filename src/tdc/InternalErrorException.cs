@@ -32,6 +32,14 @@ namespace Tiny.Decompiler
         public InternalErrorException(string message) : base(message)
         {
         }
+
+        public InternalErrorException(
+            string message,
+            string fileName,
+            int lineNumber
+        ) : this(string.Format("{0} : {1} - {2}", message, fileName, lineNumber))
+        {
+        }
     }
 }
 

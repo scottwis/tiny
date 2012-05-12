@@ -6,3 +6,4 @@ bin
 _ReSharper.*
 obj
 *.suo
+src/tiny.sln.DotSettings.user

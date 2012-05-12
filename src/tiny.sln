@@ -1,69 +1,89 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 11
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tdc", "tdc\tdc.csproj", "{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x64-Linux = Debug|x64-Linux
+		Debug|x64-Windows = Debug|x64-Windows
+		Debug|x86-Linux = Debug|x86-Linux
+		Debug|x86-Windows = Debug|x86-Windows
+		Release|x64-Linux = Release|x64-Linux
+		Release|x64-Windows = Release|x64-Windows
+		Release|x86-Linux = Release|x86-Linux
+		Release|x86-Windows = Release|x86-Windows
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x64-Linux.ActiveCfg = Debug|x64-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x64-Linux.Build.0 = Debug|x64-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x64-Windows.ActiveCfg = Debug|x64-Windows
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x64-Windows.Build.0 = Debug|x64-Windows
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x86-Linux.ActiveCfg = Debug|x86-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x86-Linux.Build.0 = Debug|x86-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x86-Windows.ActiveCfg = Debug|x86-Windows
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Debug|x86-Windows.Build.0 = Debug|x86-Windows
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x64-Linux.ActiveCfg = Release|x64-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x64-Linux.Build.0 = Release|x64-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x64-Windows.ActiveCfg = Release|x64-Windows
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x64-Windows.Build.0 = Release|x64-Windows
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x86-Linux.ActiveCfg = Release|x86-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x86-Linux.Build.0 = Release|x86-Linux
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x86-Windows.ActiveCfg = Release|x86-Windows
+		{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}.Release|x86-Windows.Build.0 = Release|x86-Windows
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = tdc\tdc.csproj
-		Policies = $0
-		$0.StandardHeader = $1
-		$1.Text = @\n${FileName}\n \nAuthor:\n      ${AuthorName} <${AuthorEmail}>\n\nCopyright (c) ${Year} ${CopyrightHolder}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.
-		$1.IncludeInNewFiles = True
+		$0.CSharpFormattingPolicy = $4
 		$0.DotNetNamingPolicy = $2
+		$0.StandardHeader = $1
+		$0.TextStylePolicy = $5
+		$1.IncludeInNewFiles = True
+		$1.Text = @\n${FileName}\n \nAuthor:\n      ${AuthorName} <${AuthorEmail}>\n\nCopyright (c) ${Year} ${CopyrightHolder}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.
 		$2.DirectoryNamespaceAssociation = PrefixedHierarchical
 		$2.ResourceNamePolicy = MSBuild
-		$0.TextStylePolicy = $3
 		$3.inheritsSet = null
 		$3.scope = text/x-csharp
-		$0.CSharpFormattingPolicy = $4
 		$4.AlignEmbeddedIfStatements = False
+		$4.BeforeConstructorDeclarationParentheses = False
+		$4.BeforeDelegateDeclarationParentheses = False
+		$4.BeforeIndexerDeclarationBracket = False
+		$4.BeforeMethodCallParentheses = False
+		$4.BeforeMethodDeclarationParentheses = False
+		$4.CatchParentheses = False
+		$4.EventAddBraceStyle = NextLine
+		$4.EventBraceStyle = NextLine
+		$4.EventRemoveBraceStyle = NextLine
+		$4.ForBraceForcement = AddBraces
+		$4.ForParentheses = False
+		$4.ForeachParentheses = False
+		$4.IfElseBraceForcement = AddBraces
+		$4.IfParentheses = False
+		$4.LockParentheses = False
+		$4.NewParentheses = False
+		$4.PlaceCatchOnNewLine = True
+		$4.PlaceElseOnNewLine = True
+		$4.PlaceFinallyOnNewLine = True
 		$4.PropertyBraceStyle = NextLine
 		$4.PropertyGetBraceStyle = NextLine
 		$4.PropertySetBraceStyle = NextLine
-		$4.EventBraceStyle = NextLine
-		$4.EventAddBraceStyle = NextLine
-		$4.EventRemoveBraceStyle = NextLine
-		$4.IfElseBraceForcement = AddBraces
-		$4.ForBraceForcement = AddBraces
-		$4.WhileBraceForcement = AddBraces
-		$4.PlaceElseOnNewLine = True
-		$4.PlaceCatchOnNewLine = True
-		$4.PlaceFinallyOnNewLine = True
-		$4.BeforeMethodDeclarationParentheses = False
-		$4.BeforeMethodCallParentheses = False
-		$4.BeforeConstructorDeclarationParentheses = False
-		$4.BeforeIndexerDeclarationBracket = False
-		$4.BeforeDelegateDeclarationParentheses = False
-		$4.NewParentheses = False
-		$4.IfParentheses = False
-		$4.WhileParentheses = False
-		$4.ForParentheses = False
-		$4.ForeachParentheses = False
-		$4.CatchParentheses = False
-		$4.SwitchParentheses = False
-		$4.LockParentheses = False
-		$4.UsingParentheses = False
 		$4.SpacesBeforeBrackets = False
-		$4.inheritsSet = Mono
+		$4.SwitchParentheses = False
+		$4.UsingParentheses = False
+		$4.WhileBraceForcement = AddBraces
+		$4.WhileParentheses = False
 		$4.inheritsScope = text/x-csharp
+		$4.inheritsSet = Mono
 		$4.scope = text/x-csharp
-		$0.TextStylePolicy = $5
 		$5.FileWidth = 120
 		$5.NoTabsAfterNonTabs = True
 		$5.RemoveTrailingWhitespace = True
-		$5.inheritsSet = VisualStudio
 		$5.inheritsScope = text/plain
+		$5.inheritsSet = VisualStudio
 		$5.scope = text/plain
+		Policies = $0
+		StartupItem = tdc\tdc.csproj
 	EndGlobalSection
 EndGlobal

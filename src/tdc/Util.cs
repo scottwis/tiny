@@ -37,7 +37,8 @@ namespace Tiny.Decompiler
             return x;
         }
 
-        public static ulong AssumeLTE(this ulong lhs, ulong rhs) {
+        public static ulong AssumeLTE(this ulong lhs, ulong rhs)
+        {
             if (lhs > rhs) {
                 throw new InternalErrorException(String.Format("Expected a value <= {0}.", rhs));
             }
@@ -51,12 +52,28 @@ namespace Tiny.Decompiler
             }
         }
 
-        public static unsafe void * AssumeNotNull(void * pValue)
+        public static unsafe void* AssumeNotNull(void* pValue)
         {
             if (pValue == null) {
                 throw new InternalErrorException("Unexpected null value.");
             }
             return pValue;
+        }
+
+        public static IntPtr AssumeNotNull(this IntPtr value)
+        {
+            if (value == null) {
+                throw new InternalErrorException("Unexpected null value.");
+            }
+            return value;
+        }
+
+        public static T AssumeNotNull<T>(this T value) where T : class
+        {
+            if (value == null) {
+                throw new InternalErrorException("Unexpected null value.");
+            }
+            return value;
         }
     }
 }

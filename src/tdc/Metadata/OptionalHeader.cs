@@ -169,7 +169,9 @@ namespace Tiny.Decompiler.Metadata
 
         public bool Verify(uint fileSize, PEHeader * pPEHeader)
         {
-            Util.AssumeNotNull(pPEHeader);
+            Util.AssumeNotNull((void *)pPEHeader);
+            fileSize.AssumeGTZ();
+
             if (CodeSize > ImageSize) {
                 return false;
             }

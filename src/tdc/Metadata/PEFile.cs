@@ -1,4 +1,3 @@
-// 
 // PEFile.cs
 //  
 // Author:
@@ -25,8 +24,7 @@
 // THE SOFTWARE.
 using System;
 using System.IO;
-using System.IO.MemoryMappedFiles;
-using Microsoft.Win32.SafeHandles;
+using Tiny.Decompiler.Interop;
 
 namespace Tiny.Decompiler.Metadata
 {
@@ -46,31 +44,22 @@ namespace Tiny.Decompiler.Metadata
 
         }
 
-        MemoryMappedFile m_memoryMappedFile;
-        MemoryMappedViewAccessor m_viewAccessor;
-        SafeMemoryMappedViewHandle m_viewHandle;
+        IUnsafeMemoryMap m_memoryMap;
+        readonly byte * m_pData;
+        readonly uint m_fileSize;
 
-        byte * m_pData;
-        uint m_fileSize;
         private PEHeader * m_peHeader;
         private OptionalHeader m_optionalHeader;
 
         public PEFile(String fileName)
         {
             try {
-                m_memoryMappedFile = MemoryMappedFile.CreateFromFile(fileName,FileMode.Open);
-                m_viewAccessor = m_memoryMappedFile.CreateViewAccessor();
-                m_viewHandle = m_viewAccessor.SafeMemoryMappedViewHandle;
-                m_viewHandle.AcquirePointer(ref m_pData);
-                try {
-                    m_fileSize = checked((uint)m_viewAccessor.Capacity);
-                }
-                catch (OverflowException) {
-                    throw new FileLoadException("The assembly is too large.", fileName);
-                }
+                m_memoryMap = NativePlatform.Default.MemoryMapFile(fileName);
+                m_pData = (byte *)m_memoryMap.Data;
+                m_fileSize = m_memoryMap.Size;
 
-                if (! (VerifyPEHeader() && VerifyOptionalHeader())) {
-                    throw new FileLoadException("The provided file is not a managed executable, or is not supported by tdc.");
+                if (!(VerifyPEHeader() && VerifyOptionalHeader())) {
+                    throw new FileLoadException("The file is not a valid managed executable.", fileName);
                 }
             }
             catch (Exception ex) {
@@ -79,41 +68,26 @@ namespace Tiny.Decompiler.Metadata
                     throw;
                 }
                 else {
-                    throw new FileLoadException("Unable to load assembly.", fileName, ex);
+                    throw new FileLoadException("Unable to load assembly", fileName, ex);
                 }
             }
         }
 
         private PEHeader * PEHeader {
             get {
-                return m_peHeader ?? (m_peHeader = (PEHeader *)(PESignature + 1));
+                if (m_peHeader == null) {
+                    m_peHeader = (PEHeader*)(PESignature + 1);
+                }
+                return m_peHeader;
             }
         }
 
         public void Dispose()
         {
-            if (m_pData != null && m_viewHandle != null) {
-                m_viewHandle.ReleasePointer();
+            if (m_memoryMap != null) {
+                m_memoryMap.Dispose();
+                m_memoryMap = null;
             }
-
-            if (m_viewHandle != null) {
-                m_viewHandle.Dispose();
-            }
-
-            if (m_viewAccessor != null) {
-                m_viewAccessor.Dispose();
-            }
-
-            if (m_memoryMappedFile != null) {
-                m_memoryMappedFile.Dispose();
-            }
-
-            m_memoryMappedFile = null;
-            m_viewAccessor = null;
-            m_viewHandle = null;
-            m_pData = null;
-            m_peHeader = null;
-            m_optionalHeader = null;
         }
 
         private int * PESignature
