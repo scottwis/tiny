@@ -58,7 +58,7 @@ namespace Tiny.Decompiler.Metadata
                 m_pData = (byte *)m_memoryMap.Data;
                 m_fileSize = m_memoryMap.Size;
 
-                if (!(VerifyPEHeader() && VerifyOptionalHeader())) {
+                if (!(VerifyPEHeader() && VerifyOptionalHeader() && LoadSectionTable() && VerifyCLRHeader())) {
                     throw new FileLoadException("The file is not a valid managed executable.", fileName);
                 }
             }
@@ -67,9 +67,7 @@ namespace Tiny.Decompiler.Metadata
                 if (ex is FileLoadException) {
                     throw;
                 }
-                else {
-                    throw new FileLoadException("Unable to load assembly", fileName, ex);
-                }
+                throw new FileLoadException("Unable to load assembly", fileName, ex);
             }
         }
 
@@ -163,6 +161,16 @@ namespace Tiny.Decompiler.Metadata
 
             return m_optionalHeader.Verify(m_fileSize, PEHeader);
         }
+
+        private bool LoadSectionTable()
+        {
+        }
+
+        private bool VerifyCLRHeader()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
 

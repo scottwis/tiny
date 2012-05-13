@@ -30,7 +30,7 @@ namespace Tiny.Decompiler.Metadata
     //# Defines an enum encapsulating the valid values for the "Magic number" field preceeding the optional header in
     //# a PE/COFF file.
     //#
-    //# Reference: PE/COFF spec version 8.2 p 17
+    //# Reference: PE/COFF spec version 8.2 § 2.4.1
     enum FileFormat : short
     {
         //# A 32 bit executable image.

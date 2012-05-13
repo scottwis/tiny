@@ -27,9 +27,10 @@ using System;
 
 namespace Tiny.Decompiler.Metadata
 {
+    [Flags]
     enum SectionCharacteristics : uint
     {
-        //#error "Define this"
+        #error "Implement this"   
     }
 }
 

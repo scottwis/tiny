@@ -7,3 +7,4 @@ _ReSharper.*
 obj
 *.suo
 src/tiny.sln.DotSettings.user
+docs/~$coff_v8.docx
