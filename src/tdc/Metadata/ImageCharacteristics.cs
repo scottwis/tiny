@@ -30,7 +30,7 @@ namespace Tiny.Decompiler.Metadata
     //# Defines an enum for the "image characteristics" bit mask in the PEHeader
     //# structure of a PE image.
     //#
-    //# Reference: PE/COFF Spec, Version 8.2 pp 15-17
+    //# Reference: PE/COFF Spec, Version 8.2 § 2.3.2
     [Flags]
     enum ImageCharacteristics : ushort
     {

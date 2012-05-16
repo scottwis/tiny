@@ -113,7 +113,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Collections\" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyAttributes.cs" />
     <Compile Include="Interop\NativePlatform.cs" />

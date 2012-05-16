@@ -55,7 +55,7 @@ namespace Tiny.Decompiler.Metadata
         //# The pointer (file offset) to the symbol table. This should always be 0 for any executable image
         //# including managed executables. It only should be non-null for object files.
         //#
-        //# Reference: PE/COFF Spec Version 8.2 p 13
+        //# Reference: PE/COFF Spec Version 8.2 § 2.3
         [FieldOffset(8)]
         public readonly int PointerToSymbolTable;
 
