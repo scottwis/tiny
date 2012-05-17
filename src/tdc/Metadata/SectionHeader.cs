@@ -60,6 +60,11 @@ namespace Tiny.Decompiler.Metadata
 
         [FieldOffset(36)]
         public SectionCharacteristics Characteristics;
+
+        public bool Verify()
+        {
+            #error "Implement this"
+        }
     }
 }
 

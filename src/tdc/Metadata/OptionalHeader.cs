@@ -150,6 +150,8 @@ namespace Tiny.Decompiler.Metadata
         //# We verify that the each entry
         public abstract DataDirectory * DataDirectories { get; }
 
+        public abstract byte* GetAddress();
+
         protected abstract uint LAYOUT_SIZE { get; }
         protected abstract ulong SIZE_MAX { get; }
 

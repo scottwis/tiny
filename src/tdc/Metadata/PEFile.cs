@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 using System;
 using System.IO;
+using BclExtras.Collections;
 using Tiny.Decompiler.Interop;
 
 namespace Tiny.Decompiler.Metadata
@@ -164,11 +165,41 @@ namespace Tiny.Decompiler.Metadata
 
         private bool LoadSectionTable()
         {
+
+            SectionHeader* pLast = null;
+            var pCurrent = (SectionHeader*)(m_optionalHeader.GetAddress() + PEHeader->OptionalHeaderSize);
+            for (int i = 0; i < PEHeader->NumberOfSections; ++i, ++pCurrent) {
+                try {
+                    if (!pCurrent->Verify()) {
+                        return false;
+                    }
+                    if (pLast != null) {
+                        try {
+                            //Per the PE/COFF Spec Version 8.2, § 3:
+                            //    > In an image file, the VAs for sections must be assigned by the linker so that they
+                            //    > are in ascending order and adjacent, and they must be a multiple of the 
+                            //    > SectionAlignment value in the optional header.
+                            //We check the alignment inside the call to Verify(). We check the 
+                            //"ascending order" / adjacney here.
+                            if (pLast->VirtualAddress < pCurrent->VirtualAddress || checked(pLast->VirtualAddress + pLast->VirtualSize) != pCurrent->VirtualAddress) {
+                                return false;
+                            }
+                        }
+                        catch (OverflowException ex) {
+                            return false;
+                        }
+                    }
+                    pLast = pCurrent;
+                } catch (InvalidOperationException) {
+                    return false;
+                }
+            }
+            
         }
 
         private bool VerifyCLRHeader()
         {
-            throw new NotImplementedException();
+            #error "Implement this"
         }
 
     }

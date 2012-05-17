@@ -159,6 +159,11 @@ namespace Tiny.Decompiler.Metadata
         protected override ulong SIZE_MAX {
             get { return ulong.MaxValue; }
         }
+
+        public override byte* GetAddress()
+        {
+            return m_pLayout;
+        }
     }
 }
 
