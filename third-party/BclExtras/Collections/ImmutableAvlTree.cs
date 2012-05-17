@@ -78,6 +78,11 @@ namespace BclExtras.Collections
             {
                 return "Empty";
             }
+
+            protected override ImmutableAvlTree<TKey, TValue> GreatestLowerBoundCore(TKey key)
+            {
+                return this;
+            }
         }
 
         private static readonly ImmutableAvlTree<TKey, TValue> s_empty = new EmptyAvlTree();
@@ -219,6 +224,36 @@ namespace BclExtras.Collections
         {
             TValue value;
             return TryFind(key, out value);
+        }
+
+        public Option<TValue> GreatestLowerBound(TKey key)
+        {
+            ImmutableAvlTree<TKey, TValue> ret = GreatestLowerBoundCore(key);
+            if (ret == Empty) {
+                return Option<TValue>.Empty;
+            }
+            return Option.Create(ret.Value);
+        }
+
+        protected virtual ImmutableAvlTree<TKey, TValue> GreatestLowerBoundCore(TKey key)
+        {
+            var comp = key.CompareTo(m_key);
+            if (comp == 0) {
+                //A key is it's own "greatest lower bound".
+                return this;
+            }
+            else if (comp < 0) {
+                //If the target node is less than the current node, it is an upper bound, not a lower bound.
+                //Therefore the answer, if it exists, must be in the left sub tree.
+                return m_left.GreatestLowerBoundCore(key);
+            }
+            else {
+                //If the target node is greater than the current node, it a lower bound, but it might not be the largest one.
+                //Look to see if a lower bound exists in the right sub tree. If it does, it must be bigger and is therefore our answer.
+                //Otherwise return the current node.
+                var candidate = m_right.GreatestLowerBoundCore(key);
+                return candidate == Empty ? this : candidate;
+            }
         }
 
         #region Protected
