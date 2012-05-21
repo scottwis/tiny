@@ -31,15 +31,36 @@ namespace Tiny.Decompiler
     {
         public static uint AssumeGTZ(this uint x)
         {
-            if (x == 0) {
-                throw new InternalErrorException("Expected a value > 0");
-            }
-            return x;
+            return x.AssumeGT(0U);
         }
 
-        public static ulong AssumeLTE(this ulong lhs, ulong rhs)
+        public static T AssumeGT<T>(this T lhs, T rhs) where T : IComparable<T>
         {
-            if (lhs > rhs) {
+            if (lhs.CompareTo(rhs) <= 0) {
+                throw new InternalErrorException(string.Format("Expected a value > {0}", rhs));
+            }
+            return lhs;
+        }
+
+        public static T AssumeGTE<T>(this T lhs, T rhs) where T : IComparable<T>
+        {
+            if (lhs.CompareTo(rhs) < 0) {
+                throw new InternalErrorException(String.Format("Expected a value >= {0}", rhs));
+            }
+            return lhs;
+        }
+
+        public static T AssumeLT<T>(this T lhs, T rhs) where T : IComparable<T>
+        {
+            if (lhs.CompareTo(rhs) >= 0) {
+                throw new InternalErrorException(String.Format("Expected a value < {0}", rhs));
+            }
+            return lhs;
+        }
+
+        public static T AssumeLTE<T>(this T lhs, T rhs) where T : IComparable<T>
+        {
+            if (lhs.CompareTo(rhs) > 0) {
                 throw new InternalErrorException(String.Format("Expected a value <= {0}.", rhs));
             }
             return lhs;
@@ -72,6 +93,14 @@ namespace Tiny.Decompiler
         {
             if (value == null) {
                 throw new InternalErrorException("Unexpected null value.");
+            }
+            return value;
+        }
+
+        public static T CheckDefined<T>(this T value, string message)
+        {
+            if (!Enum.IsDefined(typeof(T), value)) {
+                throw new InvalidOperationException(message);
             }
             return value;
         }

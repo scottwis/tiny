@@ -1,4 +1,4 @@
-﻿// PosixPlatform.cs
+﻿// MetadataToken.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +23,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if linux
+using System;
 
-using Tiny.Decompiler.Interop.Win32;
-
-namespace Tiny.Decompiler.Interop.Posix
+namespace Tiny.Decompiler.Metadata
 {
-    sealed unsafe class PosixPlatform : NativePlatform
+    //# A generic implementation of [IToken] that can encode a reference to any valid meta-data table.
+    //# The most-signifigant byte is used to decode the associated table.
+    struct MetadataToken : IToken
     {
-        public override UnsafeWin32MemoryMap MemoryMapFile(string fileName)
+        readonly uint m_value;
+
+        public MetadataToken(uint value)
         {
-            #error Implement this
+            m_value = value;
         }
 
-        public override int StrLen(byte* name, int i)
+        public bool IsNull
         {
-            #error Implement this
+            get { return (0x00FFFFFF & m_value) == 0; }
+        }
+
+        public MetadataTable Table
+        {
+            get
+            {
+                NullCheck();
+                return (MetadataTable)(((0xFF000000) & m_value) >> 24).CheckDefined("Invalid meta-data table.");
+            }
+        }
+
+        public uint Index
+        {
+            get
+            {
+                NullCheck();
+                return ((m_value) & 0x00FFFFFF) - 1;
+            }
+        }
+
+        private void NullCheck()
+        {
+            if (IsNull) {
+                throw new InvalidOperationException("The token is null");
+            }
         }
     }
 }
-
-#endif

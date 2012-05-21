@@ -24,11 +24,11 @@
 // THE SOFTWARE.
 using System;
 using System.IO;
-using BclExtras.Collections;
 using Tiny.Decompiler.Interop;
 
 namespace Tiny.Decompiler.Metadata
 {
+    //# Provides a thread-safe, read-only representation of a managed PEFile, loaded via memory-mapped IO.
     sealed unsafe class PEFile : IDisposable
     {
         public const int MSDosStubSize = 128;
@@ -46,11 +46,12 @@ namespace Tiny.Decompiler.Metadata
         }
 
         IUnsafeMemoryMap m_memoryMap;
-        readonly byte * m_pData;
-        readonly uint m_fileSize;
+        byte * m_pData;
+        uint m_fileSize;
 
         private PEHeader * m_peHeader;
         private OptionalHeader m_optionalHeader;
+        CLRHeader* m_clrHeader;
 
         public PEFile(String fileName)
         {
@@ -87,6 +88,11 @@ namespace Tiny.Decompiler.Metadata
                 m_memoryMap.Dispose();
                 m_memoryMap = null;
             }
+            m_pData = null;
+            m_fileSize = 0;
+            m_peHeader = null;
+            m_optionalHeader = null;
+            m_clrHeader = null;
         }
 
         private int * PESignature
@@ -144,7 +150,7 @@ namespace Tiny.Decompiler.Metadata
                 //For 64 bit images, the optional header size needs to be a little bit larger (than it is for 32 bit
                 //images), but we couldn't know we were a 64 bit image until we examined the "magic number" (file
                 //format) in the OptionalHeader which we do after valiating the PE Header (because it's logically not
-                //part of the PE header, but isdocumented as part of the optional header. We don't read the optional
+                //part of the PE header, but is documented as part of the optional header. We don't read the optional
                 //header (which succeeds the PEHeader) until we know the PEHeader is valid, which at a minimum
                 //means there must be 224 bytes in the optional header. If the PEHEader is not valid, then we can't
                 //read the Optional Header, because it might not exist. In any case, once we know we can reade the
@@ -163,14 +169,53 @@ namespace Tiny.Decompiler.Metadata
             return m_optionalHeader.Verify(m_fileSize, PEHeader);
         }
 
+        private SectionHeader * FindSection(uint virtualAddress)
+        {
+            if (PEHeader->NumberOfSections == 0) {
+                return null;
+            }
+            //1. Find the greatest lower bound of virtualAddress in the section table.
+            var first = SectionTable;
+            var min = SectionTable;
+            var max = SectionTable + PEHeader->NumberOfSections - 1;
+            while (max >= first && max != min) {
+                var mid = (((max - min) + 1) / 2) + min;
+                if (mid->VirtualAddress == virtualAddress) {
+                    return mid;
+                }
+                else if (virtualAddress < mid->VirtualAddress) {
+                    max = mid - 1;
+                }
+                else {
+                    virtualAddress.AssumeGT(mid->VirtualAddress);
+                    min = mid;
+                }
+            }
+            if (max < first) {
+                return null;
+            }
+
+            //2. Verify that the virtual address fits within the found section
+            //(if we select the last section as the glb, the virtual address might be outside it).
+            try {
+                virtualAddress.AssumeGTE(min->VirtualAddress);
+                if (virtualAddress > checked(min->VirtualAddress + min->VirtualSize)) {
+                    return null;
+                }
+            }
+            catch (OverflowException) {
+                return null;
+            }
+            return min;
+        }
+
         private bool LoadSectionTable()
         {
-
             SectionHeader* pLast = null;
-            var pCurrent = (SectionHeader*)(m_optionalHeader.GetAddress() + PEHeader->OptionalHeaderSize);
+            var pCurrent = SectionTable;
             for (int i = 0; i < PEHeader->NumberOfSections; ++i, ++pCurrent) {
                 try {
-                    if (!pCurrent->Verify()) {
+                    if (!pCurrent->Verify(m_optionalHeader, m_pData, m_fileSize, PEHeader))     {
                         return false;
                     }
                     if (pLast != null) {
@@ -181,11 +226,14 @@ namespace Tiny.Decompiler.Metadata
                             //    > SectionAlignment value in the optional header.
                             //We check the alignment inside the call to Verify(). We check the 
                             //"ascending order" / adjacney here.
-                            if (pLast->VirtualAddress < pCurrent->VirtualAddress || checked(pLast->VirtualAddress + pLast->VirtualSize) != pCurrent->VirtualAddress) {
+                            if (
+                                pCurrent->VirtualAddress < pLast->VirtualAddress 
+                                || checked(pLast->VirtualAddress + pLast->GetAlignedVirtualSize(m_optionalHeader)) != pCurrent->VirtualAddress
+                            ) {
                                 return false;
                             }
                         }
-                        catch (OverflowException ex) {
+                        catch (OverflowException) {
                             return false;
                         }
                     }
@@ -194,14 +242,51 @@ namespace Tiny.Decompiler.Metadata
                     return false;
                 }
             }
-            
+            return true;
+        }
+
+        SectionHeader* SectionTable
+        {
+            get { return (SectionHeader*)(m_optionalHeader.GetAddress() + PEHeader->OptionalHeaderSize); }
         }
 
         private bool VerifyCLRHeader()
         {
-            #error "Implement this"
-        }
+            //1. Can we find the section containing the CLR header?
+            var runtimeHeader = m_optionalHeader.CLRRuntimeHeader;
+            var pSection = FindSection(runtimeHeader->RVA);
+            if (pSection == null) {
+                return false;
+            }
 
+            //2. Does the section have initialized data?
+            if (pSection->PointerToRawData == 0 || pSection->SizeOfRawData == 0) {
+                return false;
+            }
+
+            //3. Is the CLR header located entirely within the initialized data portion of the section?
+            //Although it is possible that some portion of the header could be placed inside unitialized data,
+            //it is unlikely. Such a case is more likely indicative of a malformed image.
+
+            try {
+                if (checked(runtimeHeader->RVA - pSection->VirtualAddress) > pSection->SizeOfRawData) {
+                    return false;
+                }
+
+                if (
+                    checked(runtimeHeader->RVA - pSection->VirtualAddress + runtimeHeader->Size) 
+                    > pSection->SizeOfRawData
+                ) {
+                    return false;
+                }
+            }
+            catch(OverflowException) {
+                return false;
+            }
+
+            m_clrHeader = (CLRHeader *)((m_pData + (runtimeHeader->RVA - pSection->VirtualAddress)) + pSection->PointerToRawData);
+            return m_clrHeader->Verify(m_optionalHeader);
+        }
     }
 }
 

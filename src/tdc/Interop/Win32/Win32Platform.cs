@@ -79,6 +79,13 @@ namespace Tiny.Decompiler.Interop.Win32
         [DllImport("kernel32", SetLastError = true)]
         public static extern uint GetFileSize(IntPtr hFile, out uint lpFileSizeHigh);
 
+        [DllImport("msvcr110.dll", EntryPoint = "strnlen", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.SysUInt)]
+        public static extern UIntPtr StrNLen(
+            byte * pData, 
+            UIntPtr maxCount
+        );
+
         public override UnsafeWin32MemoryMap MemoryMapFile(string fileName)
         {
             fileName.AssumeNotNull();
@@ -142,6 +149,12 @@ namespace Tiny.Decompiler.Interop.Win32
                 }
                 throw;
             }
+        }
+
+        public override int StrLen(byte* pData, int maxLength)
+        {
+            maxLength.AssumeGTE(0);
+            return checked((int)StrNLen(pData, (UIntPtr) maxLength));
         }
     }
 }

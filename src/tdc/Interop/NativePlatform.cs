@@ -44,5 +44,7 @@ namespace Tiny.Decompiler.Interop
         public static NativePlatform Default { get { return s_default;  } }
 
         public abstract UnsafeWin32MemoryMap MemoryMapFile(string fileName);
+
+        public abstract int StrLen(byte* pStr, int maxCount);
     }
 }

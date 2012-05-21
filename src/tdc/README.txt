@@ -1,7 +1,7 @@
 DOC COMMENTS:
 
 This project doesn't use XML doc comments, mainly because generating good text with them requires a lot of markup,
-and entity escaping. Together they make anything other than trivial doc comments unreadable.
+and entity escaping. Together they make anything other than trivial doc comments unreadable when reading the source code.
 
 I'm not willing to sacrifice code readability for the ability to generate ugly looking web-pages no one will look at.
 
@@ -18,12 +18,13 @@ There are a few conventions we use:
 
 Parameters are described by starting a line with "parameterName: " followed by the parameter documentation. For example:
 
-//# x: The X coordinate fo the circle's radius.
+//# x: The X coordinate for the circle's radius.
 //# y :
-//#     The y coordinate of the circle.
+//#     The y coordinate of the circle's radius.
 //# radius: The radius of the circle.
 
 Links to code elements are specified by placing the symbol name inside "[" and "]" simiar to how links are specified
 in normal mark down. For example:
 
-[System.Collectiosn.Generic.List<int>].
+[System.Collectiosn.Generic.List<int>]
+[System.Collectiosn.Generic.List<int>][list]

@@ -23,11 +23,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
+using Tiny.Decompiler.Interop;
 
 namespace Tiny.Decompiler.Metadata
 {
+    //TODO: Add doc comments.
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct SectionHeader
     {
@@ -61,9 +65,92 @@ namespace Tiny.Decompiler.Metadata
         [FieldOffset(36)]
         public SectionCharacteristics Characteristics;
 
-        public bool Verify()
+        private string GetNameAsString()
         {
-            #error "Implement this"
+
+            fixed (byte* pName = Name) {
+                var length = NativePlatform.Default.StrLen(pName, 8);
+                return new string((sbyte *)pName, 0, length, Encoding.ASCII);
+            }
+        }
+
+        public bool Verify(OptionalHeader header, byte * pFilePointer, uint fileSize, PEHeader * pPeHeader)
+        {
+            //1. The name is not empty.
+            if (GetNameAsString().Trim() == "") {
+                return false;
+            }
+
+            //2. VirtualAddress is a multiple of the section alignment.
+            if (VirtualAddress == 0 || (VirtualAddress % header.SectionAlignment) != 0) {
+                return false;
+            }
+
+            //3. SizeOfRawData is a multiple of the file alignment.
+            if ((SizeOfRawData % header.FileAlignment) != 0) {
+                return false;
+            }
+            
+            //4. PointerToRawData is a multiple of the file alignment
+            if ((PointerToRawData % header.FileAlignment) != 0) {
+                return false;
+            }
+
+            //5. PointerToRawData == 0 <-> SizeOfRawData == 0
+            if ((PointerToRawData == 0) != (SizeOfRawData == 0)) {
+                return false;
+            }
+
+            //6. If PointerToRawData is not null, it must fit inside the file.
+            try {
+                if (PointerToRawData > fileSize || checked(PointerToRawData + SizeOfRawData) > fileSize) {
+                    return false;
+                }
+            } catch (OverflowException) {
+                return false;
+            }
+
+            //7. PointerToRelocations must be 0.
+            if (PointerToRelocations != 0) {
+                return false;
+            }
+
+            //8. PointerToLineNumbers must be 0.
+            if (PointerToLineNumbers != 0) {
+                return false;
+            }
+
+            //9. NumberOfRelocations must be 0.
+            if (NumberOfRelocations != 0) {
+                return false;
+            }
+
+            //10. NumberOfLineNumbers must be 0.
+            if (NumberOfLineNumbers != 0) {
+                return false;
+            }
+
+            //11. The characteristics must be valid. We seperate out the check for
+            //bits marked as reserved from the check for defined bits that we don't support.
+            if ((Characteristics & SectionCharacteristics.Reserved) != 0) {
+                return false;
+            }
+
+            if ((Characteristics & SectionCharacteristics.DisallowedFlags) != 0) {
+                return false;
+            }
+
+            return true;
+        }
+
+        public uint GetAlignedVirtualSize(OptionalHeader optionalHeader)
+        {
+            return 
+                VirtualSize 
+                + ((
+                    optionalHeader.SectionAlignment 
+                    - (VirtualSize % optionalHeader.SectionAlignment)
+                ) % optionalHeader.SectionAlignment);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// PosixPlatform.cs
+// IToken.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +23,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if linux
-
-using Tiny.Decompiler.Interop.Win32;
-
-namespace Tiny.Decompiler.Interop.Posix
+namespace Tiny.Decompiler.Metadata
 {
-    sealed unsafe class PosixPlatform : NativePlatform
+    //# Defines an interface for a CLR metadata token. A token is an encoding of a table-name, index pair. In
+    //# different contexts in a meta-data file a varying number of bits, and distinct set of value mappings are used
+    //# to encode the table an index is associated with. This interface provides a common abstraction for all of those
+    //# cases.
+    interface IToken
     {
-        public override UnsafeWin32MemoryMap MemoryMapFile(string fileName)
-        {
-            #error Implement this
-        }
+        //# Returns true if the token is null, false otherwise.
+        bool IsNull { get; }
 
-        public override int StrLen(byte* name, int i)
-        {
-            #error Implement this
-        }
+        //# The meta-data table the token reference.
+        //# Throws: [InvalidOperationException] if [IsNull] returns true.
+        MetadataTable Table { get; }
+
+        //# The index within the encoded table. 
+        //# Throws: [InvalidOpeationException] if [IsNull] returns true.
+        uint Index { get; }
     }
 }
-
-#endif

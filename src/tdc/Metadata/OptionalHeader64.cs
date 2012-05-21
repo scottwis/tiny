@@ -149,9 +149,9 @@ namespace Tiny.Decompiler.Metadata
         {
             get { return m_pLayout->NumberOfDataDirectories; }
         }
-        public override  DataDirectory * DataDirectories
+        public override  RVAAndSize * DataDirectories
         {
-            get { return (DataDirectory *)(m_pLayout + 1); }
+            get { return (RVAAndSize *)(m_pLayout + 1); }
         }
         protected override uint LAYOUT_SIZE {
             get { return (uint)sizeof(OptionalHeaderLayout64); }
@@ -162,7 +162,7 @@ namespace Tiny.Decompiler.Metadata
 
         public override byte* GetAddress()
         {
-            return m_pLayout;
+            return (byte *)m_pLayout;
         }
     }
 }

@@ -41,6 +41,29 @@ namespace Tiny.Decompiler.Metadata
         //# Furthermore, the PE/COFF spec also says that the "value" 0 is reserved,
         //# so tdc will also reject any image with a [SectionHeader.Characteristics][Characteristics] value of 0.
         Reserved  = 0xE0517,
+
+        DisallowedFlags = 
+            IMAGE_SCN_TYPE_NO_PAD
+            | IMAGE_SCN_LNK_OTHER
+            | IMAGE_SCN_LNK_INFO
+            | IMAGE_SCN_LNK_REMOVE
+            | IMAGE_SCN_LNK_COMDAT
+            | IMAGE_SCN_MEM_16BIT //no arm support at the moment?
+            | IMAGE_SCN_ALIGN_1BYTES
+            | IMAGE_SCN_ALIGN_2BYTES
+            | IMAGE_SCN_ALIGN_4BYTES
+            | IMAGE_SCN_ALIGN_8BYTES
+            | IMAGE_SCN_ALIGN_16BYTES
+            | IMAGE_SCN_ALIGN_32BYTES
+            | IMAGE_SCN_ALIGN_64BYTES
+            | IMAGE_SCN_ALIGN_128BYTES
+            | IMAGE_SCN_ALIGN_256BYTES
+            | IMAGE_SCN_ALIGN_512BYTES
+            | IMAGE_SCN_ALIGN_1024BYTES
+            | IMAGE_SCN_ALIGN_2048BYTES
+            | IMAGE_SCN_ALIGN_4096BYTES
+            | IMAGE_SCN_ALIGN_8192BYTES,
+
         //# Indicates that a section should not be padded to the next boundary. This flag is obsolete and is replaced
         //# by IMAGE_SCN_ALIGN_1BYTES. It is valid only for object files. The tiny decompiler will reject any image
         //# with a section that has this bit set to 1.

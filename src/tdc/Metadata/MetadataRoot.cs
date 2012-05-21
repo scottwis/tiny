@@ -1,4 +1,4 @@
-﻿// PosixPlatform.cs
+// MetadataRoot.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +23,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if linux
-
-using Tiny.Decompiler.Interop.Win32;
-
-namespace Tiny.Decompiler.Interop.Posix
+namespace Tiny.Decompiler.Metadata
 {
-    sealed unsafe class PosixPlatform : NativePlatform
+    struct MetadataRoot
     {
-        public override UnsafeWin32MemoryMap MemoryMapFile(string fileName)
-        {
-            #error Implement this
-        }
-
-        public override int StrLen(byte* name, int i)
-        {
-            #error Implement this
-        }
     }
 }
-
-#endif

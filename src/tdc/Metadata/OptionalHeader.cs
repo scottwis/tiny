@@ -148,14 +148,14 @@ namespace Tiny.Decompiler.Metadata
 
         //# Returns a pointer to array of DataDirectories stored in the header.
         //# We verify that the each entry
-        public abstract DataDirectory * DataDirectories { get; }
+        public abstract RVAAndSize * DataDirectories { get; }
 
         public abstract byte* GetAddress();
 
         protected abstract uint LAYOUT_SIZE { get; }
         protected abstract ulong SIZE_MAX { get; }
 
-        private DataDirectory * GetDataDirectory(int index)
+        private RVAAndSize * GetDataDirectory(int index)
         {
             if (index >= 0 && index < NumberOfDataDirectories) {
                 return DataDirectories + index;
@@ -165,7 +165,7 @@ namespace Tiny.Decompiler.Metadata
 
         //# A convience property for accessing the CLR Header.
         //# This is equivalent to `DataDirectories[14]`.
-        public DataDirectory * CLRRuntimeHeader {
+        public RVAAndSize * CLRRuntimeHeader {
             get { return GetDataDirectory(14); }
         }
 
@@ -230,7 +230,7 @@ namespace Tiny.Decompiler.Metadata
                 if (
                     HeaderSize < checked(
                         LAYOUT_SIZE
-                        + (NumberOfDataDirectories * sizeof(DataDirectory))
+                        + (NumberOfDataDirectories * sizeof(RVAAndSize))
                         + sizeof(PEHeader)
                         + PEFile.MSDosStubSize
                         + (pPEHeader->NumberOfSections * sizeof(SectionHeader))
@@ -285,6 +285,10 @@ namespace Tiny.Decompiler.Metadata
             }
 
             if (CLRRuntimeHeader->IsZero()) {
+                return false;
+            }
+
+            if (CLRRuntimeHeader->Size < sizeof(CLRHeader)) {
                 return false;
             }
 
