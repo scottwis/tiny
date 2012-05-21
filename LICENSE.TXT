@@ -7,3 +7,7 @@ Exceptions
 docs/ECMA-335.pdf is Copyright (C) 2010 Ecma International and is distrubted under it's own license. Please see the document for details.
 
 docs/pecoff_v8.docx is Copyright (C) 2010 Microsoft Coproporation and is distrubted under it's own license. Please see the document for details.
+
+third-party/BclExtras is distrubted under the Microsoft Public License. See 
+http://archive.msdn.microsoft.com/BclExtras/Project/License.aspx for more info
+
