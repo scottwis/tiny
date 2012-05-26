@@ -110,7 +110,7 @@ namespace Tiny.Decompiler.Metadata
                 return false;
             }
             //3. The total size of the meta-data must be at least large enough to store the metadata root.
-            if (Metadata.RVA == 0 || Metadata.Size < sizeof(MetadataRoot)) {
+            if (Metadata.RVA == 0 || Metadata.Size < MetadataRoot.MinSize) {
                 return false;
             }
 

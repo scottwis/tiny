@@ -144,6 +144,8 @@
     <Compile Include="Metadata\OptionalHeader64.cs" />
     <Compile Include="Metadata\RVAAndSize.cs" />
     <Compile Include="Metadata\MetadataToken.cs" />
+    <Compile Include="Metadata\StreamHeader.cs" />
+    <Compile Include="Metadata\StreamID.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="InternalErrorException.cs" />
     <Compile Include="Program.cs" />

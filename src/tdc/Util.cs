@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Tiny.Decompiler
 {
@@ -103,6 +105,19 @@ namespace Tiny.Decompiler
                 throw new InvalidOperationException(message);
             }
             return value;
+        }
+
+        public static T CheckNull<T>(this T obj, string parameterName) where T : class
+        {
+            if (obj == null) {
+                throw new ArgumentNullException(parameterName);
+            }
+            return obj;
+        }
+
+        public static IDictionary<K,V> AsReadOnly<K, V>(this IDictionary<K,V> d)
+        {
+            return new ReadOnlyDictionary<K, V>(d.CheckNull("d"));
         }
     }
 }

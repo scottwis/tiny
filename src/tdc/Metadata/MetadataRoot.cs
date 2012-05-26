@@ -23,9 +23,91 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Runtime.InteropServices;
+using Tiny.Decompiler.Interop;
+
 namespace Tiny.Decompiler.Metadata
 {
-    struct MetadataRoot
+    //# Defines the layout of the "Metadata root" header in a managed PE/COFF file.
+    //# Reference: ECMA-335, 5th Edition, Partition II, § 24.2.1
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct MetadataRoot
     {
+        public static uint MinSize = 20;
+
+        //# The magic signature for CLR metadata. Must be 0x424A5342
+        [FieldOffset(0)]
+        public readonly uint Signature;
+
+        //# Ignored.
+        [FieldOffset(4)]
+        public readonly ushort MajorVersion;
+
+        //# Ignored.
+        [FieldOffset(6)]
+        public readonly ushort MinorVersion;
+
+        //# Reserved. Must be zero. The tiny decompiler will reject any image where this field is not 0.
+        [FieldOffset(8)]
+        public readonly uint Reserved;
+
+        //# The length of the version string, rounded up to the next 4 byte boundary.
+        [FieldOffset(12)]
+        public readonly uint Length;
+
+        public string GetVersion()
+        {
+            if (Length > 255) {
+                throw new InvalidOperationException("The version string has an invalid length and cannot be read.");
+            }
+            fixed  (uint * pLength = &Length) {
+                return new string(
+                    (sbyte *)(pLength + 1),
+                    0, 
+                    NativePlatform.Default.StrLen((byte *)(pLength + 1), checked((int)Length))
+                );
+            }
+        }
+
+        //# Reserved. Must be zero. The tiny decompiler will reject any image where this field is not 0.
+        public ushort Flags
+        {
+            get
+            {
+                if (Length > 255) {
+                    throw new InvalidOperationException("Invalid meta-data root.");
+                }
+                fixed (uint * pLength = &Length) {
+                    return *(ushort*) ((byte *)pLength + Length);
+                }
+            }
+        }
+
+        //# The number of stream headers.
+        public ushort NumberOfStreams
+        {
+            get
+            {
+                if (Length > 255) {
+                    throw new InvalidOperationException("Invalid meta-data root.");
+                }
+                fixed (uint* pLength = &Length) {
+                    return *(((ushort*) ((byte*) pLength + Length)) + 1);
+                }
+            }
+        }
+
+        //# Returns a pointer to the FirstStreamHeader. StreamHeaders are variable length, so they must be read
+        //# sequentally.
+        public StreamHeader * FirstStreamHeader
+        {
+            get
+            {
+                fixed (uint *pLength = &Length) {
+                    return (StreamHeader*) ((byte*) pLength + Length + 4);
+                }
+            }
+        }
     }
 }
