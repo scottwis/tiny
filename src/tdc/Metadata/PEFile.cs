@@ -24,6 +24,8 @@
 // THE SOFTWARE.
 using System;
 using System.IO;
+using System.Threading;
+using BclExtras.Collections;
 using Tiny.Decompiler.Interop;
 
 namespace Tiny.Decompiler.Metadata
@@ -49,9 +51,12 @@ namespace Tiny.Decompiler.Metadata
         byte * m_pData;
         uint m_fileSize;
 
-        private PEHeader * m_peHeader;
-        private OptionalHeader m_optionalHeader;
+        PEHeader* m_peHeader;
+        OptionalHeader m_optionalHeader;
         CLRHeader* m_clrHeader;
+        StreamHeader*[] m_streams;
+        volatile ImmutableAvlTree<uint, string> m_userStrings = ImmutableAvlTree<uint, string>.Empty;
+        MetadataRoot* m_metadataRoot;
 
         public PEFile(String fileName)
         {
@@ -60,7 +65,7 @@ namespace Tiny.Decompiler.Metadata
                 m_pData = (byte *)m_memoryMap.Data;
                 m_fileSize = m_memoryMap.Size;
 
-                if (!(VerifyPEHeader() && VerifyOptionalHeader() && LoadSectionTable() && VerifyCLRHeader())) {
+                if (!(VerifyPEHeader() && VerifyOptionalHeader() && LoadSectionTable() && VerifyCLRHeader() && VerifyMetadataRoot())) {
                     throw new FileLoadException("The file is not a valid managed executable.", fileName);
                 }
             }
@@ -93,6 +98,8 @@ namespace Tiny.Decompiler.Metadata
             m_peHeader = null;
             m_optionalHeader = null;
             m_clrHeader = null;
+            m_streams = null;
+            m_userStrings = null;
         }
 
         private int * PESignature
@@ -286,6 +293,66 @@ namespace Tiny.Decompiler.Metadata
 
             m_clrHeader = (CLRHeader *)((m_pData + (runtimeHeader->RVA - pSection->VirtualAddress)) + pSection->PointerToRawData);
             return m_clrHeader->Verify(m_optionalHeader);
+        }
+
+        bool VerifyMetadataRoot()
+        {
+            //Verify that the contents of the meta-data root, and each stream header are valid. Also, indexes the
+            //stream headers.
+            return false;
+        }
+
+        //# Read a string at the specified offset from the "#Strings" heap. Results are cached, so subsequent reads of
+        //# the same offset will return the same string instance.
+        String ReadSystemString(uint offset)
+        {
+            string ret;
+            var stringMap = m_userStrings;
+            //Check to see if the string at the given offset has already been cached
+            if (! stringMap.TryFind(offset, out ret)) {
+                if (StringStream == null || offset > StringStream->Size) {
+                    throw new ArgumentOutOfRangeException("offset", "Invalid user string offset");
+                }
+
+                //Read and create the string. Note that we take care to only do this once.
+                var pString = ((byte*) m_metadataRoot + StringStream->Offset) + offset;
+                var length = NativePlatform.Default.StrLen(pString, checked((int) StringStream->Size - (int) offset));
+                var str = new string((sbyte*) pString, 0, length);
+
+                //Perform a lock free insertion of our generated string into the string cache. 
+                while (true) {
+                    #pragma warning disable 420
+                    if (Interlocked.CompareExchange(ref m_userStrings, stringMap.Add(offset, str), stringMap) == stringMap) {
+                    #pragma warning restore 420
+                        return str;
+                    }
+
+                    stringMap = m_userStrings;
+
+                    //Our insertion into the string cache was contentious. Look to see if any of the contending threads
+                    //inserted an entry with the same key we are trying to insert. If they did, return their inserted
+                    //value rather than the new
+                    //string we created. This keeps our results consistent. If one thread sees that 
+                    //ReadSystemString(x) == y, then all other threads will also see ReadSystemString(x) == y).
+                    if (stringMap.TryFind(offset, out ret)) {
+                        return ret;
+                    }
+                }
+            }
+            return ret;
+        }
+
+        StreamHeader * StringStream
+        {
+            get
+            {
+                //If there is no #String stream, then we should not try to read from it.
+                if (m_streams == null || m_streams.Length <= (int)StreamID.Strings) {
+                    return null;
+                }
+
+                return m_streams[(int) StreamID.Strings];
+            }
         }
     }
 }

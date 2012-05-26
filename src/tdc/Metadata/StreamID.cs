@@ -32,6 +32,7 @@ namespace Tiny.Decompiler.Metadata
         UserStrings,
         Blob,
         Guid,
-        MetadataTables
+        MetadataTables,
+        NUMBER_OF_STREAMS
     }
 }

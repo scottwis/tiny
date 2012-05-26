@@ -61,11 +61,11 @@ namespace Tiny.Decompiler.Metadata
             if (Length > 255) {
                 throw new InvalidOperationException("The version string has an invalid length and cannot be read.");
             }
-            fixed  (uint * pLength = &Length) {
+            fixed  (MetadataRoot * pThis= &this) {
                 return new string(
-                    (sbyte *)(pLength + 1),
+                    (sbyte *)(pThis + 16),
                     0, 
-                    NativePlatform.Default.StrLen((byte *)(pLength + 1), checked((int)Length))
+                    NativePlatform.Default.StrLen((byte *)(pThis + 16), checked((int)Length))
                 );
             }
         }
@@ -78,8 +78,8 @@ namespace Tiny.Decompiler.Metadata
                 if (Length > 255) {
                     throw new InvalidOperationException("Invalid meta-data root.");
                 }
-                fixed (uint * pLength = &Length) {
-                    return *(ushort*) ((byte *)pLength + Length);
+                fixed (MetadataRoot * pThis = &this) {
+                    return *(ushort*) ((byte *)pThis + Length + 16);
                 }
             }
         }
@@ -92,8 +92,8 @@ namespace Tiny.Decompiler.Metadata
                 if (Length > 255) {
                     throw new InvalidOperationException("Invalid meta-data root.");
                 }
-                fixed (uint* pLength = &Length) {
-                    return *(((ushort*) ((byte*) pLength + Length)) + 1);
+                fixed (MetadataRoot * pThis  = &this) {
+                    return *(ushort*) ((byte*) pThis + Length + 18);
                 }
             }
         }
@@ -104,8 +104,9 @@ namespace Tiny.Decompiler.Metadata
         {
             get
             {
-                fixed (uint *pLength = &Length) {
-                    return (StreamHeader*) ((byte*) pLength + Length + 4);
+                fixed (MetadataRoot* pThis = &this)
+                {
+                    return (StreamHeader*)((byte*)pThis + Length + 20);
                 }
             }
         }

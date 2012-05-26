@@ -56,8 +56,8 @@ namespace Tiny.Decompiler.Metadata
         {
             get
             {
-                fixed (uint * pSize = &Size) {
-                    return (byte*) (pSize + 1);
+                fixed (StreamHeader * pThis= &this) {
+                    return ((byte*) pThis) + 8;
                 }
             }
         }

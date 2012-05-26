@@ -156,4 +156,11 @@
     <None Include="app.config" />
     <None Include="README.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\third-party\BclExtras\BclExtras.csproj">
+      <Project>{3b86ef0e-d275-41e1-b423-0a6c3d2434e3}</Project>
+      <Name>BclExtras</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
