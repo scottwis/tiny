@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 namespace Tiny.Decompiler.Metadata
 {
     [StructLayout(LayoutKind.Explicit)]
-    struct MetadataTableHeader
+    unsafe struct MetadataTableHeader
     {
         [FieldOffset(0)]
         public readonly uint Reserved;
@@ -52,9 +52,26 @@ namespace Tiny.Decompiler.Metadata
         [FieldOffset(16)]
         public readonly ulong SortedTables;
 
+
         public uint GetRowCount(MetadataTable table)
         {
-            #error Implement this
+            if ((byte)table >= (sizeof(ulong)*8)) {
+                throw new InvalidOperationException("Invalid meta-data table.");
+            }
+            if (((1ul << (int)table) & ValidTables) == 0) {
+                return 0;
+            }
+
+            fixed (MetadataTableHeader* pThis = &this) {
+                var pRows = (uint *)((byte*) pThis + 20);
+                if (table == 0) {
+                    return pRows[0];
+                }
+                //The index of the row n is the number of 1 bits that preceed position n in the 
+                //valid tables bit mask. So we mask out all bits at or above position n in the valid mask
+                //and then compute the apropriate count.
+                return pRows[(((1ul << (int) table) - 1) & ValidTables).BitCount()];
+            }
         }
 
         public uint Size
