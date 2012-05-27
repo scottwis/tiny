@@ -124,6 +124,26 @@ namespace Tiny.Decompiler
         {
             return checked(((pad - (length%pad))%pad) + length);
         }
+
+        public static int BitCount(this ulong value)
+        {
+            //# This code is a little complex, but it is really fast. Ideally we would just use popcnt, but it's not
+            //# available to us from C#.
+            //#
+            //# See the following for references:
+            //# 1. http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSet64
+            //# 2. http://www.necessaryandsufficient.net/2009/04/optimising-bit-counting-using-iterative-data-driven-development/
+            //# 3. http://en.wikipedia.org/wiki/Hamming_weight
+            //# 4. http://www-cs-faculty.stanford.edu/~knuth/fasc1a.ps.gz
+            const ulong m1 = 0x5555555555555555UL;
+            const ulong m2 = 0x3333333333333333UL;
+            const ulong m4 = 0x0F0F0F0F0F0F0F0FUL;
+
+            value -= ((value >> 1) & m1);
+            value = ((value >> 2) & m2) + (value & m2);
+            value = (value + (value >> 4)) & m4;
+            return (int)((value * 0x0101010101010101UL) >> 56);
+        }
     }
 }
 

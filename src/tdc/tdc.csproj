@@ -130,6 +130,7 @@
     <Compile Include="Metadata\IToken.cs" />
     <Compile Include="Metadata\MetadataRoot.cs" />
     <Compile Include="Metadata\MetadataTable.cs" />
+    <Compile Include="Metadata\MetadataTableHeader.cs" />
     <Compile Include="Metadata\PEFile.cs" />
     <Compile Include="Metadata\PEHeader.cs" />
     <Compile Include="Metadata\MachineType.cs" />
