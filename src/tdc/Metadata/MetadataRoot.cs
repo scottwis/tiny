@@ -115,10 +115,12 @@ namespace Tiny.Decompiler.Metadata
         {
             streams = new StreamHeader *[(int)StreamID.NUMBER_OF_STREAMS];
 
+            //Validate the magic number.
             if (Signature != 0x424A5342) {
                 return false;
             }
 
+            //The reserved DWORD should be zero.
             if (Reserved != 0) {
                 return false;
             }
@@ -186,6 +188,12 @@ namespace Tiny.Decompiler.Metadata
         private bool VerifyVersion()
         {
             var version = GetVersion();
+            if (version.Length > 255) {
+                //If this is > 255, it must be 256, which means there was no null terminator
+                //(we already checked to make sure length <= 266), which means the image is invalid.
+                return false;
+            }
+
             if (version.StartsWith("v4.0.")) {
                 return true;
             }
