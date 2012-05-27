@@ -97,7 +97,7 @@ namespace Tiny.Decompiler.Metadata
                 return false;
             }
 
-            if (HeaderSize < optionalHeader.CLRRuntimeHeader->Size) {
+            if (HeaderSize < optionalHeader.CLRRuntimeHeader.Size) {
                 return false;
             }
 

@@ -145,12 +145,7 @@ namespace Tiny.Decompiler.Metadata
 
         public uint GetAlignedVirtualSize(OptionalHeader optionalHeader)
         {
-            return 
-                VirtualSize 
-                + ((
-                    optionalHeader.SectionAlignment 
-                    - (VirtualSize % optionalHeader.SectionAlignment)
-                ) % optionalHeader.SectionAlignment);
+            return Util.Pad(VirtualSize, optionalHeader.SectionAlignment);
         }
     }
 }

@@ -63,9 +63,9 @@ namespace Tiny.Decompiler.Metadata
             }
             fixed  (MetadataRoot * pThis= &this) {
                 return new string(
-                    (sbyte *)(pThis + 16),
+                    (sbyte *)pThis + 16,
                     0, 
-                    NativePlatform.Default.StrLen((byte *)(pThis + 16), checked((int)Length))
+                    NativePlatform.Default.StrLen((byte *)pThis + 16, checked((int)Length))
                 );
             }
         }
@@ -109,6 +109,96 @@ namespace Tiny.Decompiler.Metadata
                     return (StreamHeader*)((byte*)pThis + Length + 20);
                 }
             }
+        }
+
+        public bool Verify(uint maxSize, out StreamHeader * [] streams)
+        {
+            streams = new StreamHeader *[(int)StreamID.NUMBER_OF_STREAMS];
+
+            if (Signature != 0x424A5342) {
+                return false;
+            }
+
+            if (Reserved != 0) {
+                return false;
+            }
+
+            if (Length > 256 || (Length % 4) != 0) {
+                return false;
+            }
+
+            try {
+                if (checked(Length + MinSize + sizeof(ushort) * 2) > maxSize)
+                {
+                    return false;
+                }
+            }
+            catch (OverflowException) {
+                return false;
+            }
+
+            if (!VerifyVersion()) {
+                return false;
+            }
+
+            if (Flags != 0) {
+                return false;
+            }
+
+            if (NumberOfStreams < 1 || NumberOfStreams > 5) {
+                return false;
+            }
+
+            var pStream = FirstStreamHeader;
+            
+            fixed (MetadataRoot* pThis = &this) {
+                for (var i = 0; i < NumberOfStreams; ++i) {
+                    if (checked((byte*) pStream - (byte*) pThis > maxSize - StreamHeader.MinSize)) {
+                        return false;
+                    }
+                    uint maxLength;
+                    try {
+                        maxLength = checked(maxSize - StreamHeader.MinSize - 4u - (uint) ((byte*) pStream - (byte*) pThis));
+                    }
+                    catch (OverflowException) {
+                        return false;
+                    }
+                    var streamName = pStream->GetNameAsString(maxLength);
+                    StreamID streamID;
+                    if (! StreamHeader.StreamNames.TryGetValue(streamName, out streamID)) {
+                        return false;
+                    }
+                    if (streams[(int)streamID] != null) {
+                        return false;
+                    }
+                    streams[(int) streamID] = pStream;
+                    try {
+                        pStream = (StreamHeader *)checked((byte*) pStream + 8 + checked((uint)streamName.Length + 1).Pad(4));
+                    }
+                    catch (OverflowException) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private bool VerifyVersion()
+        {
+            var version = GetVersion();
+            if (version.StartsWith("v4.0.")) {
+                return true;
+            }
+
+            if (version.StartsWith("Standard CLI ")) {
+                var versionNumStr = version.Substring("Standard CLI ".Length);
+                int versionNum;
+                if (int.TryParse(versionNumStr, out versionNum)) {
+                    return versionNum >= 2005 && versionNum <= 2010;
+                }
+            }
+
+            return false;
         }
     }
 }

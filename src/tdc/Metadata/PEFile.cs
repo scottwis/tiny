@@ -259,47 +259,61 @@ namespace Tiny.Decompiler.Metadata
 
         private bool VerifyCLRHeader()
         {
-            //1. Can we find the section containing the CLR header?
             var runtimeHeader = m_optionalHeader.CLRRuntimeHeader;
-            var pSection = FindSection(runtimeHeader->RVA);
-            if (pSection == null) {
-                return false;
-            }
-
-            //2. Does the section have initialized data?
-            if (pSection->PointerToRawData == 0 || pSection->SizeOfRawData == 0) {
-                return false;
-            }
-
-            //3. Is the CLR header located entirely within the initialized data portion of the section?
-            //Although it is possible that some portion of the header could be placed inside unitialized data,
-            //it is unlikely. Such a case is more likely indicative of a malformed image.
-
-            try {
-                if (checked(runtimeHeader->RVA - pSection->VirtualAddress) > pSection->SizeOfRawData) {
-                    return false;
-                }
-
-                if (
-                    checked(runtimeHeader->RVA - pSection->VirtualAddress + runtimeHeader->Size) 
-                    > pSection->SizeOfRawData
-                ) {
-                    return false;
-                }
-            }
-            catch(OverflowException) {
-                return false;
-            }
-
-            m_clrHeader = (CLRHeader *)((m_pData + (runtimeHeader->RVA - pSection->VirtualAddress)) + pSection->PointerToRawData);
-            return m_clrHeader->Verify(m_optionalHeader);
+            m_clrHeader = (CLRHeader *)Resolve(runtimeHeader);
+            return m_clrHeader != null && m_clrHeader->Verify(m_optionalHeader);
         }
 
         bool VerifyMetadataRoot()
         {
             //Verify that the contents of the meta-data root, and each stream header are valid. Also, indexes the
             //stream headers.
-            return false;
+            m_metadataRoot = (MetadataRoot *)Resolve(m_clrHeader->Metadata);
+            if (m_metadataRoot == null) {
+                return false;
+            }
+            return m_metadataRoot->Verify(m_clrHeader->Metadata.Size, out m_streams);
+        }
+
+        private void * Resolve(RVAAndSize rva)
+        {
+            //1. Can we find the section containing the address
+            Util.Assume(rva.IsConsistent());
+            if (rva.IsZero()) {
+                return null;
+            }
+            var pSection = FindSection(rva.RVA);
+            
+            if (pSection == null)
+            {
+                return null;
+            }
+
+            //2. Does the section have initialized data?
+            if (pSection->PointerToRawData == 0 || pSection->SizeOfRawData == 0)
+            {
+                return null;
+            }
+
+            //3. Is the item located entirely within the initialized data portion of the section?
+            //Although it is possible that some portion could be placed inside unitialized data,
+            //it is unlikely. Such a case is more likely indicative of a malformed image.
+            try
+            {
+                if (checked(rva.RVA - pSection->VirtualAddress) > pSection->SizeOfRawData)
+                {
+                    return null;
+                }
+
+                if (checked(rva.RVA - pSection->VirtualAddress + rva.Size)> pSection->SizeOfRawData) {
+                    return null;
+                }
+            }
+            catch (OverflowException)
+            {
+                return null;
+            }
+            return ((m_pData + (rva.RVA - pSection->VirtualAddress)) + pSection->PointerToRawData);
         }
 
         //# Read a string at the specified offset from the "#Strings" heap. Results are cached, so subsequent reads of

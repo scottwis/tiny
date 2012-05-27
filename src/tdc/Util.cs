@@ -119,6 +119,11 @@ namespace Tiny.Decompiler
         {
             return new ReadOnlyDictionary<K, V>(d.CheckNull("d"));
         }
+
+        public static uint Pad(this uint length, uint pad)
+        {
+            return checked(((pad - (length%pad))%pad) + length);
+        }
     }
 }
 

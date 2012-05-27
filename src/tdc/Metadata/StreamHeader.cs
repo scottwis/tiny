@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Tiny.Decompiler.Interop;
@@ -34,10 +35,12 @@ namespace Tiny.Decompiler.Metadata
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct StreamHeader
     {
+        public static uint MinSize = 12;
+
         public readonly static IDictionary<string, StreamID> StreamNames = new Dictionary<string, StreamID>() {
             {"#Strings", StreamID.Strings},
             {"#US", StreamID.UserStrings},
-            {"#Blog", StreamID.Blob},
+            {"#Blob", StreamID.Blob},
             {"#GUID", StreamID.Guid},
             {"#~", StreamID.MetadataTables}
         }.AsReadOnly();
@@ -64,9 +67,9 @@ namespace Tiny.Decompiler.Metadata
 
         //# Fetches the name of the stream as a managed string. A new string will be allocated each time this method 
         //# is called.
-        public string GetNameAsString()
+        public string GetNameAsString(uint maxLength)
         {
-            var length = NativePlatform.Default.StrLen(Name, 32);
+            var length = NativePlatform.Default.StrLen(Name, Math.Min(32, checked((int)maxLength)));
             return new string((sbyte *)Name, 0, length);
         }
     }

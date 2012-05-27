@@ -165,8 +165,8 @@ namespace Tiny.Decompiler.Metadata
 
         //# A convience property for accessing the CLR Header.
         //# This is equivalent to `DataDirectories[14]`.
-        public RVAAndSize * CLRRuntimeHeader {
-            get { return GetDataDirectory(14); }
+        public RVAAndSize CLRRuntimeHeader {
+            get { return *GetDataDirectory(14); }
         }
 
         public bool Verify(uint fileSize, PEHeader * pPEHeader)
@@ -284,11 +284,11 @@ namespace Tiny.Decompiler.Metadata
                 return false;
             }
 
-            if (CLRRuntimeHeader->IsZero()) {
+            if (CLRRuntimeHeader.IsZero()) {
                 return false;
             }
 
-            if (CLRRuntimeHeader->Size < sizeof(CLRHeader)) {
+            if (CLRRuntimeHeader.Size < sizeof(CLRHeader)) {
                 return false;
             }
 
