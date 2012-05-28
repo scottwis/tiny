@@ -148,7 +148,7 @@ namespace Tiny.Decompiler.Metadata
             }
 
             //No bit above position 0x2c can be set in the ValidTables mask.
-            if ((~((1UL << 0x2d) - 1) & ValidTables) != 0) {
+            if ((~((1UL << (byte)MetadataTable.MAX_TABLE_ID + 1) - 1) & ValidTables) != 0) {
                 return false;
             }
 

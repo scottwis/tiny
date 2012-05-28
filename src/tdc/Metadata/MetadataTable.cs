@@ -66,6 +66,8 @@ namespace Tiny.Decompiler.Metadata
         StandAloneSig = 0x11,
         TypeDef = 0x02,
         TypeRef = 0x01,
-        TypeSpec = 0x1B
+        TypeSpec = 0x1B,
+
+        MAX_TABLE_ID = 0x2c
     }
 }

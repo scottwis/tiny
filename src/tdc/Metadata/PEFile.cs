@@ -33,7 +33,10 @@ namespace Tiny.Decompiler.Metadata
     //# Provides a thread-safe, read-only representation of a managed PEFile, loaded via memory-mapped IO.
     sealed unsafe class PEFile : IDisposable
     {
+        //# The size of the MSDosStub in a PE header, in bytes.
         public const int MSDosStubSize = 128;
+
+        //# The magic number used to identify a PE file.
         private static readonly int s_peSignature;
 
         static PEFile()
@@ -50,6 +53,7 @@ namespace Tiny.Decompiler.Metadata
         IUnsafeMemoryMap m_memoryMap;
         byte * m_pData;
         uint m_fileSize;
+        string m_fullPath;
 
         PEHeader* m_peHeader;
         OptionalHeader m_optionalHeader;
@@ -57,10 +61,15 @@ namespace Tiny.Decompiler.Metadata
         StreamHeader*[] m_streams;
         volatile ImmutableAvlTree<uint, string> m_userStrings = ImmutableAvlTree<uint, string>.Empty;
         MetadataRoot* m_metadataRoot;
+        MetadataTableHeader* m_metadataTableHeader;
+        byte*[] m_tables;
+        Assembly m_assembly;
+        volatile Module m_module;
 
         public PEFile(String fileName)
         {
             try {
+                m_fullPath = new FileInfo(fileName).FullName;
                 m_memoryMap = NativePlatform.Default.MemoryMapFile(fileName);
                 m_pData = (byte *)m_memoryMap.Data;
                 m_fileSize = m_memoryMap.Size;
@@ -118,20 +127,6 @@ namespace Tiny.Decompiler.Metadata
                 }
                 return m_peHeader;
             }
-        }
-
-        public void Dispose()
-        {
-            if (m_memoryMap != null) {
-                m_memoryMap.Dispose();
-                m_memoryMap = null;
-            }
-            m_pData = null;
-            m_fileSize = 0;
-            m_peHeader = null;
-            m_optionalHeader = null;
-            m_clrHeader = null;
-            m_streams = null;
         }
 
         private int * PESignature
@@ -350,8 +345,9 @@ namespace Tiny.Decompiler.Metadata
 
         //# Read a string at the specified offset from the "#Strings" heap. Results are cached, so subsequent reads of
         //# the same offset will return the same string instance.
-        String ReadSystemString(uint offset)
+        public String ReadSystemString(uint offset)
         {
+            CheckDisposed();
             string ret;
             var stringMap = m_userStrings;
             //Check to see if the string at the given offset has already been cached
@@ -400,6 +396,84 @@ namespace Tiny.Decompiler.Metadata
                 return m_streams[(int) StreamID.Strings];
             }
         }
+
+        public bool IsDisposed
+        {
+            get { return m_pData == null; }
+        }
+
+        public Module Module
+        {
+            get 
+            {
+                CheckDisposed();
+                if (m_module == null) {
+                    if (GetRowCout(MetadataTable.Module) == 0 || m_tables == null || m_tables[(int)MetadataTable.Module] == null) {
+                        throw new InvalidOperationException("Missing module table.");
+                    }
+                    var m = new Module((ModuleRow *)m_tables[(int)MetadataTable.Module], this);
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_module, m, null);
+                    #pragma warning restore 420
+                }
+                return m_module;
+            }
+        }
+
+        public uint GetRowCount(MetadataTable table)
+        {
+            CheckDisposed();
+            Util.AssumeNotNull((void *)m_metadataTableHeader);
+            return m_metadataTableHeader->GetRowCount(table);
+        }
+
+        public string FullPath
+        {
+            get
+            {
+                CheckDisposed();
+                return m_fullPath;
+            }
+        }
+
+        private void CheckDisposed()
+        {
+            if (m_pData == null) {
+                throw new ObjectDisposedException("PEFile");
+            }
+        }
+
+        public void Dispose()
+        {
+            m_metadataTableHeader = null;
+            m_pData = null;
+            m_fileSize = 0;
+            m_peHeader = null;
+            m_optionalHeader = null;
+            m_clrHeader = null;
+            m_streams = null;
+            m_fullPath = null;
+
+            if (m_tables != null) {
+                for (int i = 0; i < m_tables.Length; ++i) {
+                    m_tables[i] = null;
+                }
+                m_tables = null;
+            }
+
+            if (m_assembly != null)
+            {
+                m_assembly.Dispose();
+                m_assembly = null;
+            }
+
+            if (m_memoryMap != null)
+            {
+                m_memoryMap.Dispose();
+                m_memoryMap = null;
+            }
+        }
+
     }
 }
 
