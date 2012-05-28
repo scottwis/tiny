@@ -65,7 +65,7 @@ namespace Tiny.Decompiler.Metadata
                 m_pData = (byte *)m_memoryMap.Data;
                 m_fileSize = m_memoryMap.Size;
 
-                if (!(VerifyPEHeader() && VerifyOptionalHeader() && LoadSectionTable() && VerifyCLRHeader() && VerifyMetadataRoot())) {
+                if (!(Verify())) {
                     throw new FileLoadException("The file is not a valid managed executable.", fileName);
                 }
             }
@@ -76,6 +76,39 @@ namespace Tiny.Decompiler.Metadata
                 }
                 throw new FileLoadException("Unable to load assembly", fileName, ex);
             }
+        }
+
+        bool Verify()
+        {
+            //This could be a bit more compact if written using &&, but that makes debugging more difficult,
+            //so we split them out into seperate if blocks.
+            if (!VerifyPEHeader()) {
+                return false;
+            }
+            
+            if (! VerifyOptionalHeader()) {
+                return false;
+            }
+            
+            if (!LoadSectionTable()) {
+                return false;
+            }
+            if (!VerifyCLRHeader()) {
+                return false;
+            } 
+            if (!VerifyMetadataRoot()) {
+                return false;
+            }
+            if (!LoadMetadataTables()) {
+                return false;
+            }
+            return true;
+        }
+
+        bool LoadMetadataTables()
+        {
+            //TODO: Implement this
+            return false;
         }
 
         private PEHeader * PEHeader {
@@ -99,7 +132,6 @@ namespace Tiny.Decompiler.Metadata
             m_optionalHeader = null;
             m_clrHeader = null;
             m_streams = null;
-            m_userStrings = null;
         }
 
         private int * PESignature
