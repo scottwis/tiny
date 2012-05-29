@@ -107,7 +107,7 @@ namespace Tiny.Decompiler
             return value;
         }
 
-        public static T CheckNull<T>(this T obj, string parameterName) where T : class
+        public static T CheckNotNull<T>(this T obj, string parameterName) where T : class
         {
             if (obj == null) {
                 throw new ArgumentNullException(parameterName);
@@ -117,7 +117,7 @@ namespace Tiny.Decompiler
 
         public static IDictionary<K,V> AsReadOnly<K, V>(this IDictionary<K,V> d)
         {
-            return new ReadOnlyDictionary<K, V>(d.CheckNull("d"));
+            return new ReadOnlyDictionary<K, V>(d.CheckNotNull("d"));
         }
 
         public static uint Pad(this uint length, uint pad)
@@ -143,6 +143,15 @@ namespace Tiny.Decompiler
             value = ((value >> 2) & m2) + (value & m2);
             value = (value + (value >> 4)) & m4;
             return (int)((value * 0x0101010101010101UL) >> 56);
+        }
+
+        public static T AssumeIs<T>(this object o) where T : class
+        {
+            var ret = o as T;
+            if (ret == null) {
+                throw new InternalErrorException(string.Format("Expected an object of type '{0}'",typeof(T)));
+            }
+            return ret;
         }
     }
 }

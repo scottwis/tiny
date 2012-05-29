@@ -63,7 +63,6 @@ namespace Tiny.Decompiler.Metadata
         MetadataRoot* m_metadataRoot;
         MetadataTableHeader* m_metadataTableHeader;
         byte*[] m_tables;
-        Assembly m_assembly;
         volatile Module m_module;
 
         public PEFile(String fileName)
@@ -461,12 +460,6 @@ namespace Tiny.Decompiler.Metadata
                 m_tables = null;
             }
 
-            if (m_assembly != null)
-            {
-                m_assembly.Dispose();
-                m_assembly = null;
-            }
-
             if (m_memoryMap != null)
             {
                 m_memoryMap.Dispose();
@@ -474,6 +467,14 @@ namespace Tiny.Decompiler.Metadata
             }
         }
 
+        public uint GetHeapIndexSize(StreamID streamID)
+        {
+            CheckDisposed();
+            if (m_metadataTableHeader == null) {
+                throw new InvalidOperationException("Missing metadata table header.");
+            }
+            return m_metadataTableHeader->GetHeapIndexSize(streamID);
+        }
     }
 }
 

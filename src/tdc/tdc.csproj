@@ -126,6 +126,8 @@
     <Compile Include="Interop\Win32\UnsafeWin32MemoryMap.cs" />
     <Compile Include="Interop\Win32\Win32Platform.cs" />
     <Compile Include="Metadata\Assembly.cs" />
+    <Compile Include="Metadata\AssemblyFlags.cs" />
+    <Compile Include="Metadata\AssemblyRow.cs" />
     <Compile Include="Metadata\CLRHeader.cs" />
     <Compile Include="Metadata\CLRHeaderFlags.cs" />
     <Compile Include="Metadata\IToken.cs" />

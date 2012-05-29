@@ -24,6 +24,9 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Configuration.Assemblies;
+using System.IO;
 using System.Threading;
 
 namespace Tiny.Decompiler.Metadata
@@ -32,20 +35,28 @@ namespace Tiny.Decompiler.Metadata
     sealed unsafe class Assembly : IDisposable
     {
         PEFile m_peFile;
-        volatile ModuleCollection m_modules;
+        ModuleCollection m_modules;
+
+        public Assembly(string fileName)
+        {
+            try {
+                m_peFile = new PEFile(fileName);
+                if (m_peFile.GetRowCount(MetadataTable.Assembly) == 0) {
+                    throw new FileLoadException("Not an assembly", fileName);
+                }
+                m_modules = new ModuleCollection(m_peFile);
+            }
+            catch {
+                Dispose();
+                throw;
+            }
+            
+        }
 
         public ModuleCollection Modules
         {
             get { 
                 CheckDisposed();
-                if (m_modules == null) {
-                    var modules = new ModuleCollection(m_peFile);
-                    #pragma warning disable 420
-                    if (Interlocked.CompareExchange(ref m_modules, modules, null) != null) {
-                        modules.Dispose();
-                    }
-                    #pragma warning restore 420
-                }
                 return m_modules;
             }
         }
@@ -57,8 +68,93 @@ namespace Tiny.Decompiler.Metadata
             }
         }
 
+        public AssemblyHashAlgorithm  HashAlgorithm
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public int MajorVersion
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public int MinorVersion
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public int BuildNumber
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public int RevisionNumber
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public AssemblyFlags Flags
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public IReadOnlyList<byte> PublicKey
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
+        public string Culture
+        {
+            get
+            {
+                CheckDisposed();
+                #error "Implement this"
+            }
+        }
+
         public void Dispose()
         {
+            if (m_peFile != null) {
+                m_peFile.Dispose();
+            }
+
             if (m_modules != null) {
                 m_modules.Dispose();
             }

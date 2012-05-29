@@ -27,8 +27,7 @@ using System;
 
 namespace Tiny.Decompiler.Metadata
 {
-    sealed class Module
+    sealed unsafe class Module
     {
-
     }
 }
