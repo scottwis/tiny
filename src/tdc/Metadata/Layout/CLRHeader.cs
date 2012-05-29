@@ -25,7 +25,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
 
     //# Defines the layout of the CLR header in a managed executable.

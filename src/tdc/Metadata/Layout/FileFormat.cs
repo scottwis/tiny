@@ -1,5 +1,5 @@
 // 
-// RVAAndSize.cs
+// FileFormat.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -24,35 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Diagnostics.Contracts;
-using System.Runtime.InteropServices;
-
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    //# Describes a paired RVA and size used in a PE file. It is used to represent:
-    //# 1. Data directories in the optional PE header.
-    //# Reference: PE/COFF Spec, Vesion 8.2, § 2.4.3
-    //# 2. Pointers in the CLR header
-    //# Reference: ECMA-335 Spec, 5th edition, Partition II §25.3.3
-    [StructLayout(LayoutKind.Explicit)]
-    struct RVAAndSize
+    //# Defines an enum encapsulating the valid values for the "Magic number" field preceeding the optional header in
+    //# a PE/COFF file.
+    //#
+    //# Reference: PE/COFF spec version 8.2 § 2.4.1
+    enum FileFormat : short
     {
-        [FieldOffset(0)]
-        public readonly uint RVA;
-        [FieldOffset(4)]
-        public readonly uint Size;
-
-        [Pure]
-        public bool IsZero()
-        {
-            return RVA == 0 && Size == 0;
-        }
-
-        [Pure]
-        public bool IsConsistent()
-        {
-            return (RVA == 0) == (Size == 0);
-        }
+        //# A 32 bit executable image.
+        PE32 = 0x10b,
+        //# A an extension to PE32 that defines 64 bit RVA (relative virtual address) fields instead of the 32 bit
+        //# values used in PE32. It is used for 64 bit executables. .
+        PE32_PLUS = 0x20b,
+        //# This value is called out in the PE/COFF spec, so it is included here for completeness.
+        //# It is not supported by tdc.
+        ROM_IMAGE = 0x107
     }
 }
 

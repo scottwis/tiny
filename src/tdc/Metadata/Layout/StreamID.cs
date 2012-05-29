@@ -1,4 +1,4 @@
-﻿// MetadataToken.cs
+﻿// StreamID.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,49 +23,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    //# A generic implementation of [IToken] that can encode a reference to any valid meta-data table.
-    //# The most-signifigant byte is used to decode the associated table.
-    struct MetadataToken : IToken
+    //# An enum representing the names of streams that can occur in a managed PE file.
+    enum StreamID
     {
-        readonly uint m_value;
-
-        public MetadataToken(uint value)
-        {
-            m_value = value;
-        }
-
-        public bool IsNull
-        {
-            get { return (0x00FFFFFF & m_value) == 0; }
-        }
-
-        public MetadataTable Table
-        {
-            get
-            {
-                NullCheck();
-                return (MetadataTable)(((0xFF000000) & m_value) >> 24).CheckDefined("Invalid meta-data table.");
-            }
-        }
-
-        public uint Index
-        {
-            get
-            {
-                NullCheck();
-                return ((m_value) & 0x00FFFFFF) - 1;
-            }
-        }
-
-        private void NullCheck()
-        {
-            if (IsNull) {
-                throw new InvalidOperationException("The token is null");
-            }
-        }
+        Strings,
+        UserStrings,
+        Blob,
+        Guid,
+        MetadataTables,
+        NUMBER_OF_STREAMS
     }
 }

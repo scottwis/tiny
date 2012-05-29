@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Tiny.Decompiler.Interop;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
     //# The memory layout of a "StreamHeader" in a managed PE file.
     //# Reference: ECMA-335, 5th Edition, Partition II, § 24.2.2

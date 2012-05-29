@@ -27,7 +27,7 @@ using System;
 using System.Runtime.InteropServices;
 using Tiny.Decompiler.Interop;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
     //# Defines the layout of the "Metadata root" header in a managed PE/COFF file.
     //# Reference: ECMA-335, 5th Edition, Partition II, § 24.2.1

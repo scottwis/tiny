@@ -1,5 +1,5 @@
 // 
-// OptionalHeader64.cs
+// OptionalHeader32.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -14,7 +14,7 @@
 // furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// all copies or substantial portions of     the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,16 +23,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    //# An implementation of [OptionalHeader] for [FileFormat.PE32_PLUS][PE32_PLUS] format files.
-    sealed unsafe class OptionalHeader64 : OptionalHeader
+    //# An implementation of [OptionalHeader] for [FileFormat.PE32][PE32] format files.
+    sealed unsafe class OptionalHeader32 : OptionalHeader
     {
-        private OptionalHeaderLayout64 * m_pLayout;
+        private OptionalHeaderLayout32 * m_pLayout;
 
-        public OptionalHeader64(OptionalHeaderLayout64 * pLayout)
+        public OptionalHeader32(OptionalHeaderLayout32 * pLayout)
         {
             m_pLayout = pLayout;
         }
@@ -154,10 +153,10 @@ namespace Tiny.Decompiler.Metadata
             get { return (RVAAndSize *)(m_pLayout + 1); }
         }
         protected override uint LAYOUT_SIZE {
-            get { return (uint)sizeof(OptionalHeaderLayout64); }
+            get { return (uint)sizeof(OptionalHeaderLayout32); }
         }
         protected override ulong SIZE_MAX {
-            get { return ulong.MaxValue; }
+            get { return uint.MaxValue; }
         }
 
         public override byte* GetAddress()

@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
     //# Defines an interface for a CLR metadata token. A token is an encoding of a table-name, index pair. In
     //# different contexts in a meta-data file a varying number of bits, and distinct set of value mappings are used

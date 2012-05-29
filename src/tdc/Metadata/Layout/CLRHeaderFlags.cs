@@ -25,7 +25,7 @@
 
 using System;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
     //# An enum defining the set of "known" flags used in the [CLRHeader.Flags] field. 
     //# Reference: ECMA 335 Spec, 5th Edition, Partition II § 25.3.3.1.

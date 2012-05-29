@@ -1,8 +1,9 @@
-ï»¿// StreamID.cs
+// 
+// RVAAndSize.cs
 //  
 // Author:
-//     Scott Wisniewski <scott@scottdw2.com>
-//  
+//       Scott Wisniewski <scott@scottdw2.com>
+// 
 // Copyright (c) 2012 Scott Wisniewski
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -11,10 +12,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-//  
+// 
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-//  
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,16 +24,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Tiny.Decompiler.Metadata
+using System.Diagnostics.Contracts;
+using System.Runtime.InteropServices;
+
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    //# An enum representing the names of streams that can occur in a managed PE file.
-    enum StreamID
+    //# Describes a paired RVA and size used in a PE file. It is used to represent:
+    //# 1. Data directories in the optional PE header.
+    //# Reference: PE/COFF Spec, Vesion 8.2, § 2.4.3
+    //# 2. Pointers in the CLR header
+    //# Reference: ECMA-335 Spec, 5th edition, Partition II §25.3.3
+    [StructLayout(LayoutKind.Explicit)]
+    struct RVAAndSize
     {
-        Strings,
-        UserStrings,
-        Blob,
-        Guid,
-        MetadataTables,
-        NUMBER_OF_STREAMS
+        [FieldOffset(0)]
+        public readonly uint RVA;
+        [FieldOffset(4)]
+        public readonly uint Size;
+
+        [Pure]
+        public bool IsZero()
+        {
+            return RVA == 0 && Size == 0;
+        }
+
+        [Pure]
+        public bool IsConsistent()
+        {
+            return (RVA == 0) == (Size == 0);
+        }
     }
 }
+

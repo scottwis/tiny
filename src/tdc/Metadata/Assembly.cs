@@ -27,7 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration.Assemblies;
 using System.IO;
-using System.Threading;
+using Tiny.Decompiler.Metadata.Layout;
 
 namespace Tiny.Decompiler.Metadata
 {
@@ -36,6 +36,7 @@ namespace Tiny.Decompiler.Metadata
     {
         PEFile m_peFile;
         ModuleCollection m_modules;
+        AssemblyRow* m_assemblyRow;
 
         public Assembly(string fileName)
         {
@@ -73,7 +74,7 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                return m_assemblyRow->HashAlgorithm;
             }
         }
 
@@ -82,7 +83,7 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                return m_assemblyRow->MajorVersion;
             }
         }
 
@@ -91,7 +92,7 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                return m_assemblyRow->MinorVersion;
             }
         }
 
@@ -100,7 +101,7 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                return m_assemblyRow->BuildNumber;
             }
         }
 
@@ -109,7 +110,7 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                return m_assemblyRow->RevisionNumber;
             }
         }
 
@@ -118,7 +119,7 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                return m_assemblyRow->Flags;
             }
         }
 
@@ -127,7 +128,11 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                uint index = m_assemblyRow->GetPublicKeyIndex(m_peFile);
+                if (index == 0) {
+                    return null;
+                }
+                return m_peFile.ReadBlob(index);
             }
         }
 
@@ -136,7 +141,11 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                uint index = m_assemblyRow->GetNameOffset(m_peFile);
+                if (index == 0) {
+                    return null;
+                }
+                return m_peFile.ReadSystemString(index);
             }
         }
 
@@ -145,7 +154,11 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                #error "Implement this"
+                uint index = m_assemblyRow->GetCultureOffset(m_peFile);
+                if (index == 0) {
+                    return null;
+                }
+                return m_peFile.ReadSystemString(index);
             }
         }
 
@@ -161,6 +174,7 @@ namespace Tiny.Decompiler.Metadata
 
             m_modules = null;
             m_peFile = null;
+            m_assemblyRow = null;
         }
     }
 }

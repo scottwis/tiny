@@ -26,7 +26,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
     //# Defines the layout of the "header" at the begining of the "#~"(metadata tables) stream in a managed PE file.
     //# Reference: ECMA-335, 5th Edition, Partition II § 24.2.6

@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
     //# Defines an enum identifying the meta-data tables present in a managed executable.
     //# Reference: ECMA-335 Spec, 5th Edition, Partion II, §§ 22.2-22.39

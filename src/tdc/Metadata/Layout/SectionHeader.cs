@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Tiny.Decompiler.Interop;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
     //TODO: Add doc comments.
     [StructLayout(LayoutKind.Explicit)]
