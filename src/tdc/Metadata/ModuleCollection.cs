@@ -83,9 +83,7 @@ namespace Tiny.Decompiler.Metadata
 
         private void LoadModule(int index)
         {
-            if (m_otherModules[index] == null) {
-                
-            }
+            #error "Implement this"
         }
 
         //# Cleans up native resources used by the module collection.
