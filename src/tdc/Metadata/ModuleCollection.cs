@@ -48,7 +48,7 @@ namespace Tiny.Decompiler.Metadata
         void CheckDisposed()
         {
             if (m_mainFile == null || m_mainFile.IsDisposed) {
-                throw new ObjectDisposedException();
+                throw new ObjectDisposedException("ModuleCollection");
             }
         }
 
@@ -81,9 +81,19 @@ namespace Tiny.Decompiler.Metadata
             }
         }
 
-        private void LoadModule(int index)
+        private unsafe void LoadModule(int index)
         {
-            #error "Implement this"
+            if (m_otherModules[index] == null) {
+                var f = m_mainFile.GetFileRow(index);
+                if ((f->Flags & FileAttributes.ContainsNoMetadata) != 0) {
+                    m_otherModules[index] = Module.CreateNonMetadataModule(m_mainFile.ReadSystemString(
+                        f->GetNameOffset(m_mainFile)
+                    ));
+                }
+                else {
+                    m_otherModules[index] = new PEFile(m_mainFile.ReadSystemString(f->GetNameOffset(m_mainFile)));
+                }
+            }
         }
 
         //# Cleans up native resources used by the module collection.

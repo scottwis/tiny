@@ -130,7 +130,10 @@
     <Compile Include="Metadata\Layout\AssemblyRow.cs" />
     <Compile Include="Metadata\Layout\CLRHeader.cs" />
     <Compile Include="Metadata\Layout\CLRHeaderFlags.cs" />
+    <Compile Include="Metadata\Layout\CodedIndexType.cs" />
     <Compile Include="Metadata\Layout\DllCharacteristics.cs" />
+    <Compile Include="Metadata\Layout\File.cs" />
+    <Compile Include="Metadata\Layout\FileAttributes.cs" />
     <Compile Include="Metadata\Layout\FileFormat.cs" />
     <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
     <Compile Include="Metadata\Layout\ImageSubsystem.cs" />
@@ -140,6 +143,7 @@
     <Compile Include="Metadata\Layout\MetadataTable.cs" />
     <Compile Include="Metadata\Layout\MetadataTableHeader.cs" />
     <Compile Include="Metadata\Layout\MetadataToken.cs" />
+    <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\OptionalHeader.cs" />
     <Compile Include="Metadata\Layout\OptionalHeader32.cs" />
     <Compile Include="Metadata\Layout\OptionalHeader32Layout.cs" />

@@ -133,7 +133,7 @@ namespace Tiny.Decompiler.Metadata.Layout
                 return false;
             }
 
-            if (MinorVersion != 2) {
+            if (MinorVersion != 0) {
                 return false;
             }
 
@@ -149,11 +149,6 @@ namespace Tiny.Decompiler.Metadata.Layout
 
             //No bit above position 0x2c can be set in the ValidTables mask.
             if ((~((1UL << (byte)MetadataTable.MAX_TABLE_ID + 1) - 1) & ValidTables) != 0) {
-                return false;
-            }
-
-            //A table should not be marked as sorted if it is not present.
-            if ((~ValidTables & SortedTables) != 0) {
                 return false;
             }
 

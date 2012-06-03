@@ -1,4 +1,4 @@
-ï»¿// Module.cs
+// FileAttributes.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -24,28 +24,14 @@
 // THE SOFTWARE.
 
 using System;
-using Tiny.Decompiler.Metadata.Layout;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    sealed unsafe class Module
+    //# Defines an enum describin the valid bit values of the [FileRow.Flags] field.
+    //# reference: ECMA-335, 5th edition, Partition II, § 23.1.6
+    [Flags]
+    enum FileAttributes : uint
     {
-        private Module(ModuleRow* moduleRow, PEFile peFile)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
-
-        public static Module CreateNonMetadataModule(string name)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
-
-        public static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
+        ContainsNoMetadata = 0x1
     }
 }

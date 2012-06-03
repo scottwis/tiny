@@ -1,4 +1,4 @@
-﻿// Module.cs
+﻿// CodedIndexType.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,29 +23,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using Tiny.Decompiler.Metadata.Layout;
-
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    sealed unsafe class Module
+    //# An enum identifying the set of "coded index types" present in a metadata file.
+    //# Reference: ECMA-335, 5th Edition, Partition II, § 24.2.6
+    enum CodedIndexType
     {
-        private Module(ModuleRow* moduleRow, PEFile peFile)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
-
-        public static Module CreateNonMetadataModule(string name)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
-
-        public static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
+        TypeDefOrRef,
+        HasConstant,
+        HasCustomAttribute,
+        HasFieldMarshal,
+        HasDeclSecurity,
+        MemberRefParent,
+        HasSemantics,
+        MethodDefOrRef,
+        MemberForwarded,
+        Implementation,
+        CustomAttributeType,
+        ResolutionScope,
+        TypeOrMethodDef,
+        NUMBER_OF_CODED_INDEX_TYPES
     }
 }

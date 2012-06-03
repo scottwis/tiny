@@ -37,14 +37,23 @@ namespace Tiny.Decompiler.Metadata
         PEFile m_peFile;
         ModuleCollection m_modules;
         AssemblyRow* m_assemblyRow;
+        string m_name;
+        IReadOnlyList<byte> m_publicKey;
+        string m_culture;
 
         public Assembly(string fileName)
         {
             try {
                 m_peFile = new PEFile(fileName);
-                if (m_peFile.GetRowCount(MetadataTable.Assembly) == 0) {
+
+                var assemblyRowCount = m_peFile.GetRowCount(MetadataTable.Assembly);
+                if (assemblyRowCount == 0) {
                     throw new FileLoadException("Not an assembly", fileName);
                 }
+                if (assemblyRowCount > 1) {
+                    throw new FileLoadException("Too many rows in the assembly table.");
+                }
+                
                 m_modules = new ModuleCollection(m_peFile);
             }
             catch {
@@ -128,11 +137,11 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                uint index = m_assemblyRow->GetPublicKeyIndex(m_peFile);
-                if (index == 0) {
-                    return null;
+                if (m_publicKey == null) {
+                    uint index = m_assemblyRow->GetPublicKeyOffset(m_peFile);
+                    m_publicKey= m_peFile.ReadBlob(index);
                 }
-                return m_peFile.ReadBlob(index);
+                return m_publicKey;
             }
         }
 
@@ -141,11 +150,11 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                uint index = m_assemblyRow->GetNameOffset(m_peFile);
-                if (index == 0) {
-                    return null;
+                if (m_name == null) {
+                    var index = m_assemblyRow->GetNameOffset(m_peFile);
+                    m_name = m_peFile.ReadSystemString(index);
                 }
-                return m_peFile.ReadSystemString(index);
+                return m_name;
             }
         }
 
@@ -154,11 +163,11 @@ namespace Tiny.Decompiler.Metadata
             get
             {
                 CheckDisposed();
-                uint index = m_assemblyRow->GetCultureOffset(m_peFile);
-                if (index == 0) {
-                    return null;
+                if (m_culture == null) {
+                    var index = m_assemblyRow->GetCultureOffset(m_peFile);
+                    m_culture = m_peFile.ReadSystemString(index);
                 }
-                return m_peFile.ReadSystemString(index);
+                return m_culture;
             }
         }
 

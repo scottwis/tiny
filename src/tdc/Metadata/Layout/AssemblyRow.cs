@@ -57,7 +57,7 @@ namespace Tiny.Decompiler.Metadata.Layout
         [FieldOffset(12)] public readonly AssemblyFlags Flags;
 
         //# Returns the index of the public key in the blob heap. 
-        public uint GetPublicKeyIndex(PEFile peFile)
+        public uint GetPublicKeyOffset(PEFile peFile)
         {
             peFile.AssumeNotNull();
             fixed (AssemblyRow* pThis = &this) {

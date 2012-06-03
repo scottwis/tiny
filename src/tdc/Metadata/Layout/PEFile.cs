@@ -24,9 +24,10 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
-using BclExtras.Collections;
 using Tiny.Decompiler.Interop;
 
 namespace Tiny.Decompiler.Metadata.Layout
@@ -60,11 +61,11 @@ namespace Tiny.Decompiler.Metadata.Layout
         OptionalHeader m_optionalHeader;
         CLRHeader* m_clrHeader;
         StreamHeader*[] m_streams;
-        volatile ImmutableAvlTree<uint, string> m_userStrings = ImmutableAvlTree<uint, string>.Empty;
         MetadataRoot* m_metadataRoot;
         MetadataTableHeader* m_metadataTableHeader;
         byte*[] m_tables;
         volatile Module m_module;
+        uint[] m_codedIndexSizes;
 
         public PEFile(String fileName)
         {
@@ -116,8 +117,86 @@ namespace Tiny.Decompiler.Metadata.Layout
 
         bool LoadMetadataTables()
         {
-            //TODO: Implement this
+            var pStreamHeader = (StreamHeader *)m_streams[(int)StreamID.MetadataTables];
+            if (pStreamHeader == null) {
+                return false;
+            }
+            m_metadataTableHeader = (MetadataTableHeader *)checked((byte*) m_metadataRoot + pStreamHeader->Offset);
+            if (!m_metadataTableHeader->Verify()) {
+                return false;
+            }
+            ComputeCodedIndexSizes();
+            //TODO: Finish Implement this
             return false;
+        }
+
+        void ComputeCodedIndexSizes()
+        {
+            m_codedIndexSizes = new uint[(int) CodedIndexType.NUMBER_OF_CODED_INDEX_TYPES];
+            m_codedIndexSizes[(int) CodedIndexType.HasFieldMarshal] = ComputeCodedIndexSize(
+                1,
+                MetadataTable.Field,
+                MetadataTable.Param
+            );
+            m_codedIndexSizes[(int) CodedIndexType.HasDeclSecurity] = ComputeCodedIndexSize(
+                2,
+                MetadataTable.TypeDef,
+                MetadataTable.MethodDef,
+                MetadataTable.Assembly
+            );
+            m_codedIndexSizes[(int) CodedIndexType.MemberRefParent] = ComputeCodedIndexSize(
+                3,
+                MetadataTable.TypeDef,
+                MetadataTable.TypeRef,
+                MetadataTable.ModuleRef,
+                MetadataTable.MethodDef,
+                MetadataTable.TypeSpec
+            );
+            m_codedIndexSizes[(int) CodedIndexType.HasSemantics] = ComputeCodedIndexSize(
+                1,
+                MetadataTable.Event,
+                MetadataTable.Property
+            );
+            m_codedIndexSizes[(int) CodedIndexType.MethodDefOrRef] = ComputeCodedIndexSize(
+                1,
+                MetadataTable.MethodDef,
+                MetadataTable.MemberRef
+            );
+            m_codedIndexSizes[(int)CodedIndexType.MemberForwarded] = ComputeCodedIndexSize(
+                1,
+                MetadataTable.Field,
+                MetadataTable.MethodDef
+            );
+            m_codedIndexSizes[(int)CodedIndexType.Implementation] = ComputeCodedIndexSize(
+                2,
+                MetadataTable.File,
+                MetadataTable.AssemblyRef,
+                MetadataTable.ExportedType
+            );
+            m_codedIndexSizes[(int)CodedIndexType.CustomAttributeType] = ComputeCodedIndexSize(
+                3,
+                MetadataTable.MemberRef
+            );
+            m_codedIndexSizes[(int)CodedIndexType.ResolutionScope] = ComputeCodedIndexSize(
+                2,
+                MetadataTable.Module,
+                MetadataTable.ModuleRef,
+                MetadataTable.AssemblyRef,
+                MetadataTable.TypeRef
+            );
+            m_codedIndexSizes[(int)CodedIndexType.TypeOrMethodDef] = ComputeCodedIndexSize(
+                2,
+                MetadataTable.TypeDef,
+                MetadataTable.MethodDef
+            );
+        }
+
+        uint ComputeCodedIndexSize(int bitsToEncode, params MetadataTable[] tables)
+        {
+            if (tables.Select(GetRowCount).Max() > (1 << (17 - bitsToEncode)) - 1) {
+                return 4;
+            }
+            return 2;
         }
 
         private PEHeader * PEHeader {
@@ -217,7 +296,7 @@ namespace Tiny.Decompiler.Metadata.Layout
                 if (mid->VirtualAddress == virtualAddress) {
                     return mid;
                 }
-                else if (virtualAddress < mid->VirtualAddress) {
+                if (virtualAddress < mid->VirtualAddress) {
                     max = mid - 1;
                 }
                 else {
@@ -348,40 +427,12 @@ namespace Tiny.Decompiler.Metadata.Layout
         public String ReadSystemString(uint offset)
         {
             CheckDisposed();
-            string ret;
-            var stringMap = m_userStrings;
-            //Check to see if the string at the given offset has already been cached
-            if (! stringMap.TryFind(offset, out ret)) {
-                if (StringStream == null || offset > StringStream->Size) {
-                    throw new ArgumentOutOfRangeException("offset", "Invalid user string offset");
-                }
-
-                //Read and create the string. Note that we take care to only do this once.
-                var pString = ((byte*) m_metadataRoot + StringStream->Offset) + offset;
-                var length = NativePlatform.Default.StrLen(pString, checked((int) StringStream->Size - (int) offset));
-                var str = new string((sbyte*) pString, 0, length);
-
-                //Perform a lock free insertion of our generated string into the string cache. 
-                while (true) {
-                    #pragma warning disable 420
-                    if (Interlocked.CompareExchange(ref m_userStrings, stringMap.Add(offset, str), stringMap) == stringMap) {
-                    #pragma warning restore 420
-                        return str;
-                    }
-
-                    stringMap = m_userStrings;
-
-                    //Our insertion into the string cache was contentious. Look to see if any of the contending threads
-                    //inserted an entry with the same key we are trying to insert. If they did, return their inserted
-                    //value rather than the new
-                    //string we created. This keeps our results consistent. If one thread sees that 
-                    //ReadSystemString(x) == y, then all other threads will also see ReadSystemString(x) == y).
-                    if (stringMap.TryFind(offset, out ret)) {
-                        return ret;
-                    }
-                }
+            if (StringStream == null || offset > StringStream->Size) {
+                throw new ArgumentOutOfRangeException("offset", "Invalid user string offset.");
             }
-            return ret;
+            var pString = ((byte*)m_metadataRoot + StringStream->Offset) + offset;
+            var length = NativePlatform.Default.StrLen(pString, checked((int)StringStream->Size - (int)offset));
+            return new string((sbyte*)pString, 0, length);
         }
 
         StreamHeader * StringStream
@@ -408,16 +459,131 @@ namespace Tiny.Decompiler.Metadata.Layout
             {
                 CheckDisposed();
                 if (m_module == null) {
-                    if (GetRowCout(MetadataTable.Module) == 0 || m_tables == null || m_tables[(int)MetadataTable.Module] == null) {
+                    if (GetRowCount(MetadataTable.Module) == 0 || m_tables == null || m_tables[(int)MetadataTable.Module] == null) {
                         throw new InvalidOperationException("Missing module table.");
                     }
-                    var m = new Module((ModuleRow *)m_tables[(int)MetadataTable.Module], this);
+                    var m = Module.CreateMetadataModule((ModuleRow *)m_tables[(int)MetadataTable.Module], this);
                     #pragma warning disable 420
                     Interlocked.CompareExchange(ref m_module, m, null);
                     #pragma warning restore 420
                 }
                 return m_module;
             }
+        }
+
+        //Reference: ECMA-335, 5th Edition, Partition II, § 22
+        private uint GetRowSize(MetadataTable module)
+        {
+            switch (module) {
+                case MetadataTable.Assembly:
+                    return 24 + GetHeapIndexSize(StreamID.Blob) + 2*GetHeapIndexSize(StreamID.Strings);
+                case MetadataTable.AssemblyOS:
+                    return 12;
+                case MetadataTable.AssemblyProcessor:
+                    return 4;
+                case MetadataTable.AssemblyRef:
+                    return 12+ 2*GetHeapIndexSize(StreamID.Blob) + 2*GetHeapIndexSize(StreamID.Strings);
+                case MetadataTable.AssemblyRefOS:
+                    return 12 + GetTableIndexSize(MetadataTable.AssemblyRef);
+                case MetadataTable.AssemblyRefProcessor:
+                    return 4 + GetTableIndexSize(MetadataTable.AssemblyRef);
+                case MetadataTable.ClassLayout:
+                    return 6 + GetTableIndexSize(MetadataTable.TypeDef);
+                case MetadataTable.Constant:
+                    return 2 + GetCodedIndexSize(CodedIndexType.HasConstant) + GetHeapIndexSize(StreamID.Blob);
+                case MetadataTable.CustomAttribute:
+                    return 
+                        GetCodedIndexSize(CodedIndexType.HasCustomAttribute)
+                        + GetCodedIndexSize(CodedIndexType.CustomAttributeType)
+                        + GetHeapIndexSize(StreamID.Blob);
+                case MetadataTable.DeclSecurity:
+                    return 2 + GetCodedIndexSize(CodedIndexType.HasDeclSecurity) + GetHeapIndexSize(StreamID.Blob);
+                case MetadataTable.EventMap:
+                    return GetTableIndexSize(MetadataTable.TypeDef) + GetTableIndexSize(MetadataTable.Event);
+                case MetadataTable.Event:
+                    return 2 + GetHeapIndexSize(StreamID.Strings) + GetCodedIndexSize(CodedIndexType.TypeDefOrRef);
+                case MetadataTable.ExportedType:
+                    return 
+                        8 
+                        + GetHeapIndexSize(StreamID.Strings) * 2 
+                        + GetCodedIndexSize(CodedIndexType.Implementation);
+                case MetadataTable.Field:
+                    return 2 + GetHeapIndexSize(StreamID.Strings) + GetHeapIndexSize(StreamID.Blob);
+                case MetadataTable.FieldLayout:
+                    return 4 + GetTableIndexSize(MetadataTable.Field);
+                case MetadataTable.FieldMarshal:
+                    return GetCodedIndexSize(CodedIndexType.HasFieldMarshal) + GetHeapIndexSize(StreamID.Blob);
+                case MetadataTable.FieldRVA:
+                    return 4 + GetTableIndexSize(MetadataTable.Field);
+                case MetadataTable.File:
+                    return 4 + GetHeapIndexSize(StreamID.Strings) + GetHeapIndexSize(StreamID.Blob);
+                case MetadataTable.GenericParam:
+                    return 4 + GetCodedIndexSize(CodedIndexType.TypeOrMethodDef) + GetHeapIndexSize(StreamID.Strings);
+                case MetadataTable.GenericParamConstraint:
+                    return 
+                        GetTableIndexSize(MetadataTable.GenericParam) 
+                        + GetCodedIndexSize(CodedIndexType.TypeDefOrRef);
+                case MetadataTable.ImplMap:
+                    throw new NotImplementedException();
+                case MetadataTable.InterfaceImpl:
+                    throw new NotImplementedException();
+                case MetadataTable.ManifestResource:
+                    throw new NotImplementedException();
+                case MetadataTable.MemberRef:
+                    throw new NotImplementedException();
+                case MetadataTable.MethodDef:
+                    throw new NotImplementedException();
+                case MetadataTable.MethodImpl:
+                    throw new NotImplementedException();
+                case MetadataTable.MethodSemantics:
+                    throw new NotImplementedException();
+                case MetadataTable.MethodSpec:
+                    throw new NotImplementedException();
+                case MetadataTable.Module:
+                    throw new NotImplementedException();
+                case MetadataTable.ModuleRef:
+                    throw new NotImplementedException();
+                case MetadataTable.NestedClass:
+                    throw new NotImplementedException();
+                case MetadataTable.Param:
+                    throw new NotImplementedException();
+                case MetadataTable.Property:
+                    throw new NotImplementedException();
+                case MetadataTable.PropertyMap:
+                    throw new NotImplementedException();
+                case MetadataTable.StandAloneSig:
+                    throw new NotImplementedException();
+                case MetadataTable.TypeDef:
+                    throw new NotImplementedException();
+                case MetadataTable.TypeRef:
+                    throw new NotImplementedException();
+                case MetadataTable.TypeSpec:
+                    throw new NotImplementedException();
+                default:
+                    throw new ArgumentOutOfRangeException("module");
+            }
+        }
+
+        uint GetCodedIndexSize(CodedIndexType indexType)
+        {
+            if (m_codedIndexSizes == null) {
+                throw new InvalidOperationException("Haven't computed coded index sizes yet");
+            }
+            if (indexType < 0 || indexType >= CodedIndexType.NUMBER_OF_CODED_INDEX_TYPES) {
+                throw new ArgumentOutOfRangeException("indexType");
+            }
+            if (m_codedIndexSizes[(int)indexType] == 0) {
+                throw new InvalidOperationException("Missing coded index size");
+            }
+            return m_codedIndexSizes[(int) indexType];
+        }
+
+        uint GetTableIndexSize(MetadataTable table)
+        {
+            if (GetRowCount(table) >= (1 << 17)) {
+                return 4;
+            }
+            return 2;
         }
 
         public uint GetRowCount(MetadataTable table)
@@ -443,6 +609,35 @@ namespace Tiny.Decompiler.Metadata.Layout
             }
         }
 
+        public uint GetHeapIndexSize(StreamID streamID)
+        {
+            CheckDisposed();
+            if (m_metadataTableHeader == null) {
+                throw new InvalidOperationException("Missing metadata table header.");
+            }
+            return m_metadataTableHeader->GetHeapIndexSize(streamID);
+        }
+
+        public FileRow * GetFileRow(int index)
+        {
+            CheckDisposed();
+            if (index < 0 || index >= GetRowCount(MetadataTable.Module)) {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            if (m_tables == null || m_tables[(int)MetadataTable.Module] == null) {
+                throw new InvalidOperationException("Missing meta-data table.");
+            }
+            return checked(
+                (FileRow*)(m_tables[(int)MetadataTable.Module] + GetRowSize((int)MetadataTable.Module) * index)
+            );
+        }
+
+        public IReadOnlyList<byte> ReadBlob(uint index)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             m_metadataTableHeader = null;
@@ -455,26 +650,16 @@ namespace Tiny.Decompiler.Metadata.Layout
             m_fullPath = null;
 
             if (m_tables != null) {
-                for (int i = 0; i < m_tables.Length; ++i) {
+                for (var i = 0; i < m_tables.Length; ++i) {
                     m_tables[i] = null;
                 }
                 m_tables = null;
             }
 
-            if (m_memoryMap != null)
-            {
+            if (m_memoryMap != null) {
                 m_memoryMap.Dispose();
                 m_memoryMap = null;
             }
-        }
-
-        public uint GetHeapIndexSize(StreamID streamID)
-        {
-            CheckDisposed();
-            if (m_metadataTableHeader == null) {
-                throw new InvalidOperationException("Missing metadata table header.");
-            }
-            return m_metadataTableHeader->GetHeapIndexSize(streamID);
         }
     }
 }

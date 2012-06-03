@@ -1,4 +1,4 @@
-﻿// Module.cs
+﻿// File.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,29 +23,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using Tiny.Decompiler.Metadata.Layout;
+using System.Runtime.InteropServices;
 
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    sealed unsafe class Module
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct FileRow
     {
-        private Module(ModuleRow* moduleRow, PEFile peFile)
+        [FieldOffset(0)] public readonly FileAttributes Flags;
+
+        public uint GetNameOffset(PEFile peFile)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            fixed (FileRow* pThis = &this) {
+                var pName = (byte*) pThis + 4;
+                return peFile.GetHeapIndexSize(StreamID.Strings) == 2 ? *(ushort*) pName : *(uint*) pName;
+            }
         }
 
-        public static Module CreateNonMetadataModule(string name)
+        public uint GetHashValueOffset(PEFile peFile)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
-
-        public static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            fixed (FileRow * pThis = &this) {
+                var pHashValue = (byte*)pThis + peFile.GetHeapIndexSize(StreamID.Strings);
+                return peFile.GetHeapIndexSize(StreamID.Blob) == 2 ? *(ushort*) pHashValue : *(uint*) pHashValue;
+            }
         }
     }
 }

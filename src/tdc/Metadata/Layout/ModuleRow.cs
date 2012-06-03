@@ -1,4 +1,4 @@
-﻿// Module.cs
+﻿// ModuleRow.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,29 +23,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using Tiny.Decompiler.Metadata.Layout;
-
-namespace Tiny.Decompiler.Metadata
+namespace Tiny.Decompiler.Metadata.Layout
 {
-    sealed unsafe class Module
+    struct ModuleRow
     {
-        private Module(ModuleRow* moduleRow, PEFile peFile)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
-
-        public static Module CreateNonMetadataModule(string name)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
-
-        public static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
-        }
+           //TODO: Implement this
     }
 }
