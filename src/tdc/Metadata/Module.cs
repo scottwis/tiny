@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using Tiny.Decompiler.Metadata.Layout;
 
 namespace Tiny.Decompiler.Metadata
@@ -35,12 +36,19 @@ namespace Tiny.Decompiler.Metadata
         string m_name;
         readonly bool m_containsMetadata;
         Guid? m_guid;
+        readonly LiftedCollection<TypeDefinition> m_types;
 
         private Module(ModuleRow* moduleRow, PEFile peFile)
         {
             m_pModuleRow = moduleRow;
             m_peFile = peFile;
             m_containsMetadata = true;
+            m_types = new LiftedCollection<TypeDefinition>(
+                m_peFile.GetRowCount(MetadataTable.TypeDef),
+                (index)=>peFile.GetTypeDefRow(index),
+                (pRow)=>new TypeDefinition((TypeDefRow *)pRow, m_peFile),
+                ()=>m_peFile.IsDisposed
+            );
         }
 
         private Module(string name)
@@ -56,7 +64,6 @@ namespace Tiny.Decompiler.Metadata
 
         public static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
         {
-            peFile.CheckNotNull("peFile");
             Util.CheckNotNull((void *)moduleRow, "moduleRow");
             return new Module(moduleRow, peFile);
         }
@@ -101,6 +108,15 @@ namespace Tiny.Decompiler.Metadata
                     m_guid = m_peFile.ReadGuid(m_pModuleRow->GetMvidOffset(m_peFile));
                 }
                 return m_guid.Value;
+            }
+        }
+
+        public IReadOnlyCollection<TypeDefinition> Types
+        {
+            get
+            {
+                CheckDisposed();
+                return m_types;
             }
         }
     }

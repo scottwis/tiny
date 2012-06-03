@@ -63,7 +63,7 @@ namespace Tiny.Decompiler.Metadata
             
         }
 
-        public ModuleCollection Modules
+        public IReadOnlyList<Module> Modules
         {
             get { 
                 CheckDisposed();

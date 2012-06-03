@@ -156,8 +156,12 @@
     <Compile Include="Metadata\Layout\SectionHeader.cs" />
     <Compile Include="Metadata\Layout\StreamHeader.cs" />
     <Compile Include="Metadata\Layout\StreamID.cs" />
+    <Compile Include="Metadata\Layout\TypeDefRow.cs" />
+    <Compile Include="Metadata\LiftedCollection.cs" />
     <Compile Include="Metadata\Module.cs" />
     <Compile Include="Metadata\ModuleCollection.cs" />
+    <Compile Include="Metadata\TypeDefinition.cs" />
+    <Compile Include="Metadata\TypeReference.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="InternalErrorException.cs" />
     <Compile Include="Program.cs" />

@@ -662,6 +662,12 @@ namespace Tiny.Decompiler.Metadata.Layout
             throw new NotImplementedException();
         }
 
+        public TypeDefRow* GetTypeDefRow(uint index)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             m_metadataTableHeader = null;
