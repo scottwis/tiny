@@ -1,4 +1,4 @@
-﻿// CodedIndexType.cs
+﻿// CodedIndex.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -27,7 +27,7 @@ namespace Tiny.Decompiler.Metadata.Layout
 {
     //# An enum identifying the set of "coded index types" present in a metadata file.
     //# Reference: ECMA-335, 5th Edition, Partition II, § 24.2.6
-    enum CodedIndexType
+    enum CodedIndex
     {
         TypeDefOrRef,
         HasConstant,
@@ -43,5 +43,13 @@ namespace Tiny.Decompiler.Metadata.Layout
         ResolutionScope,
         TypeOrMethodDef,
         NUMBER_OF_CODED_INDEX_TYPES
+    }
+
+    static class CodedIndexTypeExtensions
+    {
+        public static uint IndexSize(this CodedIndex type, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").GetCodedIndexSize(type);
+        }
     }
 }

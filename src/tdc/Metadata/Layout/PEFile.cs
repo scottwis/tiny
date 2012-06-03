@@ -132,19 +132,19 @@ namespace Tiny.Decompiler.Metadata.Layout
 
         void ComputeCodedIndexSizes()
         {
-            m_codedIndexSizes = new uint[(int) CodedIndexType.NUMBER_OF_CODED_INDEX_TYPES];
-            m_codedIndexSizes[(int) CodedIndexType.HasFieldMarshal] = ComputeCodedIndexSize(
+            m_codedIndexSizes = new uint[(int) CodedIndex.NUMBER_OF_CODED_INDEX_TYPES];
+            m_codedIndexSizes[(int) CodedIndex.HasFieldMarshal] = ComputeCodedIndexSize(
                 1,
                 MetadataTable.Field,
                 MetadataTable.Param
             );
-            m_codedIndexSizes[(int) CodedIndexType.HasDeclSecurity] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int) CodedIndex.HasDeclSecurity] = ComputeCodedIndexSize(
                 2,
                 MetadataTable.TypeDef,
                 MetadataTable.MethodDef,
                 MetadataTable.Assembly
             );
-            m_codedIndexSizes[(int) CodedIndexType.MemberRefParent] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int) CodedIndex.MemberRefParent] = ComputeCodedIndexSize(
                 3,
                 MetadataTable.TypeDef,
                 MetadataTable.TypeRef,
@@ -152,39 +152,39 @@ namespace Tiny.Decompiler.Metadata.Layout
                 MetadataTable.MethodDef,
                 MetadataTable.TypeSpec
             );
-            m_codedIndexSizes[(int) CodedIndexType.HasSemantics] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int) CodedIndex.HasSemantics] = ComputeCodedIndexSize(
                 1,
                 MetadataTable.Event,
                 MetadataTable.Property
             );
-            m_codedIndexSizes[(int) CodedIndexType.MethodDefOrRef] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int) CodedIndex.MethodDefOrRef] = ComputeCodedIndexSize(
                 1,
                 MetadataTable.MethodDef,
                 MetadataTable.MemberRef
             );
-            m_codedIndexSizes[(int)CodedIndexType.MemberForwarded] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int)CodedIndex.MemberForwarded] = ComputeCodedIndexSize(
                 1,
                 MetadataTable.Field,
                 MetadataTable.MethodDef
             );
-            m_codedIndexSizes[(int)CodedIndexType.Implementation] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int)CodedIndex.Implementation] = ComputeCodedIndexSize(
                 2,
                 MetadataTable.File,
                 MetadataTable.AssemblyRef,
                 MetadataTable.ExportedType
             );
-            m_codedIndexSizes[(int)CodedIndexType.CustomAttributeType] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int)CodedIndex.CustomAttributeType] = ComputeCodedIndexSize(
                 3,
                 MetadataTable.MemberRef
             );
-            m_codedIndexSizes[(int)CodedIndexType.ResolutionScope] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int)CodedIndex.ResolutionScope] = ComputeCodedIndexSize(
                 2,
                 MetadataTable.Module,
                 MetadataTable.ModuleRef,
                 MetadataTable.AssemblyRef,
                 MetadataTable.TypeRef
             );
-            m_codedIndexSizes[(int)CodedIndexType.TypeOrMethodDef] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int)CodedIndex.TypeOrMethodDef] = ComputeCodedIndexSize(
                 2,
                 MetadataTable.TypeDef,
                 MetadataTable.MethodDef
@@ -476,109 +476,120 @@ namespace Tiny.Decompiler.Metadata.Layout
         {
             switch (module) {
                 case MetadataTable.Assembly:
-                    return 24 + GetHeapIndexSize(StreamID.Blob) + 2*GetHeapIndexSize(StreamID.Strings);
+                    return 24 + StreamID.Blob.IndexSize(this) + 2*StreamID.Strings.IndexSize(this);
                 case MetadataTable.AssemblyOS:
                     return 12;
                 case MetadataTable.AssemblyProcessor:
                     return 4;
                 case MetadataTable.AssemblyRef:
-                    return 12+ 2*GetHeapIndexSize(StreamID.Blob) + 2*GetHeapIndexSize(StreamID.Strings);
+                    return 12+ 2*StreamID.Blob.IndexSize(this) + 2*StreamID.Strings.IndexSize(this);
                 case MetadataTable.AssemblyRefOS:
-                    return 12 + GetTableIndexSize(MetadataTable.AssemblyRef);
+                    return 12 + MetadataTable.AssemblyRef.IndexSize(this);
                 case MetadataTable.AssemblyRefProcessor:
-                    return 4 + GetTableIndexSize(MetadataTable.AssemblyRef);
+                    return 4 + MetadataTable.AssemblyRef.IndexSize(this);
                 case MetadataTable.ClassLayout:
-                    return 6 + GetTableIndexSize(MetadataTable.TypeDef);
+                    return 6 + MetadataTable.TypeDef.IndexSize(this);
                 case MetadataTable.Constant:
-                    return 2 + GetCodedIndexSize(CodedIndexType.HasConstant) + GetHeapIndexSize(StreamID.Blob);
+                    return 2 + CodedIndex.HasConstant.IndexSize(this) + StreamID.Blob.IndexSize(this);
                 case MetadataTable.CustomAttribute:
-                    return 
-                        GetCodedIndexSize(CodedIndexType.HasCustomAttribute)
-                        + GetCodedIndexSize(CodedIndexType.CustomAttributeType)
-                        + GetHeapIndexSize(StreamID.Blob);
+                    return
+                        CodedIndex.HasCustomAttribute.IndexSize(this)
+                        + CodedIndex.CustomAttributeType.IndexSize(this)
+                        + StreamID.Blob.IndexSize(this);
                 case MetadataTable.DeclSecurity:
-                    return 2 + GetCodedIndexSize(CodedIndexType.HasDeclSecurity) + GetHeapIndexSize(StreamID.Blob);
+                    return 2 + CodedIndex.HasDeclSecurity.IndexSize(this) + StreamID.Blob.IndexSize(this);
                 case MetadataTable.EventMap:
-                    return GetTableIndexSize(MetadataTable.TypeDef) + GetTableIndexSize(MetadataTable.Event);
+                    return MetadataTable.TypeDef.IndexSize(this) + MetadataTable.Event.IndexSize(this);
                 case MetadataTable.Event:
-                    return 2 + GetHeapIndexSize(StreamID.Strings) + GetCodedIndexSize(CodedIndexType.TypeDefOrRef);
+                    return 2 + StreamID.Strings.IndexSize(this) + CodedIndex.TypeDefOrRef.IndexSize(this);
                 case MetadataTable.ExportedType:
-                    return 
-                        8 
-                        + GetHeapIndexSize(StreamID.Strings) * 2 
-                        + GetCodedIndexSize(CodedIndexType.Implementation);
+                    return 8 + StreamID.Strings.IndexSize(this) * 2 +CodedIndex.Implementation.IndexSize(this);
                 case MetadataTable.Field:
-                    return 2 + GetHeapIndexSize(StreamID.Strings) + GetHeapIndexSize(StreamID.Blob);
+                    return 2 + StreamID.Strings.IndexSize(this) + StreamID.Blob.IndexSize(this);
                 case MetadataTable.FieldLayout:
-                    return 4 + GetTableIndexSize(MetadataTable.Field);
+                    return 4 + MetadataTable.Field.IndexSize(this);
                 case MetadataTable.FieldMarshal:
-                    return GetCodedIndexSize(CodedIndexType.HasFieldMarshal) + GetHeapIndexSize(StreamID.Blob);
+                    return CodedIndex.HasFieldMarshal.IndexSize(this) + StreamID.Blob.IndexSize(this);
                 case MetadataTable.FieldRVA:
-                    return 4 + GetTableIndexSize(MetadataTable.Field);
+                    return 4 + MetadataTable.Field.IndexSize(this);
                 case MetadataTable.File:
-                    return 4 + GetHeapIndexSize(StreamID.Strings) + GetHeapIndexSize(StreamID.Blob);
+                    return 4 + StreamID.Strings.IndexSize(this) + StreamID.Blob.IndexSize(this);
                 case MetadataTable.GenericParam:
-                    return 4 + GetCodedIndexSize(CodedIndexType.TypeOrMethodDef) + GetHeapIndexSize(StreamID.Strings);
+                    return 4 + CodedIndex.TypeOrMethodDef.IndexSize(this) + StreamID.Strings.IndexSize(this);
                 case MetadataTable.GenericParamConstraint:
-                    return 
-                        GetTableIndexSize(MetadataTable.GenericParam) 
-                        + GetCodedIndexSize(CodedIndexType.TypeDefOrRef);
+                    return MetadataTable.GenericParam.IndexSize(this) + CodedIndex.TypeDefOrRef.IndexSize(this);
                 case MetadataTable.ImplMap:
-                    throw new NotImplementedException();
+                    return
+                        2
+                        + CodedIndex.MemberForwarded.IndexSize(this)
+                        + StreamID.Strings.IndexSize(this)
+                        + MetadataTable.ModuleRef.IndexSize(this);
                 case MetadataTable.InterfaceImpl:
-                    throw new NotImplementedException();
+                    return MetadataTable.TypeDef.IndexSize(this) + CodedIndex.TypeDefOrRef.IndexSize(this);
                 case MetadataTable.ManifestResource:
-                    throw new NotImplementedException();
+                    return 4 + 4 + StreamID.Strings.IndexSize(this) + CodedIndex.Implementation.IndexSize(this);
                 case MetadataTable.MemberRef:
-                    throw new NotImplementedException();
+                    return 
+                        CodedIndex.MemberRefParent.IndexSize(this)
+                        + StreamID.Strings.IndexSize(this)
+                        + StreamID.Blob.IndexSize(this);
                 case MetadataTable.MethodDef:
-                    throw new NotImplementedException();
+                    return 
+                        8
+                        + StreamID.Strings.IndexSize(this)
+                        + StreamID.Blob.IndexSize(this)
+                        + MetadataTable.Param.IndexSize(this);
                 case MetadataTable.MethodImpl:
-                    throw new NotImplementedException();
+                    return MetadataTable.TypeDef.IndexSize(this) + CodedIndex.MethodDefOrRef.IndexSize(this)*2;
                 case MetadataTable.MethodSemantics:
-                    throw new NotImplementedException();
+                    return 2 + MetadataTable.MethodDef.IndexSize(this) + CodedIndex.HasSemantics.IndexSize(this);
                 case MetadataTable.MethodSpec:
-                    throw new NotImplementedException();
+                    return CodedIndex.MethodDefOrRef.IndexSize(this) + StreamID.Blob.IndexSize(this);
                 case MetadataTable.Module:
-                    throw new NotImplementedException();
+                    return 2 + StreamID.Strings.IndexSize(this) + StreamID.Guid.IndexSize(this)*3;
                 case MetadataTable.ModuleRef:
-                    throw new NotImplementedException();
+                    return StreamID.Strings.IndexSize(this);
                 case MetadataTable.NestedClass:
-                    throw new NotImplementedException();
+                    return MetadataTable.TypeDef.IndexSize(this)*2;
                 case MetadataTable.Param:
-                    throw new NotImplementedException();
+                    return 4 + StreamID.Strings.IndexSize(this);
                 case MetadataTable.Property:
-                    throw new NotImplementedException();
+                    return 2 + StreamID.Strings.IndexSize(this) + StreamID.Blob.IndexSize(this);
                 case MetadataTable.PropertyMap:
-                    throw new NotImplementedException();
+                    return MetadataTable.TypeDef.IndexSize(this) + MetadataTable.Property.IndexSize(this);
                 case MetadataTable.StandAloneSig:
-                    throw new NotImplementedException();
+                    return StreamID.Blob.IndexSize(this);
                 case MetadataTable.TypeDef:
-                    throw new NotImplementedException();
+                    return
+                        4
+                        + StreamID.Strings.IndexSize(this) * 2
+                        + CodedIndex.TypeDefOrRef.IndexSize(this)
+                        + MetadataTable.Field.IndexSize(this)
+                        + MetadataTable.MethodDef.IndexSize(this);
                 case MetadataTable.TypeRef:
-                    throw new NotImplementedException();
+                    return CodedIndex.ResolutionScope.IndexSize(this) + StreamID.Strings.IndexSize(this)*2;
                 case MetadataTable.TypeSpec:
-                    throw new NotImplementedException();
+                    return StreamID.Blob.IndexSize(this);
                 default:
                     throw new ArgumentOutOfRangeException("module");
             }
         }
 
-        uint GetCodedIndexSize(CodedIndexType indexType)
+        public uint GetCodedIndexSize(CodedIndex index)
         {
             if (m_codedIndexSizes == null) {
                 throw new InvalidOperationException("Haven't computed coded index sizes yet");
             }
-            if (indexType < 0 || indexType >= CodedIndexType.NUMBER_OF_CODED_INDEX_TYPES) {
-                throw new ArgumentOutOfRangeException("indexType");
+            if (index < 0 || index >= CodedIndex.NUMBER_OF_CODED_INDEX_TYPES) {
+                throw new ArgumentOutOfRangeException("index");
             }
-            if (m_codedIndexSizes[(int)indexType] == 0) {
+            if (m_codedIndexSizes[(int)index] == 0) {
                 throw new InvalidOperationException("Missing coded index size");
             }
-            return m_codedIndexSizes[(int) indexType];
+            return m_codedIndexSizes[(int) index];
         }
 
-        uint GetTableIndexSize(MetadataTable table)
+        public uint GetTableIndexSize(MetadataTable table)
         {
             if (GetRowCount(table) >= (1 << 17)) {
                 return 4;

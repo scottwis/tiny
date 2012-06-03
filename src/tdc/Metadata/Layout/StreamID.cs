@@ -35,4 +35,12 @@ namespace Tiny.Decompiler.Metadata.Layout
         MetadataTables,
         NUMBER_OF_STREAMS
     }
+
+    static class StreamIDExtensions
+    {
+        public static uint IndexSize(this StreamID id, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").GetHeapIndexSize(id);
+        }
+    }
 }

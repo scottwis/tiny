@@ -130,7 +130,7 @@
     <Compile Include="Metadata\Layout\AssemblyRow.cs" />
     <Compile Include="Metadata\Layout\CLRHeader.cs" />
     <Compile Include="Metadata\Layout\CLRHeaderFlags.cs" />
-    <Compile Include="Metadata\Layout\CodedIndexType.cs" />
+    <Compile Include="Metadata\Layout\CodedIndex.cs" />
     <Compile Include="Metadata\Layout\DllCharacteristics.cs" />
     <Compile Include="Metadata\Layout\File.cs" />
     <Compile Include="Metadata\Layout\FileAttributes.cs" />

@@ -70,4 +70,12 @@ namespace Tiny.Decompiler.Metadata.Layout
 
         MAX_TABLE_ID = 0x2c
     }
+
+    static class MetadataTableExtensions
+    {
+        public static uint IndexSize(this MetadataTable table, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").GetTableIndexSize(table);
+        }
+    }
 }
