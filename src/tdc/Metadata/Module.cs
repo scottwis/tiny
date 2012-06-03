@@ -30,22 +30,78 @@ namespace Tiny.Decompiler.Metadata
 {
     sealed unsafe class Module
     {
+        readonly ModuleRow* m_pModuleRow;
+        readonly PEFile m_peFile;
+        string m_name;
+        readonly bool m_containsMetadata;
+        Guid? m_guid;
+
         private Module(ModuleRow* moduleRow, PEFile peFile)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            m_pModuleRow = moduleRow;
+            m_peFile = peFile;
+            m_containsMetadata = true;
+        }
+
+        private Module(string name)
+        {
+            m_name = name;
+            m_containsMetadata = false;
         }
 
         public static Module CreateNonMetadataModule(string name)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            return new Module(name.CheckNotNull("name"));
         }
 
         public static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            peFile.CheckNotNull("peFile");
+            Util.CheckNotNull((void *)moduleRow, "moduleRow");
+            return new Module(moduleRow, peFile);
+        }
+
+        public bool ContainsMetadata
+        {
+            get
+            {
+                CheckDisposed();
+                return m_containsMetadata;
+            }
+        }
+
+        void CheckDisposed()
+        {
+            if (m_containsMetadata && m_peFile.IsDisposed) {
+                throw new ObjectDisposedException("Module");
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                CheckDisposed();
+                if (m_name == null && m_containsMetadata) {
+                    m_name = m_peFile.ReadSystemString(m_pModuleRow->GetNameOffset(m_peFile));
+                }
+                return m_name;
+            }
+        }
+
+        public Guid Guid
+        {
+            get
+            { 
+                CheckDisposed();
+                if (!m_containsMetadata) {
+                    throw new InvalidOperationException("Non meta-data modules do not define a guid.");
+                }
+                if (m_guid == null) {
+                    m_guid = m_peFile.ReadGuid(m_pModuleRow->GetMvidOffset(m_peFile));
+                }
+                return m_guid.Value;
+            }
         }
     }
 }

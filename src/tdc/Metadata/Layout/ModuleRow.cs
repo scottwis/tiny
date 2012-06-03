@@ -23,10 +23,61 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Runtime.InteropServices;
+
 namespace Tiny.Decompiler.Metadata.Layout
 {
-    struct ModuleRow
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct ModuleRow
     {
-           //TODO: Implement this
+        [FieldOffset(0)] public readonly ushort Generation;
+
+        public uint GetNameOffset(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (ModuleRow* pThis = &this) {
+                var pName = (byte*) pThis + 2;
+                if (StreamID.Strings.IndexSize(peFile) == 2) {
+                    return *(ushort*) pName;
+                }
+                return *(uint*) pName;
+            }
+        }
+
+        public uint GetMvidOffset(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (ModuleRow* pThis = &this) {
+                var pMvid = (byte*) pThis + 2 + StreamID.Strings.IndexSize(peFile);
+                if (StreamID.Guid.IndexSize(peFile) == 2) {
+                    return *(ushort*) pMvid;
+                }
+                return *(uint*) pMvid;
+            }
+        }
+
+        public uint GetEncIdOffset(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (ModuleRow* pThis = &this) {
+                var pEncId = (byte*) pThis + 2 + StreamID.Strings.IndexSize(peFile) + StreamID.Guid.IndexSize(peFile);
+                if (StreamID.Guid.IndexSize(peFile) == 2) {
+                    return *(ushort*) pEncId;
+                }
+                return *(uint*) pEncId;
+            }
+        }
+
+        public uint GetEncBaseId(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (ModuleRow* pThis = &this) {
+                var pBaseId = (byte*) pThis + 2 + StreamID.Strings.IndexSize(peFile) + StreamID.Guid.IndexSize(peFile)*2;
+                if (StreamID.Guid.IndexSize(peFile) == 2) {
+                    return *(ushort*) pBaseId;
+                }
+                return *(uint*) pBaseId;
+            }
+        }
     }
 }

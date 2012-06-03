@@ -11,7 +11,6 @@ namespace BclExtras.Threading
     #region IProgressTracker
 
     /// <summary>
-    /// TODO: Need a wait to slip in WaitUntilShow()
     /// </summary>
     public interface IProgressTracker : ISynchronizeInvoke
     {

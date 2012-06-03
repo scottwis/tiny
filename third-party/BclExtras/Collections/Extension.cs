@@ -230,8 +230,4 @@ namespace BclExtras.Collections
     }
 
     #endregion
-
-    // TODO:  Add an extension for BindingList<T> which does a DiffUpdate but does all of the 
-    // smarts to turn off change events and such whhile the list is updating.  Then turns them
-    // back on once the update is done raises a ResetBinding if the list changed
 }

@@ -20,9 +20,6 @@ namespace BclExtras.Threading
     /// This class does nothing except declaratively say that I want a class
     /// to be immutable.  Test case code verifies it's actually immutable
     /// 
-    /// TODO: Write the test case code
-    /// TODO: Put this on more classes
-    /// TODO: Write FxCop rule where subclass is not immutable
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public sealed class ImmutableAttribute : Attribute

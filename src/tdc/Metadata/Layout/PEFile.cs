@@ -126,8 +126,15 @@ namespace Tiny.Decompiler.Metadata.Layout
                 return false;
             }
             ComputeCodedIndexSizes();
-            //TODO: Finish Implement this
-            return false;
+            m_tables = new byte*[(int)MetadataTable.MAX_TABLE_ID + 1];
+            var pCurrent = (byte*) m_metadataTableHeader + m_metadataTableHeader->Size;
+            for (MetadataTable i = 0; i <= MetadataTable.MAX_TABLE_ID; ++i ) {
+                if (GetRowCount(i) != 0) {
+                    m_tables[(int)i] = pCurrent;
+                    pCurrent += i.RowSize(this);
+                }
+            }
+            return true;
         }
 
         void ComputeCodedIndexSizes()
@@ -472,9 +479,9 @@ namespace Tiny.Decompiler.Metadata.Layout
         }
 
         //Reference: ECMA-335, 5th Edition, Partition II, § 22
-        private uint GetRowSize(MetadataTable module)
+        public uint GetRowSize(MetadataTable table)
         {
-            switch (module) {
+            switch (table) {
                 case MetadataTable.Assembly:
                     return 24 + StreamID.Blob.IndexSize(this) + 2*StreamID.Strings.IndexSize(this);
                 case MetadataTable.AssemblyOS:
@@ -571,7 +578,7 @@ namespace Tiny.Decompiler.Metadata.Layout
                 case MetadataTable.TypeSpec:
                     return StreamID.Blob.IndexSize(this);
                 default:
-                    throw new ArgumentOutOfRangeException("module");
+                    throw new ArgumentOutOfRangeException("table");
             }
         }
 
@@ -644,6 +651,12 @@ namespace Tiny.Decompiler.Metadata.Layout
         }
 
         public IReadOnlyList<byte> ReadBlob(uint index)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
+        public Guid ReadGuid(uint offset)
         {
             //TODO: Implement this
             throw new NotImplementedException();

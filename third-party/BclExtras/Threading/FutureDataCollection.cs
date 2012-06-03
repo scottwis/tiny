@@ -16,7 +16,6 @@ namespace BclExtras.Threading
     /// <summary>
     /// Creates a DataSource that is easily bindable to controls.  It will watch
     /// the future and update the list once it completes 
-    /// TODO: Write Unit Tests 
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public sealed class FutureDataCollection<T> : BindingList<T>

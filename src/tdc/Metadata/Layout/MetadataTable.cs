@@ -77,5 +77,10 @@ namespace Tiny.Decompiler.Metadata.Layout
         {
             return peFile.CheckNotNull("peFile").GetTableIndexSize(table);
         }
+
+        public static uint RowSize(this MetadataTable table, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").GetRowSize(table);
+        }
     }
 }

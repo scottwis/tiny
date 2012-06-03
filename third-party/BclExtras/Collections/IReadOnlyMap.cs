@@ -7,7 +7,6 @@ namespace BclExtras.Collections
     /// <summary>
     /// Basic IReadOnlyMap semantics
     /// 
-    /// TODO: Implement, IPersistentMap
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>

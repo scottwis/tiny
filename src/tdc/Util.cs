@@ -107,6 +107,14 @@ namespace Tiny.Decompiler
             return value;
         }
 
+        public static unsafe void * CheckNotNull(void * pData, string parameterName)
+        {
+            if (pData == null) {
+                throw new ArgumentNullException(parameterName);
+            }
+            return pData;
+        }
+
         public static T CheckNotNull<T>(this T obj, string parameterName) where T : class
         {
             if (obj == null) {
