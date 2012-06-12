@@ -1,5 +1,5 @@
 // 
-// Program.cs
+// InternalErrorException.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -24,22 +24,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using System.IO;
-using Tiny.Metadata;
 
 namespace Tiny
 {
-    static class Program
+    public sealed class InternalErrorException : Exception
     {
-        public static int Main(string[] argv)
+        public InternalErrorException(string message) : base(message)
         {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
-            }
-            return 0;
+        }
+
+        public InternalErrorException(
+            string message,
+            string fileName,
+            int lineNumber
+        ) : this(string.Format("{0} : {1} - {2}", message, fileName, lineNumber))
+        {
         }
     }
 }

@@ -1,5 +1,4 @@
-// 
-// Program.cs
+// NativePlatform.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +22,28 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+using Tiny.Interop.Win32;
+
+namespace Tiny.Interop
 {
-    static class Program
+    public abstract unsafe class NativePlatform
     {
-        public static int Main(string[] argv)
+        static readonly NativePlatform s_default;
+
+        static NativePlatform()
         {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
-            }
-            return 0;
+            #if WIN32
+                s_default = new Win32Platform();
+            #else
+                #error "An implementation of the NativePlatform class has not been written for this configuration."
+            #endif
         }
+
+        public static NativePlatform Default { get { return s_default;  } }
+
+        public abstract UnsafeWin32MemoryMap MemoryMapFile(string fileName);
+
+        public abstract int StrLen(byte* pStr, int maxCount);
     }
 }
-

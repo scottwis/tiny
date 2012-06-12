@@ -14,7 +14,7 @@ namespace BclExtras.Collections
     [Serializable]
     [SuppressMessage("Microsoft.Naming", "CA1710")]
     [DebuggerTypeProxy(typeof(DebuggerEnumerableView<>))]
-    public sealed class ImmutableArray<T> : IReadOnlyList<T>, IEnumerable<T>
+    public sealed class ImmutableArray<T> : IReadOnlyListEx<T>, IEnumerable<T>
     {
         #region Static Helpers
 
@@ -67,7 +67,7 @@ namespace BclExtras.Collections
 
         }
 
-        public ImmutableArray(IReadOnlyCollection<T> col)
+        public ImmutableArray(IReadOnlyCollectionEx<T> col)
             : this(col, col.Count)
         {
         }
@@ -147,7 +147,7 @@ namespace BclExtras.Collections
             return new ImmutableArray<T>(col);
         }
 
-        public static ImmutableArray<T> Create<T>(IReadOnlyCollection<T> col)
+        public static ImmutableArray<T> Create<T>(IReadOnlyCollectionEx<T> col)
         {
             return new ImmutableArray<T>(col);
         }

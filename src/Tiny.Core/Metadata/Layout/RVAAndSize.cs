@@ -1,5 +1,5 @@
 // 
-// Program.cs
+// RVAAndSize.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -23,23 +23,35 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+using System.Diagnostics.Contracts;
+using System.Runtime.InteropServices;
+
+namespace Tiny.Metadata.Layout
 {
-    static class Program
+    //# Describes a paired RVA and size used in a PE file. It is used to represent:
+    //# 1. Data directories in the optional PE header.
+    //# Reference: PE/COFF Spec, Vesion 8.2, § 2.4.3
+    //# 2. Pointers in the CLR header
+    //# Reference: ECMA-335 Spec, 5th edition, Partition II §25.3.3
+    [StructLayout(LayoutKind.Explicit)]
+    struct RVAAndSize
     {
-        public static int Main(string[] argv)
+        [FieldOffset(0)]
+        public readonly uint RVA;
+        [FieldOffset(4)]
+        public readonly uint Size;
+
+        [Pure]
+        public bool IsZero()
         {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
-            }
-            return 0;
+            return RVA == 0 && Size == 0;
+        }
+
+        [Pure]
+        public bool IsConsistent()
+        {
+            return (RVA == 0) == (Size == 0);
         }
     }
 }

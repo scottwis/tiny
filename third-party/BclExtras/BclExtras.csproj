@@ -171,8 +171,8 @@
     <Compile Include="Collections\IPersistentCollection.cs" />
     <Compile Include="Collections\IPersistentList.cs" />
     <Compile Include="Collections\IPersistentMap.cs" />
-    <Compile Include="Collections\IReadOnlyCollection.cs" />
-    <Compile Include="Collections\IReadOnlyList.cs" />
+    <Compile Include="Collections\IReadOnlyCollectionEx.cs" />
+    <Compile Include="Collections\IReadOnlyListEx.cs" />
     <Compile Include="Collections\IReadOnlyMap.cs" />
     <Compile Include="Collections\WeakDictionary.cs" />
     <Compile Include="ComparerNode.cs" />

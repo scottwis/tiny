@@ -1,5 +1,5 @@
 // 
-// Program.cs
+// FileFormat.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +23,23 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+namespace Tiny.Metadata.Layout
 {
-    static class Program
+    //# Defines an enum encapsulating the valid values for the "Magic number" field preceeding the optional header in
+    //# a PE/COFF file.
+    //#
+    //# Reference: PE/COFF spec version 8.2 § 2.4.1
+    enum FileFormat : short
     {
-        public static int Main(string[] argv)
-        {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
-            }
-            return 0;
-        }
+        //# A 32 bit executable image.
+        PE32 = 0x10b,
+        //# A an extension to PE32 that defines 64 bit RVA (relative virtual address) fields instead of the 32 bit
+        //# values used in PE32. It is used for 64 bit executables. .
+        PE32_PLUS = 0x20b,
+        //# This value is called out in the PE/COFF spec, so it is included here for completeness.
+        //# It is not supported by tdc.
+        ROM_IMAGE = 0x107
     }
 }
 

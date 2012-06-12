@@ -1,9 +1,8 @@
-// 
-// Program.cs
+﻿// File.cs
 //  
 // Author:
-//       Scott Wisniewski <scott@scottdw2.com>
-// 
+//     Scott Wisniewski <scott@scottdw2.com>
+//  
 // Copyright (c) 2012 Scott Wisniewski
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -12,10 +11,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//  
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//  
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,24 +22,30 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+using System.Runtime.InteropServices;
+
+namespace Tiny.Metadata.Layout
 {
-    static class Program
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct FileRow
     {
-        public static int Main(string[] argv)
+        [FieldOffset(0)] public readonly FileAttributes Flags;
+
+        public uint GetNameOffset(PEFile peFile)
         {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
+            fixed (FileRow* pThis = &this) {
+                var pName = (byte*) pThis + 4;
+                return StreamID.Strings.IndexSize(peFile) == 2 ? *(ushort*) pName : *(uint*) pName;
             }
-            return 0;
+        }
+
+        public uint GetHashValueOffset(PEFile peFile)
+        {
+            fixed (FileRow * pThis = &this) {
+                var pHashValue = (byte*)pThis + StreamID.Strings.IndexSize(peFile);
+                return StreamID.Blob.IndexSize(peFile) == 2 ? *(ushort*) pHashValue : *(uint*) pHashValue;
+            }
         }
     }
 }
-

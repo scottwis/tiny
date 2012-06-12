@@ -7,7 +7,7 @@ namespace BclExtras.Collections
     /// <summary>
     /// Represents a persistent or immutable list which is indexable
     /// </summary>
-    public interface IPersistentList<T> : IReadOnlyList<T>
+    public interface IPersistentList<T> : IReadOnlyListEx<T>
     {
         IPersistentList<T> Insert(int index, T value);
         IPersistentList<T> RemoveAt(int index);

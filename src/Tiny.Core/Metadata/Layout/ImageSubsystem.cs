@@ -1,5 +1,5 @@
 // 
-// Program.cs
+// ImageSubsystem.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +23,31 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+namespace Tiny.Metadata.Layout
 {
-    static class Program
+    //# An enum describing the known values of the [OptionalHeader.SubSystem] field
+    enum ImageSubsystem : ushort
     {
-        public static int Main(string[] argv)
-        {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
-            }
-            return 0;
-        }
+        IMAGE_SUBSYSTEM_UNKNOWN=0,
+        //# Device drivers and native Windows processes
+        IMAGE_SUBSYSTEM_NATIVE=1,
+        //# The Windows graphical user interface (GUI) subsystem
+        IMAGE_SUBSYSTEM_WINDOWS_GUI=2,
+        //# The Windows character subsystem
+        IMAGE_SUBSYSTEM_WINDOWS_CUI=3,
+        //# The Posix character subsystem
+        IMAGE_SUBSYSTEM_POSIX_CUI=7,
+        IMAGE_SUBSYSTEM_WINDOWS_CE_GUI=9,
+        //# An Extensible Firmware Interface (EFI) application
+        IMAGE_SUBSYSTEM_EFI_APPLICATION=10,
+        //# An EFI driver with boot services
+        IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER=11,
+        //# An EFI driver with run-time services
+        IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER=12,
+        //# An EFI ROM image
+        IMAGE_SUBSYSTEM_EFI_ROM=13,
+        IMAGE_SUBSYSTEM_XBOX=14
     }
 }
 

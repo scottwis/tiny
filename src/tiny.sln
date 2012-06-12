@@ -1,11 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 11
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tdc", "tdc\tdc.csproj", "{35CC4704-A011-4548-BBDE-1C3FA7D26A1D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "third-party", "third-party", "{0C8EDA94-A823-4CC2-BDA3-829396AD5423}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BclExtras", "..\third-party\BclExtras\BclExtras.csproj", "{3B86EF0E-D275-41E1-B423-0A6C3D2434E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tiny.Core", "Tiny.Core\Tiny.Core.csproj", "{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3539AFE0-DE08-42A5-A0C6-E3905BFB487A}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +58,22 @@ Global
 		{3B86EF0E-D275-41E1-B423-0A6C3D2434E3}.Release|x86-Linux.Build.0 = Release|x86-Linux
 		{3B86EF0E-D275-41E1-B423-0A6C3D2434E3}.Release|x86-Windows.ActiveCfg = Release|x86-Windows
 		{3B86EF0E-D275-41E1-B423-0A6C3D2434E3}.Release|x86-Windows.Build.0 = Release|x86-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x64-Linux.ActiveCfg = Debug|x64-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x64-Linux.Build.0 = Debug|x64-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x64-Windows.ActiveCfg = Debug|x64-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x64-Windows.Build.0 = Debug|x64-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x86-Linux.ActiveCfg = Debug|x86-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x86-Linux.Build.0 = Debug|x86-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x86-Windows.ActiveCfg = Debug|x86-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Debug|x86-Windows.Build.0 = Debug|x86-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x64-Linux.ActiveCfg = Release|x64-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x64-Linux.Build.0 = Release|x64-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x64-Windows.ActiveCfg = Release|x64-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x64-Windows.Build.0 = Release|x64-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x86-Linux.ActiveCfg = Release|x86-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x86-Linux.Build.0 = Release|x86-Linux
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x86-Windows.ActiveCfg = Release|x86-Windows
+		{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}.Release|x86-Windows.Build.0 = Release|x86-Windows
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

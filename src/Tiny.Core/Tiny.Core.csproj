@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64-Windows</Platform>
+    <ProjectGuid>{B254AFE0-DA03-4140-95CD-F399E2F1E4EF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tiny</RootNamespace>
+    <AssemblyName>Tiny.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Windows' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;WIN32;TINY_64</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64-Windows' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>WIN32;TINY_64</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Windows' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;WIN32;TINY_64</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86-Windows' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>WIN32;TINY_64</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Linux' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;linux;TINY_64</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64-Linux' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>linux;TINY_64</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Linux' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;linux;TINY_64</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86-Linux' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>linux;TINY_64</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputPath>..\..\bin\$(Platform)\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyAttributes.cs" />
+    <Compile Include="Collections\LiftedList.cs" />
+    <Compile Include="Collections\LiftedValueTypeList.cs" />
+    <Compile Include="Collections\ReadonlyListBase.cs" />
+    <Compile Include="FluidAsserts.cs" />
+    <Compile Include="InternalErrorException.cs" />
+    <Compile Include="Interop\IUnsafeMemoryMap.cs" />
+    <Compile Include="Interop\NativePlatform.cs" />
+    <Compile Include="Interop\Posix\PosixMemoryMap.cs" />
+    <Compile Include="Interop\Posix\PosixPlatform.cs" />
+    <Compile Include="Interop\Win32\CreateFileAttributes.cs" />
+    <Compile Include="Interop\Win32\CreationDisposition.cs" />
+    <Compile Include="Interop\Win32\FileAccess.cs" />
+    <Compile Include="Interop\Win32\FileMapAccess.cs" />
+    <Compile Include="Interop\Win32\ProtectionFlags.cs" />
+    <Compile Include="Interop\Win32\ShareMode.cs" />
+    <Compile Include="Interop\Win32\UnsafeWin32MemoryMap.cs" />
+    <Compile Include="Interop\Win32\Win32Platform.cs" />
+    <Compile Include="Metadata\Assembly.cs" />
+    <Compile Include="Metadata\ITypeContainer.cs" />
+    <Compile Include="Metadata\Layout\AssemblyFlags.cs" />
+    <Compile Include="Metadata\Layout\AssemblyRow.cs" />
+    <Compile Include="Metadata\Layout\CLRHeader.cs" />
+    <Compile Include="Metadata\Layout\CLRHeaderFlags.cs" />
+    <Compile Include="Metadata\Layout\CodedIndex.cs" />
+    <Compile Include="Metadata\Layout\DllCharacteristics.cs" />
+    <Compile Include="Metadata\Layout\File.cs" />
+    <Compile Include="Metadata\Layout\FileAttributes.cs" />
+    <Compile Include="Metadata\Layout\FileFormat.cs" />
+    <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
+    <Compile Include="Metadata\Layout\ImageSubsystem.cs" />
+    <Compile Include="Metadata\Layout\IToken.cs" />
+    <Compile Include="Metadata\Layout\MachineType.cs" />
+    <Compile Include="Metadata\Layout\MetadataRoot.cs" />
+    <Compile Include="Metadata\Layout\MetadataTable.cs" />
+    <Compile Include="Metadata\Layout\MetadataTableHeader.cs" />
+    <Compile Include="Metadata\Layout\MetadataToken.cs" />
+    <Compile Include="Metadata\Layout\ModuleRow.cs" />
+    <Compile Include="Metadata\Layout\NestedClassRow.cs" />
+    <Compile Include="Metadata\Layout\OptionalHeader.cs" />
+    <Compile Include="Metadata\Layout\OptionalHeader32.cs" />
+    <Compile Include="Metadata\Layout\OptionalHeader32Layout.cs" />
+    <Compile Include="Metadata\Layout\OptionalHeader64.cs" />
+    <Compile Include="Metadata\Layout\OptionalHeaderLayout64.cs" />
+    <Compile Include="Metadata\Layout\PEFile.cs" />
+    <Compile Include="Metadata\Layout\PEHeader.cs" />
+    <Compile Include="Metadata\Layout\RVAAndSize.cs" />
+    <Compile Include="Metadata\Layout\SectionCharacteristics.cs" />
+    <Compile Include="Metadata\Layout\SectionHeader.cs" />
+    <Compile Include="Metadata\Layout\StreamHeader.cs" />
+    <Compile Include="Metadata\Layout\StreamID.cs" />
+    <Compile Include="Metadata\Layout\TypeAttributes.cs" />
+    <Compile Include="Metadata\Layout\TypeDefOrRef.cs" />
+    <Compile Include="Metadata\Layout\TypeDefRow.cs" />
+    <Compile Include="Metadata\Module.cs" />
+    <Compile Include="Metadata\ModuleCollection.cs" />
+    <Compile Include="Metadata\NestedTypeInfo.cs" />
+    <Compile Include="Metadata\Type.cs" />
+    <Compile Include="Metadata\TypeDefinition.cs" />
+    <Compile Include="Util.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

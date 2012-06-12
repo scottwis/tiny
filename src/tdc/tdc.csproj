@@ -23,6 +23,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64-Windows' ">
     <DebugType>none</DebugType>
@@ -33,6 +34,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>WIN32;TINY_64</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Windows' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,6 +47,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86-Windows' ">
     <DebugType>none</DebugType>
@@ -55,6 +58,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>WIN32</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Linux' ">
     <DebugSymbols>true</DebugSymbols>
@@ -67,6 +71,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86-Linux' ">
     <DebugType>none</DebugType>
@@ -77,6 +82,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>linux</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Linux' ">
     <DebugSymbols>true</DebugSymbols>
@@ -89,6 +95,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64-Linux' ">
     <DebugType>none</DebugType>
@@ -99,6 +106,7 @@
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>linux;TINY_64</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\bin\$(Platform)\$(Configuration)</OutputPath>
@@ -109,72 +117,16 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="Collections\" />
+    <ProjectReference Include="..\Tiny.Core\Tiny.Core.csproj">
+      <Project>{b254afe0-da03-4140-95cd-f399e2f1e4ef}</Project>
+      <Name>Tiny.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyAttributes.cs" />
-    <Compile Include="Interop\NativePlatform.cs" />
-    <Compile Include="Interop\IUnsafeMemoryMap.cs" />
-    <Compile Include="Interop\Posix\PosixMemoryMap.cs" />
-    <Compile Include="Interop\Posix\PosixPlatform.cs" />
-    <Compile Include="Interop\Win32\ProtectionFlags.cs" />
-    <Compile Include="Interop\Win32\CreationDisposition.cs" />
-    <Compile Include="Interop\Win32\FileAccess.cs" />
-    <Compile Include="Interop\Win32\FileMapAccess.cs" />
-    <Compile Include="Interop\Win32\ShareMode.cs" />
-    <Compile Include="Interop\Win32\CreateFileAttributes.cs" />
-    <Compile Include="Interop\Win32\UnsafeWin32MemoryMap.cs" />
-    <Compile Include="Interop\Win32\Win32Platform.cs" />
-    <Compile Include="Metadata\Assembly.cs" />
-    <Compile Include="Metadata\Layout\AssemblyFlags.cs" />
-    <Compile Include="Metadata\Layout\AssemblyRow.cs" />
-    <Compile Include="Metadata\Layout\CLRHeader.cs" />
-    <Compile Include="Metadata\Layout\CLRHeaderFlags.cs" />
-    <Compile Include="Metadata\Layout\CodedIndex.cs" />
-    <Compile Include="Metadata\Layout\DllCharacteristics.cs" />
-    <Compile Include="Metadata\Layout\File.cs" />
-    <Compile Include="Metadata\Layout\FileAttributes.cs" />
-    <Compile Include="Metadata\Layout\FileFormat.cs" />
-    <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
-    <Compile Include="Metadata\Layout\ImageSubsystem.cs" />
-    <Compile Include="Metadata\Layout\IToken.cs" />
-    <Compile Include="Metadata\Layout\MachineType.cs" />
-    <Compile Include="Metadata\Layout\MetadataRoot.cs" />
-    <Compile Include="Metadata\Layout\MetadataTable.cs" />
-    <Compile Include="Metadata\Layout\MetadataTableHeader.cs" />
-    <Compile Include="Metadata\Layout\MetadataToken.cs" />
-    <Compile Include="Metadata\Layout\ModuleRow.cs" />
-    <Compile Include="Metadata\Layout\OptionalHeader.cs" />
-    <Compile Include="Metadata\Layout\OptionalHeader32.cs" />
-    <Compile Include="Metadata\Layout\OptionalHeader32Layout.cs" />
-    <Compile Include="Metadata\Layout\OptionalHeader64.cs" />
-    <Compile Include="Metadata\Layout\OptionalHeaderLayout64.cs" />
-    <Compile Include="Metadata\Layout\PEFile.cs" />
-    <Compile Include="Metadata\Layout\PEHeader.cs" />
-    <Compile Include="Metadata\Layout\RVAAndSize.cs" />
-    <Compile Include="Metadata\Layout\SectionCharacteristics.cs" />
-    <Compile Include="Metadata\Layout\SectionHeader.cs" />
-    <Compile Include="Metadata\Layout\StreamHeader.cs" />
-    <Compile Include="Metadata\Layout\StreamID.cs" />
-    <Compile Include="Metadata\Layout\TypeDefRow.cs" />
-    <Compile Include="Metadata\LiftedCollection.cs" />
-    <Compile Include="Metadata\Module.cs" />
-    <Compile Include="Metadata\ModuleCollection.cs" />
-    <Compile Include="Metadata\TypeDefinition.cs" />
-    <Compile Include="Metadata\TypeReference.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="InternalErrorException.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="README.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\third-party\BclExtras\BclExtras.csproj">
-      <Project>{3b86ef0e-d275-41e1-b423-0a6c3d2434e3}</Project>
-      <Name>BclExtras</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
 </Project>

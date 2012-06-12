@@ -65,7 +65,7 @@ namespace BclExtras.Collections
             m_array = new ImmutableArray<T>(col);
         }
 
-        public ImmutableList(IReadOnlyCollection<T> col)
+        public ImmutableList(IReadOnlyCollectionEx<T> col)
         {
             m_array = new ImmutableArray<T>(col);
         }
@@ -241,7 +241,7 @@ namespace BclExtras.Collections
             return new ImmutableList<T>(col);
         }
 
-        public static ImmutableList<T> Create<T>(IReadOnlyCollection<T> col)
+        public static ImmutableList<T> Create<T>(IReadOnlyCollectionEx<T> col)
         {
             return new ImmutableList<T>(col);
         }

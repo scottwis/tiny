@@ -17,9 +17,9 @@ namespace BclExtras.Collections
         [Serializable]
         private class CollectionShim<T> : ICollection<T>
         {
-            private readonly IReadOnlyCollection<T> m_col;
+            private readonly IReadOnlyCollectionEx<T> m_col;
 
-            internal CollectionShim(IReadOnlyCollection<T> col)
+            internal CollectionShim(IReadOnlyCollectionEx<T> col)
             {
                 m_col = col;
             }
@@ -90,9 +90,9 @@ namespace BclExtras.Collections
         [Serializable]
         private sealed class ListShim<T> : CollectionShim<T>, IList<T>
         {
-            private readonly IReadOnlyList<T> m_list;
+            private readonly IReadOnlyListEx<T> m_list;
 
-            internal ListShim(IReadOnlyList<T> list)
+            internal ListShim(IReadOnlyListEx<T> list)
                 : base(list)
             {
                 m_list = list;
@@ -272,9 +272,9 @@ namespace BclExtras.Collections
         [Serializable]
         private class ObjectCollectionShim<T> : System.Collections.ICollection
         {
-            private readonly IReadOnlyCollection<T> m_col;
+            private readonly IReadOnlyCollectionEx<T> m_col;
 
-            internal ObjectCollectionShim(IReadOnlyCollection<T> col)
+            internal ObjectCollectionShim(IReadOnlyCollectionEx<T> col)
             {
                 m_col = col;
             }
@@ -325,9 +325,9 @@ namespace BclExtras.Collections
         [Serializable]
         private sealed class ObjectListShim<T> : ObjectCollectionShim<T>, System.Collections.IList
         {
-            private readonly IReadOnlyList<T> m_list;
+            private readonly IReadOnlyListEx<T> m_list;
 
-            internal ObjectListShim(IReadOnlyList<T> list)
+            internal ObjectListShim(IReadOnlyListEx<T> list)
                 : base(list)
             {
                 m_list = list;
@@ -573,25 +573,25 @@ namespace BclExtras.Collections
         }
 
         /// <summary>
-        /// Useful when interopting IReadOnlyCollection`1 into a scenario where
+        /// Useful when interopting IReadOnlyCollectionEx`1 into a scenario where
         /// an instance of ICollection`1 is needed
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="col"></param>
         /// <returns></returns>
-        public static ICollection<T> CreateICollection<T>(IReadOnlyCollection<T> col)
+        public static ICollection<T> CreateICollection<T>(IReadOnlyCollectionEx<T> col)
         {
             return new CollectionShim<T>(col);
         }
 
         /// <summary>
-        /// Useful when interopting IReadOnlyList`1 into a scenario where an instance
+        /// Useful when interopting IReadOnlyListEx`1 into a scenario where an instance
         /// of IList`1 is needed
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static IList<T> CreateIList<T>(IReadOnlyList<T> list)
+        public static IList<T> CreateIList<T>(IReadOnlyListEx<T> list)
         {
             return new ListShim<T>(list);
         }
@@ -601,12 +601,12 @@ namespace BclExtras.Collections
             return new DictionaryShim<TKey, TValue>(map);
         }
 
-        public static System.Collections.ICollection CreateObjectICollection<T>(IReadOnlyCollection<T> col)
+        public static System.Collections.ICollection CreateObjectICollection<T>(IReadOnlyCollectionEx<T> col)
         {
             return new ObjectCollectionShim<T>(col);
         }
 
-        public static System.Collections.IList CreateObjectIList<T>(IReadOnlyList<T> list)
+        public static System.Collections.IList CreateObjectIList<T>(IReadOnlyListEx<T> list)
         {
             return new ObjectListShim<T>(list);
         }

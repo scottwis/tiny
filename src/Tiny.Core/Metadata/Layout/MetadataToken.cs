@@ -1,9 +1,8 @@
-// 
-// Program.cs
+﻿// MetadataToken.cs
 //  
 // Author:
-//       Scott Wisniewski <scott@scottdw2.com>
-// 
+//     Scott Wisniewski <scott@scottdw2.com>
+//  
 // Copyright (c) 2012 Scott Wisniewski
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -12,10 +11,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//  
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//  
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,24 +22,50 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+using System;
+
+namespace Tiny.Metadata.Layout
 {
-    static class Program
+    //# A generic implementation of [IToken] that can encode a reference to any valid meta-data table.
+    //# The most-signifigant byte is used to decode the associated table.
+    struct MetadataToken : IToken
     {
-        public static int Main(string[] argv)
+        readonly uint m_value;
+
+        public MetadataToken(uint value)
         {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
+            m_value = value;
+        }
+
+        public bool IsNull
+        {
+            get { return (0x00FFFFFF & m_value) == 0; }
+        }
+
+        public MetadataTable Table
+        {
+            get
+            {
+                NullCheck();
+                return (MetadataTable)(((0xFF000000) & m_value) >> 24).AssumeDefined("Invalid meta-data table.");
             }
-            return 0;
+        }
+
+        public uint Index
+        {
+            get
+            {
+                NullCheck();
+                return ((m_value) & 0x00FFFFFF) - 1;
+            }
+        }
+
+        private void NullCheck()
+        {
+            if (IsNull) {
+                throw new InvalidOperationException("The token is null");
+            }
         }
     }
 }
-

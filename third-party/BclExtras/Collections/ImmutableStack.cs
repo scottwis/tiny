@@ -179,9 +179,9 @@ namespace BclExtras.Collections
 
         #endregion
 
-        #region IReadOnlyCollection<T> Members
+        #region IReadOnlyCollectionEx<T> Members
 
-        bool IReadOnlyCollection<T>.Contains(T value)
+        bool IReadOnlyCollectionEx<T>.Contains(T value)
         {
             var comp = EqualityComparer<T>.Default;
             return this.Any(x => comp.Equals(x, value));

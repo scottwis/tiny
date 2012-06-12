@@ -141,14 +141,14 @@ namespace BclExtras.Collections
 
         #endregion
 
-        #region IReadOnlyCollection<T> Members
+        #region IReadOnlyCollectionEx<T> Members
 
         int IReadOnlyCollection<T>.Count
         {
             get { return Count; }
         }
 
-        bool IReadOnlyCollection<T>.Contains(T value)
+        bool IReadOnlyCollectionEx<T>.Contains(T value)
         {
             return
                 ((IPersistentCollection<T>)m_provideStack).Contains(value)

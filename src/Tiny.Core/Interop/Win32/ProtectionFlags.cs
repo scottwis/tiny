@@ -1,5 +1,4 @@
-// 
-// Program.cs
+﻿// ProtectionFlags.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +22,30 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+#if WIN32
+
+using System;
+
+namespace Tiny.Interop.Win32
 {
-    static class Program
+    [Flags]
+    enum ProtectionFlags : uint
     {
-        public static int Main(string[] argv)
-        {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
-            }
-            return 0;
-        }
+        PAGE_EXECUTE_READ = 0x20,
+        PAGE_EXECUTE_READ_WRITE = 0x40,
+        PAGE_EXECUTE_WRITE_COPY = 0x80,
+        PAGE_READONLY = 0x02,
+        PAGE_READWRITE = 0x04,
+        PAGE_WRITECOPY = 0x08,
+        SEC_COMMIT = 0x8000000,
+        SEC_IMAGE = 0x1000000,
+        SEC_IMAGE_NO_EXECUTE = 0x11000000,
+        SEC_LARGE_PAGES = 0x80000000,
+        SEC_NOCACHE = 0x10000000,
+        SEC_RESERVE = 0x4000000,
+        SEC_WRITECOMBINE = 0x40000000
     }
 }
 
+#endif

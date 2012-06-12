@@ -1,5 +1,4 @@
-// 
-// Program.cs
+// CreationDisposition.cs
 //  
 // Author:
 //       Scott Wisniewski <scott@scottdw2.com>
@@ -23,24 +22,17 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.IO;
-using Tiny.Metadata;
 
-namespace Tiny
+#if WIN32
+namespace Tiny.Interop.Win32
 {
-    static class Program
+    enum CreationDisposition : uint
     {
-        public static int Main(string[] argv)
-        {
-            String exeFilePath = new Uri(System.Reflection.Assembly.GetEntryAssembly().CodeBase).LocalPath;
-            String dllFilePath = Path.Combine(Path.GetDirectoryName(exeFilePath), "Tiny.Core.dll");
-            using (var assembly = new Assembly(dllFilePath)) {
-                var m = assembly.Modules[0];
-                var types = m.Types;
-            }
-            return 0;
-        }
+        CREATE_ALWAYS=0x2,
+        CREATE_NEW=0x1,
+        OPEN_ALWAYS=0x4,
+        OPEN_EXISTING=0x3,
+        TRUNCATE_EXISTING=0x5
     }
 }
-
+#endif

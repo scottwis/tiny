@@ -8,7 +8,7 @@ namespace BclExtras.Collections
     /// Represtents a persistent or immutable collection
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IPersistentCollection<T> : IReadOnlyCollection<T>, IEnumerable<T>
+    public interface IPersistentCollection<T> : IReadOnlyCollectionEx<T>, IEnumerable<T>
     {
         IPersistentCollection<T> Add(T value);
         IPersistentCollection<T> Remove(T value);
