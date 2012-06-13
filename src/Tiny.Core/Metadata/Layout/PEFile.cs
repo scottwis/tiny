@@ -681,7 +681,7 @@ namespace Tiny.Metadata.Layout
             if (m_tables == null || m_tables[(int)table] == null) {
                 throw new InvalidOperationException("Missing meta-data table.");
             }
-            return checked(m_tables[(int) MetadataTable.Module] + GetRowSize(MetadataTable.Module)*index);
+            return checked(m_tables[(int)table] + GetRowSize(table)*index);
         }
         
         public IReadOnlyList<byte> ReadBlob(uint index)
