@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Text;
 
 namespace Tiny.Metadata
@@ -35,13 +36,12 @@ namespace Tiny.Metadata
     {
         readonly Type m_modfier;
         readonly Type m_baseType;
-        readonly bool m_isRequired;
 
-        internal ModifiedType(Type modifier, Type baseType, bool isRequred)
+        internal ModifiedType(TypeKind kind, Type modifier, Type baseType) : 
+            base(kind.Check(kind.IsModifiedType(), "Not a valid modified type kind", "kind"))
         {
             m_modfier = modifier.CheckNotNull("modifier");
             m_baseType = baseType.CheckNotNull("baseType");
-            m_isRequired = isRequred;
         }
 
         //# The type of the modifier being applied.
@@ -56,15 +56,9 @@ namespace Tiny.Metadata
             get { return m_baseType; }
         }
 
-        //# Indicates wether they modifier is a "required-modifier" (ModReq) or an "optional modifier" (ModOpt)
-        public bool IsRequired
-        {
-            get { return m_isRequired; }
-        }
-
         internal override void GetFullName(StringBuilder b)
         {
-            b.Append(IsRequired ? "modreq" : "modopt");
+            b.Append(Kind == TypeKind.ModReq ? "modreq" : "modopt");
             b.Append("(");
             Modifier.GetFullName(b);
             b.Append(") ");

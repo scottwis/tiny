@@ -153,6 +153,14 @@ namespace Tiny
             return lhs;
         }
 
+        public static T Check<T>(this T value, bool condition, string message, string parameterName)
+        {
+            if (!condition) {
+                throw new ArgumentException(message, parameterName);
+            }
+            return value;
+        }
+
         public static T AssumeIs<T>(this object o) where T : class
         {
             var ret = o as T;

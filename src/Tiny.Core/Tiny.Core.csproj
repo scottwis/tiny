@@ -162,6 +162,7 @@
     <Compile Include="Metadata\Property.cs" />
     <Compile Include="Metadata\Type.cs" />
     <Compile Include="Metadata\TypeDefinition.cs" />
+    <Compile Include="Metadata\TypeKind.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

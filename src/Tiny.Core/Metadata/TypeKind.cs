@@ -1,4 +1,4 @@
-// Type.cs
+﻿// TypeKind.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,41 +23,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Text;
-using Tiny.Metadata.Layout;
-
 namespace Tiny.Metadata
 {
-    public abstract class Type
+    public enum TypeKind
     {
-        readonly TypeKind m_kind;
+        TypeDefinition,
+        ModOpt,
+        ModReq,
+        GeneralArray,
+        FunctionPointer,
+        GenericInstance,
+        GenericParameter,
+        Pointer,
+        ByRef,
+        Pinned,
+        Sentinel
+    }
 
-        internal Type(TypeKind kind)
+    public static class TypeKindExtensions
+    {
+        public static bool IsModifiedType(this TypeKind kind)
         {
-            m_kind = kind.CheckDefined("kind");
-        }
-
-        internal abstract void GetFullName(StringBuilder b);
-
-        public override string ToString()
-        {
-            return FullName;
-        }
-
-        //# The fully qualified name of the type.
-        public virtual string FullName
-        {
-            get { 
-                var b = new StringBuilder();
-                GetFullName(b);
-                return b.ToString();
+            switch (kind) {
+                case TypeKind.ModOpt:
+                case TypeKind.ModReq:
+                    return true;
+                default:
+                    return false;
             }
-        }
-
-        public TypeKind Kind
-        {
-            get { return m_kind; }
         }
     }
 }

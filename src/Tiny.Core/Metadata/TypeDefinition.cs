@@ -42,7 +42,7 @@ namespace Tiny.Metadata
         volatile string m_namespace;
         readonly PEFile m_peFile;
 
-        internal TypeDefinition(TypeDefRow * pRow, PEFile peFile)
+        internal TypeDefinition(TypeDefRow * pRow, PEFile peFile) : base(TypeKind.TypeDefinition)
         {
             m_peFile = peFile.CheckNotNull("peFile");
             FluidAsserts.CheckNotNull((void*)pRow, "pRow");
