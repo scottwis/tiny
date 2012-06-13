@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using Tiny.Metadata.Layout;
 
@@ -38,6 +39,7 @@ namespace Tiny.Metadata
         readonly TypeDefRow* m_pRow;
         volatile IReadOnlyList<TypeDefinition> m_nestedTypes;
         volatile string m_name;
+        volatile string m_namespace;
 
         internal TypeDefinition(TypeDefRow * pRow, PEFile peFile) : base(peFile)
         {
@@ -45,6 +47,7 @@ namespace Tiny.Metadata
             m_pRow = pRow;
         }
 
+        //# Returns the type containing this type, or null if the type is not nested.
         public TypeDefinition DeclaringType
         {
             get
@@ -68,6 +71,7 @@ namespace Tiny.Metadata
             }
         }
 
+        //# Returns a list of types nested inside this one. This should never return a null value.
         public IReadOnlyList<TypeDefinition> Types
         {
             get
@@ -96,7 +100,8 @@ namespace Tiny.Metadata
             }
         }
 
-        public string Name
+        //# The name of the type.
+        public override string Name
         {
             get
             {
@@ -106,7 +111,130 @@ namespace Tiny.Metadata
                     Interlocked.CompareExchange(ref m_name, name, null);
                     #pragma warning restore 420
                 }
-                return m_name;
+                return m_name.AssumeNotNull();
+            }
+        }
+
+        //# The namespace the type is defined in. If the type is nested this will return the namespace of the containing type.
+        public string Namespace
+        {
+            get
+            {
+                if (DeclaringType != null) {
+                    return DeclaringType.Namespace;
+                }
+                if (m_namespace == null) {
+                    var name = m_peFile.ReadSystemString(m_pRow->GetTypeNamespaceIndex(m_peFile));
+                    #pragma warning disable 420
+                        Interlocked.CompareExchange(ref m_namespace, name, null);
+                    #pragma warning restore 420
+                }
+                return m_namespace.AssumeNotNull();
+            }
+        }
+
+        //# The fully qualified name of the type.
+        public override string FullName
+        {
+            get { 
+                var b = new StringBuilder();
+                GetFullName(b);
+                return b.ToString();
+            }
+        }
+
+        internal override void GetFullName(StringBuilder b)
+        {
+            if (DeclaringType != null) {
+                DeclaringType.GetFullName(b);
+                b.AppendFormat("+{0}", Name);
+            }
+            else if (Namespace.Equals("")) {
+                b.Append(Name);
+            }
+            else  {
+                b.AppendFormat("{0}.{1}", Namespace, Name);
+            }
+        }
+
+        //# The set of fields defined on the type. If the class defines no fields, this will be an empty list.
+        public IReadOnlyList<FieldDefinition> Fields
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# The set of methods defined on the type, or null if the type defines no methods.
+        public IReadOnlyList<MethodDefinition> Methods
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# The type this type inherits from, or null if the type has no base class.
+        public Type BaseType
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# The set of interfaces implemented by the type. If the type implements no interfaces this will be an empty
+        //# list.
+        public IReadOnlyList<Type> ImplementedInterfaces
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# The set of events defined by the type.
+        public IReadOnlyList<Event> Events
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# The set of properties defined by the type.
+        public IReadOnlyList<Property> Properties
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# The set of generic parameters declared by the type.
+        public IReadOnlyList<GenericParameter> GenericParameters
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# The set of custom attributes applied to the type.
+        public IReadOnlyList<CustomAttribute> CustomAttributes
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
             }
         }
     }

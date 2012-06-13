@@ -696,6 +696,11 @@ namespace Tiny.Metadata.Layout
             throw new NotImplementedException();
         }
 
+        public bool IsSorted(MetadataTable table)
+        {
+            return (m_metadataTableHeader->ValidTables & (1UL << (int) table)) != 0;
+        }
+
         public void Dispose()
         {
             m_metadataTableHeader = null;
@@ -718,11 +723,8 @@ namespace Tiny.Metadata.Layout
                 m_memoryMap.Dispose();
                 m_memoryMap = null;
             }
-        }
 
-        public bool IsSorted(MetadataTable table)
-        {
-            return (m_metadataTableHeader->ValidTables & (1UL << (int) table)) != 0;
+            GC.SuppressFinalize(this);
         }
     }
 }

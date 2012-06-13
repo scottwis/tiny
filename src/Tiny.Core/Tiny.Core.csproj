@@ -115,6 +115,10 @@
     <Compile Include="Interop\Win32\UnsafeWin32MemoryMap.cs" />
     <Compile Include="Interop\Win32\Win32Platform.cs" />
     <Compile Include="Metadata\Assembly.cs" />
+    <Compile Include="Metadata\CustomAttribute.cs" />
+    <Compile Include="Metadata\Event.cs" />
+    <Compile Include="Metadata\FieldDefinition.cs" />
+    <Compile Include="Metadata\GenericParameter.cs" />
     <Compile Include="Metadata\ITypeContainer.cs" />
     <Compile Include="Metadata\Layout\AssemblyFlags.cs" />
     <Compile Include="Metadata\Layout\AssemblyRow.cs" />
@@ -150,9 +154,11 @@
     <Compile Include="Metadata\Layout\TypeAttributes.cs" />
     <Compile Include="Metadata\Layout\TypeDefOrRef.cs" />
     <Compile Include="Metadata\Layout\TypeDefRow.cs" />
+    <Compile Include="Metadata\MethodDefinition.cs" />
     <Compile Include="Metadata\Module.cs" />
     <Compile Include="Metadata\ModuleCollection.cs" />
     <Compile Include="Metadata\NestedTypeInfo.cs" />
+    <Compile Include="Metadata\Property.cs" />
     <Compile Include="Metadata\Type.cs" />
     <Compile Include="Metadata\TypeDefinition.cs" />
     <Compile Include="Util.cs" />

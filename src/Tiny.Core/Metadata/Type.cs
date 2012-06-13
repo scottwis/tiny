@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Text;
 using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
@@ -43,5 +44,10 @@ namespace Tiny.Metadata
                 throw new ObjectDisposedException("Type");
             }
         }
+
+        internal abstract void GetFullName(StringBuilder b);
+
+        public abstract string Name { get; }
+        public abstract string FullName { get; }
     }
 }

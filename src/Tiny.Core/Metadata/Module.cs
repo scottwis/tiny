@@ -140,9 +140,14 @@ namespace Tiny.Metadata
                 ()=>m_peFile.IsDisposed
             );
 
-            nestedTypes.ForEach(x => x.NestedType.DeclaringType = x.EnclosingType);
-            allTypes.AsParallel().GroupBy(x => x.DeclaringType).ForEach(
-                x => (x.Key ?? (IMutableTypeContainer) this).Types = x.ToList().AsReadOnly()
+            var enclosingTypes = nestedTypes.Select(x => x.NestedType.DeclaringType = x.EnclosingType).ToHashSet();
+            allTypes.GroupBy(x => x.DeclaringType).ForEach(
+                x => (x.Key ?? (IMutableTypeContainer)this).Types = x.ToList().AsReadOnly()
+            );
+            allTypes.Where(
+                x => !enclosingTypes.Contains(x)
+            ).ForEach(
+                (IMutableTypeContainer x) => x.Types = new List<TypeDefinition>().AsReadOnly()
             );
         }
         

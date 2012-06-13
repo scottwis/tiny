@@ -38,6 +38,13 @@ namespace Tiny
             return new ReadOnlyDictionary<K, V>(d.CheckNotNull("d"));
         }
 
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> items)
+        {
+            var ret = new HashSet<T>();
+            items.ForEach(x=>ret.Add(x));
+            return ret;
+        }
+
         public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
         {
             items.CheckNotNull("items");
