@@ -155,6 +155,7 @@
     <Compile Include="Metadata\Layout\TypeDefOrRef.cs" />
     <Compile Include="Metadata\Layout\TypeDefRow.cs" />
     <Compile Include="Metadata\MethodDefinition.cs" />
+    <Compile Include="Metadata\ModifiedType.cs" />
     <Compile Include="Metadata\Module.cs" />
     <Compile Include="Metadata\ModuleCollection.cs" />
     <Compile Include="Metadata\NestedTypeInfo.cs" />

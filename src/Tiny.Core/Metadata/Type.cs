@@ -31,23 +31,21 @@ namespace Tiny.Metadata
 {
     public abstract class Type
     {
-        internal readonly PEFile m_peFile;
-
-        internal Type(PEFile peFile)
-        {
-            m_peFile = peFile.CheckNotNull("peFile");
-        }
-
-        protected void CheckDisposed()
-        {
-            if (m_peFile.IsDisposed) {
-                throw new ObjectDisposedException("Type");
-            }
-        }
-
         internal abstract void GetFullName(StringBuilder b);
 
-        public abstract string Name { get; }
-        public abstract string FullName { get; }
+        public override string ToString()
+        {
+            return FullName;
+        }
+
+        //# The fully qualified name of the type.
+        public virtual string FullName
+        {
+            get { 
+                var b = new StringBuilder();
+                GetFullName(b);
+                return b.ToString();
+            }
+        }
     }
 }

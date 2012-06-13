@@ -40,9 +40,11 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<TypeDefinition> m_nestedTypes;
         volatile string m_name;
         volatile string m_namespace;
+        readonly PEFile m_peFile;
 
-        internal TypeDefinition(TypeDefRow * pRow, PEFile peFile) : base(peFile)
+        internal TypeDefinition(TypeDefRow * pRow, PEFile peFile)
         {
+            m_peFile = peFile.CheckNotNull("peFile");
             FluidAsserts.CheckNotNull((void*)pRow, "pRow");
             m_pRow = pRow;
         }
@@ -101,7 +103,7 @@ namespace Tiny.Metadata
         }
 
         //# The name of the type.
-        public override string Name
+        public string Name
         {
             get
             {
@@ -130,16 +132,6 @@ namespace Tiny.Metadata
                     #pragma warning restore 420
                 }
                 return m_namespace.AssumeNotNull();
-            }
-        }
-
-        //# The fully qualified name of the type.
-        public override string FullName
-        {
-            get { 
-                var b = new StringBuilder();
-                GetFullName(b);
-                return b.ToString();
             }
         }
 
@@ -235,6 +227,13 @@ namespace Tiny.Metadata
             {
                 //TODO: Implement this
                 throw new NotImplementedException();
+            }
+        }
+
+        void CheckDisposed()
+        {
+            if (m_peFile.IsDisposed) {
+                throw new ObjectDisposedException("TypeDefinition");
             }
         }
     }
