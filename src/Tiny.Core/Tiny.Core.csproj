@@ -114,8 +114,10 @@
     <Compile Include="Interop\Win32\ShareMode.cs" />
     <Compile Include="Interop\Win32\UnsafeWin32MemoryMap.cs" />
     <Compile Include="Interop\Win32\Win32Platform.cs" />
+    <Compile Include="Metadata\ArrayType.cs" />
     <Compile Include="Metadata\Assembly.cs" />
     <Compile Include="Metadata\CustomAttribute.cs" />
+    <Compile Include="Metadata\Dimension.cs" />
     <Compile Include="Metadata\Event.cs" />
     <Compile Include="Metadata\FieldDefinition.cs" />
     <Compile Include="Metadata\GenericParameter.cs" />
