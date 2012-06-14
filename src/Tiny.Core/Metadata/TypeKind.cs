@@ -23,6 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Tiny.Metadata
 {
     public enum TypeKind
@@ -31,6 +33,7 @@ namespace Tiny.Metadata
         ModOpt,
         ModReq,
         GeneralArray,
+        Vector,
         FunctionPointer,
         GenericInstance,
         GenericParameter,
@@ -47,6 +50,52 @@ namespace Tiny.Metadata
             switch (kind) {
                 case TypeKind.ModOpt:
                 case TypeKind.ModReq:
+                case TypeKind.Sentinel:
+                case TypeKind.Pinned:
+                case TypeKind.Pointer:
+                case TypeKind.ByRef:
+                case TypeKind.Vector:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static string ModifierName(this TypeKind kind)
+        {
+            switch (kind) {
+                case TypeKind.ModOpt:
+                    return "modopt";
+                case TypeKind.ModReq:
+                    return "modreq";
+                case TypeKind.Pinned:
+                    return "pinned";
+                case TypeKind.Sentinel:
+                    return "sentinel";
+                default:
+                    throw new ArgumentException("Not a valid modifier kind.", "kind");
+            }
+        }
+
+        public static string Suffix(this TypeKind kind)
+        {
+            switch (kind) {
+                case TypeKind.Pointer:
+                    return "*";
+                case TypeKind.ByRef:
+                    return "&";
+                case TypeKind.Vector:
+                    return "[]";
+                default:
+                    throw new ArgumentException("Kind does not have a suffix.", "kind");
+            }
+        }
+
+        public static bool IsPointerOrByRef(this TypeKind kind)
+        {
+            switch (kind) {
+                case TypeKind.Pointer:
+                case TypeKind.ByRef:
                     return true;
                 default:
                     return false;

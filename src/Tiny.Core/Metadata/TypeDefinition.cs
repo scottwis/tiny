@@ -32,7 +32,7 @@ using Tiny.Metadata.Layout;
 namespace Tiny.Metadata
 {
     //# Represents the definition of a class, struct, interface, or enum type defined in a managed executable.
-    public sealed unsafe class TypeDefinition : Type, ITypeContainer, IMutableTypeContainer
+    public sealed unsafe class TypeDefinition : Type, ITypeContainer, IMutableTypeContainer, IMemberDefinition
     {
         volatile bool m_didSetParent;
         volatile TypeDefinition m_parent;

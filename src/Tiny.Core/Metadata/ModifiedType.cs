@@ -28,10 +28,14 @@ using System.Text;
 
 namespace Tiny.Metadata
 {
-    //# Represents either a modopt or modreq type. A ModOpt or ModReq will "modify" a type by applying another type
-    //# as a modifier. For example, the Managed C++ compiler will use
-    //# "modopt(System.Runtime.CompilerServices.IsConst) T" to represent "const T" types, allowing Managed C++ classes
-    //# to overload methods between "const T" and "T".
+    //# Represents a type that modfies another type. This includes:
+    //# 1. [TypeKind.ModOpt]
+    //# 2. [TypeKind.ModReq]
+    //# 3. [TypeKind.Sentinel]
+    //# 4. [TypeKind.Pinned]
+    //# 5. [TypeKind.Pointer]
+    //# 6. [TypeKind.ByRef]
+    //# 7. [TypeKind.Vector]
     public class ModifiedType : Type
     {
         readonly Type m_modfier;
@@ -40,17 +44,24 @@ namespace Tiny.Metadata
         internal ModifiedType(TypeKind kind, Type modifier, Type baseType) : 
             base(kind.Check(kind.IsModifiedType(), "Not a valid modified type kind", "kind"))
         {
-            m_modfier = modifier.CheckNotNull("modifier");
+            if (Kind == TypeKind.ModOpt || Kind == TypeKind.ModReq) {
+                m_modfier = modifier.CheckNotNull("modifier");
+            }
+            else {
+                m_modfier = modifier.CheckNull("modifier", "A modifier type may only be specified for ModOpt and ModReq types");
+            }
+            
             m_baseType = baseType.CheckNotNull("baseType");
         }
 
-        //# The type of the modifier being applied.
+        //# For [TypeKind.ModOpt] or [TypeKind.ModReq] types, returns the modifier type being applied to [BaseType].
+        //# Otherwise, null is returned.
         public Type Modifier
         {
             get { return m_modfier; }
         }
 
-        //# The type [Modifier] applies to.
+        //# The base type being modified.
         public Type BaseType
         {
             get { return m_baseType; }
@@ -58,11 +69,30 @@ namespace Tiny.Metadata
 
         internal override void GetFullName(StringBuilder b)
         {
-            b.Append(Kind == TypeKind.ModReq ? "modreq" : "modopt");
-            b.Append("(");
-            Modifier.GetFullName(b);
-            b.Append(") ");
-            BaseType.GetFullName(b);
+            switch (Kind) {
+                case TypeKind.ModOpt:
+                case TypeKind.ModReq:
+                case TypeKind.Pinned:
+                case TypeKind.Sentinel:
+                    b.Append(Kind.ModifierName());
+                    b.Append("(");
+                    Modifier.GetFullName(b);
+                    b.Append(") ");
+                    BaseType.GetFullName(b);
+                    break;
+                case TypeKind.Pointer:
+                case TypeKind.ByRef:
+                case TypeKind.Vector:
+                    BaseType.GetFullName(b);
+                    if (BaseType.Kind.IsPointerOrByRef()) {
+                        b.Append(" ");
+                    }
+                    b.Append(Kind.Suffix());
+                    break;
+                default:
+                    throw new InternalErrorException("Unexpected type kind");
+            }
+            
         }
     }
 }

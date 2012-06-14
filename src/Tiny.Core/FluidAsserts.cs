@@ -129,6 +129,15 @@ namespace Tiny
             return obj;
         }
 
+        public static T CheckNull<T>(this T obj, string parameterName, string message) where T : class
+        {
+            if (obj != null)
+            {
+                throw new ArgumentException(message, parameterName);
+            }
+            return null;
+        }
+
         public static T CheckGTE<T>(this T lhs, T rhs, string parameterName) where T : IComparable<T>
         {
             if (lhs.CompareTo(rhs) < 0) {

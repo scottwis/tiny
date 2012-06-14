@@ -119,6 +119,7 @@
     <Compile Include="Metadata\Event.cs" />
     <Compile Include="Metadata\FieldDefinition.cs" />
     <Compile Include="Metadata\GenericParameter.cs" />
+    <Compile Include="Metadata\IMember.cs" />
     <Compile Include="Metadata\ITypeContainer.cs" />
     <Compile Include="Metadata\Layout\AssemblyFlags.cs" />
     <Compile Include="Metadata\Layout\AssemblyRow.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Metadata\Type.cs" />
     <Compile Include="Metadata\TypeDefinition.cs" />
     <Compile Include="Metadata\TypeKind.cs" />
+    <Compile Include="ResharperAnnotations.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
