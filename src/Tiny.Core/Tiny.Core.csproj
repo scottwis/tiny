@@ -120,6 +120,7 @@
     <Compile Include="Metadata\Dimension.cs" />
     <Compile Include="Metadata\Event.cs" />
     <Compile Include="Metadata\FieldDefinition.cs" />
+    <Compile Include="Metadata\GenericInstanceType.cs" />
     <Compile Include="Metadata\GenericParameter.cs" />
     <Compile Include="Metadata\IMember.cs" />
     <Compile Include="Metadata\ITypeContainer.cs" />

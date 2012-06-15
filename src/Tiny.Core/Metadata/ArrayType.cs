@@ -32,6 +32,7 @@ namespace Tiny.Metadata
     //# Represents a "general array type" in the CLR. Note that this is distinct from a "vector type"
     //# which is used to represent zero-based single dimensional arrays. All instances of ArrayType
     //# will either represent a multi-dimensional array or an array type with a non zero lower bound.
+    //# Vector types are represented using the [ModifidedType] class.
     class ArrayType : Type
     {
         readonly Type m_baseType;

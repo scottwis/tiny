@@ -122,7 +122,7 @@ namespace Tiny.Metadata
             var allTypes = new LiftedList<TypeDefinition>(
                 MetadataTable.TypeDef.RowCount(m_peFile),
                 (index) => m_peFile.GetRow(index, MetadataTable.TypeDef),
-                (pRow) => new TypeDefinition((TypeDefRow*)pRow, m_peFile),
+                (pRow) => new TypeDefinition((TypeDefRow*)pRow, this),
                 () => m_peFile.IsDisposed
             );
 
@@ -164,6 +164,11 @@ namespace Tiny.Metadata
                 }
                 return m_types;
             }
+        }
+
+        internal PEFile PEFile
+        {
+            get { return m_peFile; }
         }
 
         IReadOnlyList<TypeDefinition> IMutableTypeContainer.Types

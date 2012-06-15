@@ -40,12 +40,12 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<TypeDefinition> m_nestedTypes;
         volatile string m_name;
         volatile string m_namespace;
-        readonly PEFile m_peFile;
+        readonly Module m_module;
 
-        internal TypeDefinition(TypeDefRow * pRow, PEFile peFile) : base(TypeKind.TypeDefinition)
+        internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
-            m_peFile = peFile.CheckNotNull("peFile");
-            FluidAsserts.CheckNotNull((void*)pRow, "pRow");
+            m_module = module.CheckNotNull("module");
+            FluidAsserts.CheckNotNull((void *)pRow, "pRow");
             m_pRow = pRow;
         }
 
@@ -108,7 +108,7 @@ namespace Tiny.Metadata
             get
             {
                 if (m_name == null) {
-                    var name = m_peFile.ReadSystemString(m_pRow->GetTypeNameIndex(m_peFile));
+                    var name = Module.PEFile.ReadSystemString(m_pRow->GetTypeNameIndex(Module.PEFile));
                     #pragma warning disable 420
                     Interlocked.CompareExchange(ref m_name, name, null);
                     #pragma warning restore 420
@@ -126,7 +126,7 @@ namespace Tiny.Metadata
                     return DeclaringType.Namespace;
                 }
                 if (m_namespace == null) {
-                    var name = m_peFile.ReadSystemString(m_pRow->GetTypeNamespaceIndex(m_peFile));
+                    var name = Module.PEFile.ReadSystemString(m_pRow->GetTypeNamespaceIndex(Module.PEFile));
                     #pragma warning disable 420
                         Interlocked.CompareExchange(ref m_namespace, name, null);
                     #pragma warning restore 420
@@ -230,9 +230,14 @@ namespace Tiny.Metadata
             }
         }
 
+        public Module Module
+        {
+            get { return m_module; }
+        }
+
         void CheckDisposed()
         {
-            if (m_peFile.IsDisposed) {
+            if (Module == null || Module.PEFile.IsDisposed) {
                 throw new ObjectDisposedException("TypeDefinition");
             }
         }
