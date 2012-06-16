@@ -33,7 +33,7 @@ namespace Tiny.Metadata
     //# which is used to represent zero-based single dimensional arrays. All instances of ArrayType
     //# will either represent a multi-dimensional array or an array type with a non zero lower bound.
     //# Vector types are represented using the [ModifidedType] class.
-    class ArrayType : Type
+    public sealed class ArrayType : Type
     {
         readonly Type m_baseType;
         readonly IReadOnlyList<Dimension> m_dimensions;

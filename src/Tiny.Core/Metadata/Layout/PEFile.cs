@@ -641,7 +641,7 @@ namespace Tiny.Metadata.Layout
             return 2;
         }
 
-        public uint GetRowCount(MetadataTable table)
+        public int GetRowCount(MetadataTable table)
         {
             CheckDisposed();
             FluidAsserts.AssumeNotNull((void *)m_metadataTableHeader);
@@ -673,18 +673,20 @@ namespace Tiny.Metadata.Layout
             return m_metadataTableHeader->GetHeapIndexSize(streamID);
         }
 
-        public void * GetRow(uint index, MetadataTable table)
+        public void * GetRow(int index, MetadataTable table)
         {
             CheckDisposed();
             table.CheckDefined("table");
+            index.CheckGTE(0, "index");
             index.CheckLT(GetRowCount(table), "index");
+
             if (m_tables == null || m_tables[(int)table] == null) {
                 throw new InvalidOperationException("Missing meta-data table.");
             }
             return checked(m_tables[(int)table] + GetRowSize(table)*index);
         }
         
-        public IReadOnlyList<byte> ReadBlob(uint index)
+        public IReadOnlyList<byte> ReadBlob(uint offset)
         {
             //TODO: Implement this
             throw new NotImplementedException();
@@ -699,6 +701,123 @@ namespace Tiny.Metadata.Layout
         public bool IsSorted(MetadataTable table)
         {
             return (m_metadataTableHeader->ValidTables & (1UL << (int) table)) != 0;
+        }
+
+        public int GetRowIndex(MetadataTable table, void* pRow)
+        {
+            table.CheckDefined("table");
+            FluidAsserts.CheckNotNull((void *)pRow, "pRow");
+
+            var pFirst = GetRow(0, table);
+            if (
+                pRow < pFirst 
+                || (((byte*)pRow - (byte*)pFirst) % GetRowSize(table)) != 0
+            ) {
+                throw new ArgumentException(string.Format("Not a valid row in {0}", table), "pRow");
+            }
+
+            var index = ((byte*) pRow - (byte*) pFirst)/GetRowSize(table);
+            if (index >= GetRowCount(table)) {
+                throw new ArgumentException(string.Format("Not a valid row in {0}", table), "pRow");
+            }
+
+            return (int)index;
+        }
+
+        //# Returns the index of the largest item in [table] strictly less than (<) [value], or -1 if no such value exists.
+        //#
+        //# Parameters
+        //# ============
+        //# [table] : The metadata table to search.
+        //# [value] : The value to search for.
+        //# [selector]
+        //#     A function that projects the desired sort field(s) from the rows of the table. The table must be sorted\
+        //#     by selector.
+        public int GreatestLowerBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
+        {
+            table.CheckDefined("table");
+            selector.CheckNotNull("selector");
+
+            if (! IsSorted(table)) {
+                throw new InvalidOperationException(string.Format("The table '{0}' is not sorted", table));
+            }
+
+            if (GetRowCount(table) == 0) {
+                return -1;
+            }
+
+            var min = 0;
+            var max = GetRowCount(table) - 1;
+            var comparer = Comparer<T>.Default;
+
+            while (max > 0 && max != min) {
+                var mid = ((max - min) + 1)/2 + min;
+                var comp = comparer.Compare(value, selector(GetRow(mid, table)));
+                if (comp <= 0) {
+                    max = mid - 1;
+                }
+                else {
+                    min = mid;
+                }
+            }
+
+            if (max < 0) {
+                return -1;
+            }
+
+            if (min > 0 || comparer.Compare(value, selector(GetRow(min, table))) > 0) {
+                return min;
+            }
+            return -1;
+        }
+
+        //# Returns the index of the smallest item in [table] strictly greater than (>) [value]. If no such element
+        //# exists then the index immedietly beyond the end of the table (count + 1) is returned.
+        //#
+        //# Parameters
+        //# ============
+        //# [table] : The metadata table to search.
+        //# [value] : The value to search for.
+        //# [selector]
+        //#     A function that projects the desired sort field(s) from the rows of the table. The table must be sorted\
+        //#     by selector.
+        public int LeastUpperBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
+        {
+            table.CheckDefined("table");
+            selector.CheckNotNull("selector");
+
+            if (!IsSorted(table)) {
+                throw new InvalidOperationException(string.Format("The table '{0}' is not sorted", table));
+            }
+
+            if (GetRowCount(table) == 0) {
+                return 1;
+            }
+
+            var min = 0;
+            var max = GetRowCount(table) - 1;
+            var last = max;
+            var comparer = Comparer<T>.Default;
+
+            while (min < last && max != min) {
+                var mid = (max - min)/2 + min;
+                var comp = comparer.Compare(value, selector(GetRow(mid, table)));
+                if (comp < 0) {
+                    max = mid;
+                }
+                else {
+                    min = mid + 1;
+                }
+
+            }
+
+            if (min > last) {
+                return last + 1;
+            }
+            if (max < last || comparer.Compare(value, selector(GetRow(max, table))) > 0) {
+                return max;
+            }
+            return last + 1;
         }
 
         public void Dispose()
@@ -725,6 +844,18 @@ namespace Tiny.Metadata.Layout
             }
 
             GC.SuppressFinalize(this);
+        }
+
+        public Type ParseTypeSpec(int index, Module module)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
+        public Type ResolveTypeRef(int index, Module module)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
         }
     }
 }

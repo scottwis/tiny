@@ -36,7 +36,7 @@ namespace Tiny.Metadata
     //# 5. [TypeKind.Pointer]
     //# 6. [TypeKind.ByRef]
     //# 7. [TypeKind.Vector]
-    public class ModifiedType : Type
+    public sealed class ModifiedType : Type
     {
         readonly Type m_modfier;
         readonly Type m_baseType;

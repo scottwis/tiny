@@ -29,7 +29,9 @@ using System.Runtime.InteropServices;
 namespace Tiny.Metadata.Layout
 {
     //# Defines the layout of the "header" at the begining of the "#~"(metadata tables) stream in a managed PE file.
-    //# Reference: ECMA-335, 5th Edition, Partition II § 24.2.6
+    //# Reference
+    //# ===================
+    //# * ECMA-335, 5th Edition, Partition II § 24.2.6
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct MetadataTableHeader
     {
@@ -74,7 +76,7 @@ namespace Tiny.Metadata.Layout
 
         //# Returns the number of rows for the given meta-data table. If a table is not present, 0 will be returned.
         //# throws: ArgumentOutOfRangeException - If [table] is not valid.
-        public uint GetRowCount(MetadataTable table)
+        public int GetRowCount(MetadataTable table)
         {
             if ((byte)table >= (sizeof(ulong)*8)) {
                 throw new ArgumentOutOfRangeException("table", "Invalid meta-data table.");
@@ -90,7 +92,7 @@ namespace Tiny.Metadata.Layout
                 //valid tables bit mask. So we mask out all bits at or above position n in the valid mask
                 //and then compute it's bit count.
                 var index = (((1ul << (int) table) - 1) & ValidTables).BitCount();
-                return pRows[index];
+                return checked((int)pRows[index]);
             }
         }
 
@@ -102,7 +104,10 @@ namespace Tiny.Metadata.Layout
 
         //# Returns the number of bytes used to incode indexes into the given stream.
         //# If the number of entries in the provided stream is <= 2^16, this will be 2. Otherwise 4 will be returned.
-        //# throws: ArgumentOutOfRangeException if the provided stream is not any of the following:
+        //#
+        //# Throws
+        //# =====================
+        //# [ArgumentOutOfRangeException] : if the provided stream is not any of the following:
         //#     1. [StreamID.Strings]
         //#     2. [StreamID.Guid]
         //#     3. [StreamID.Blob]

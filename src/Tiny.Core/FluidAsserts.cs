@@ -29,11 +29,6 @@ namespace Tiny
 {
     public static class FluidAsserts
     {
-        public static uint AssumeGTZ(this uint x)
-        {
-            return x.AssumeGT(0U);
-        }
-
         public static T AssumeGT<T>(this T lhs, T rhs) where T : IComparable<T>
         {
             if (lhs.CompareTo(rhs) <= 0) {
@@ -170,6 +165,11 @@ namespace Tiny
             return value;
         }
 
+        public static T Check<T>(this T value, Func<T, bool> predicate, string message, string parameterName)
+        {
+            return Check(value, predicate(value), message, parameterName);
+        }
+
         public static T AssumeIs<T>(this object o) where T : class
         {
             var ret = o as T;
@@ -177,6 +177,14 @@ namespace Tiny
                 throw new InternalErrorException(String.Format("Expected an object of type '{0}'", typeof (T)));
             }
             return ret;
+        }
+
+        public static bool AssumeTrue(this bool b, string message)
+        {
+            if (! b) {
+                throw new InternalErrorException(message);
+            }
+            return true;
         }
     }
 }

@@ -30,7 +30,9 @@ using System.Runtime.InteropServices;
 namespace Tiny.Metadata.Layout
 {
     //# Defines the layout of the PE Header in a managed executable.
-    //# Reference: Partion II Section 25.2.2 ECMA 335 Spec, Version 5
+    //# Reference
+    //# ===================
+    //# * Partion II Section 25.2.2 ECMA 335 Spec, Version 5
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct PEHeader
     {
@@ -56,7 +58,9 @@ namespace Tiny.Metadata.Layout
         //# The pointer (file offset) to the symbol table. This should always be 0 for any executable image
         //# including managed executables. It only should be non-null for object files.
         //#
-        //# Reference: PE/COFF Spec Version 8.2 § 2.3
+        //# Reference
+        //# ===================
+        //# * PE/COFF Spec Version 8.2 § 2.3
         [FieldOffset(8)]
         public readonly int PointerToSymbolTable;
 
@@ -75,7 +79,7 @@ namespace Tiny.Metadata.Layout
         public readonly ImageCharacteristics Characteristics;
 
         public bool Validate(byte * pFileBase, uint fileSize) {
-            fileSize.AssumeGTZ();
+            fileSize.AssumeGT(0U);
             fixed(PEHeader * pThis = &this) {
                 FluidAsserts.Assume(pThis >= pFileBase && pThis < checked(pFileBase + fileSize));
                 FluidAsserts.Assume(fileSize - ((byte *)pThis - pFileBase) >= sizeof(PEHeader));

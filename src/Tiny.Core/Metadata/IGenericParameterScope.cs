@@ -1,4 +1,4 @@
-﻿// IMember.cs
+﻿// IGenericParameterScope.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,12 +23,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Collections.Generic;
+
 namespace Tiny.Metadata
 {
-    public interface IMemberDefinition
+    public interface IGenericParameterScope : IMemberDefinition
     {
-        string Name { get; }
-        string FullName { get; }
-        TypeDefinition DeclaringType { get; }
+        IReadOnlyList<GenericParameter> GenericParameters { get; }
+        Module Module { get;  }
     }
 }

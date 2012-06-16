@@ -1,4 +1,4 @@
-﻿// TypeDefOrRef.cs
+// TypeOrMethodDef.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -27,34 +27,32 @@ using System;
 
 namespace Tiny.Metadata.Layout
 {
-    struct TypeDefOrRef : IToken
+    struct TypeOrMethodDef : IToken
     {
         readonly uint m_index;
 
-        public TypeDefOrRef(uint index)
+        public TypeOrMethodDef(uint index) : this()
         {
             m_index = index;
         }
 
         public bool IsNull
         {
-            get { return ((m_index & ~0x3u) >> 2) == 0; }
+            get { return ((m_index & ~0x1U) >> 1) == 0; }
         }
 
         public MetadataTable Table
         {
             get
             {
-                NullCheck();
-                switch (m_index & 0x3) {
+                CheckNull();
+                switch (m_index & 0x1) {
                     case 0:
                         return MetadataTable.TypeDef;
                     case 1:
-                        return MetadataTable.TypeRef;
-                    case 2:
-                        return MetadataTable.TypeSpec;
+                        return MetadataTable.MethodDef;
                     default:
-                        throw new InvalidOperationException("Invalid metadata table.");
+                        throw new InternalErrorException("This code should be unreachable.S");
                 }
             }
         }
@@ -63,15 +61,15 @@ namespace Tiny.Metadata.Layout
         {
             get
             {
-                NullCheck();
-                return (int)((m_index & ~0x3u) >> 2);
+                CheckNull();
+                return (int)((m_index & ~0x1U) >> 1);
             }
         }
 
-        void NullCheck()
+        void CheckNull()
         {
             if (IsNull) {
-                throw new InvalidOperationException("The token is null.");
+                throw new InvalidOperationException("The index is null");
             }
         }
 

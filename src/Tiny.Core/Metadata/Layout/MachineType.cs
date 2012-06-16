@@ -30,7 +30,9 @@ namespace Tiny.Metadata.Layout
     //# Verfy few of these are supported by tdc, but eveyrthing documented in the PE
     //# spec is included here for completeness.
     //#
-    //# Reference: See PE/COFF Spec Version 8.2, § 2.3.1 for details.
+    //# Reference
+    //# ===================
+    //# * See PE/COFF Spec Version 8.2, § 2.3.1 for details.
     enum MachineType : ushort
     {
         //# Indicates that the contents of PE file are applicable to any machine type

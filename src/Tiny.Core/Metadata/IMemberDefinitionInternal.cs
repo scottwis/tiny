@@ -1,4 +1,4 @@
-﻿// IMember.cs
+﻿// IMemberDefinitionInternal.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,12 +23,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Text;
+
 namespace Tiny.Metadata
 {
-    public interface IMemberDefinition
+    interface IMemberDefinitionInternal : IMemberDefinition
     {
-        string Name { get; }
-        string FullName { get; }
-        TypeDefinition DeclaringType { get; }
+        void GetFullName(StringBuilder b);
     }
 }

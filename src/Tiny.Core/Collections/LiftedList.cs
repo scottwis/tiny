@@ -30,7 +30,7 @@ using Tiny;
 
 namespace Tiny.Collections
 {
-    public unsafe delegate void* GetRowDelegate(uint index);
+    public unsafe delegate void* GetRowDelegate(int index);
     public unsafe delegate T CreateObjectDelegate<out T>(void* pRow);
 
     public sealed unsafe class LiftedList<T> : ReadonlyListBase<T> where T : class
@@ -44,13 +44,13 @@ namespace Tiny.Collections
         readonly T[] m_array;
 
         public LiftedList(
-            uint itemCount,
+            int itemCount,
             GetRowDelegate rowFectcher,
             CreateObjectDelegate<T> factory,
             Func<bool> disposedChecker
         )
         {
-            itemCount.CheckGTE(0U, "itemCount");
+            itemCount.CheckGTE(0, "itemCount");
 
             FetchRow = rowFectcher.CheckNotNull("rowFetcher");
             CreateObject = factory.CheckNotNull("factory");
@@ -91,12 +91,12 @@ namespace Tiny.Collections
                 if (index < 0 || index >= m_array.Length) {
                     throw new ArgumentOutOfRangeException("index");
                 }
-                LoadObject((uint) index);
+                LoadObject(index);
                 return m_array[index];
             }
         }
 
-        void LoadObject(uint index)
+        void LoadObject(int index)
         {
             if (m_array[index] == null) {
                 var obj = CreateObject(FetchRow(index));

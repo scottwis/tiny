@@ -32,7 +32,8 @@ using Tiny.Metadata.Layout;
 namespace Tiny.Metadata
 {
     //# Represents the definition of a class, struct, interface, or enum type defined in a managed executable.
-    public sealed unsafe class TypeDefinition : Type, ITypeContainer, IMutableTypeContainer, IMemberDefinition
+    public sealed unsafe class TypeDefinition : 
+        Type, ITypeContainer, IMutableTypeContainer, IGenericParameterScope, IMemberDefinitionInternal
     {
         volatile bool m_didSetParent;
         volatile TypeDefinition m_parent;
@@ -133,6 +134,11 @@ namespace Tiny.Metadata
                 }
                 return m_namespace.AssumeNotNull();
             }
+        }
+
+        void IMemberDefinitionInternal.GetFullName(StringBuilder b)
+        {
+            GetFullName(b);
         }
 
         internal override void GetFullName(StringBuilder b)

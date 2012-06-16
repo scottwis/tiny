@@ -40,7 +40,8 @@ namespace Tiny.Metadata
         Pointer,
         ByRef,
         Pinned,
-        Sentinel
+        Sentinel,
+        TypeReference
     }
 
     public static class TypeKindExtensions

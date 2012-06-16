@@ -32,7 +32,7 @@ namespace Tiny.Collections
     public static unsafe class LiftedValueTypeList
     {
         public static LiftedValueTypeList<T> Create<T>(
-            uint itemCount,
+            int itemCount,
             GetRowDelegate rowFectcher,
             CreateObjectDelegate<T> factory, 
             Func<bool> disposedChecker
@@ -41,6 +41,7 @@ namespace Tiny.Collections
             return new LiftedValueTypeList<T>(itemCount, rowFectcher, factory, disposedChecker);
         }
     }
+
     public sealed unsafe class LiftedValueTypeList<T> : ReadonlyListBase<T> where T : struct
     {
         // ReSharper disable InconsistentNaming
@@ -52,13 +53,13 @@ namespace Tiny.Collections
         readonly int m_itemCount;
 
         public LiftedValueTypeList(
-            uint itemCount,
+            int itemCount,
             GetRowDelegate rowFectcher,
             CreateObjectDelegate<T> factory, 
             Func<bool> disposedChecker
         )
         {
-            m_itemCount = (int)itemCount.CheckLTE((uint)int.MaxValue, "itemCount");
+            m_itemCount = itemCount.CheckGTE(0, "itemCount");
             FetchRow = rowFectcher.CheckNotNull("rowFetcher");
             CreateObject = factory.CheckNotNull("factory");
             IsDisposed = disposedChecker.CheckNotNull("disposedChecker");
@@ -96,7 +97,7 @@ namespace Tiny.Collections
                 if (index < 0 || index >= Count) {
                     throw new ArgumentOutOfRangeException("index");
                 }
-                return CreateObject(FetchRow((uint)index));
+                return CreateObject(FetchRow(index));
             }
         }
     }

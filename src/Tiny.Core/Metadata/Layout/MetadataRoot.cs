@@ -30,7 +30,9 @@ using Tiny.Interop;
 namespace Tiny.Metadata.Layout
 {
     //# Defines the layout of the "Metadata root" header in a managed PE/COFF file.
-    //# Reference: ECMA-335, 5th Edition, Partition II, § 24.2.1
+    //# Reference
+    //# ===================
+    //# * ECMA-335, 5th Edition, Partition II, § 24.2.1
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct MetadataRoot
     {

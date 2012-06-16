@@ -173,7 +173,7 @@ namespace Tiny.Metadata.Layout
         public bool Verify(uint fileSize, PEHeader * pPEHeader)
         {
             FluidAsserts.AssumeNotNull((void *)pPEHeader);
-            fileSize.AssumeGTZ();
+            fileSize.AssumeGT(0U);
 
             if (CodeSize > ImageSize) {
                 return false;

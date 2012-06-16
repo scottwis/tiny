@@ -1,4 +1,4 @@
-// IToken.cs
+﻿// GenericParameterConstraintRow.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,37 +23,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
+using System.Runtime.InteropServices;
 
 namespace Tiny.Metadata.Layout
 {
-    //# Defines an interface for a CLR metadata token. A token is an encoding of a table-name, index pair. In
-    //# different contexts in a meta-data file a varying number of bits, and distinct set of value mappings are used
-    //# to encode the table an index is associated with. This interface provides a common abstraction for all of those
-    //# cases.
-    interface IToken : IComparable<IToken>, IEquatable<IToken>
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct GenericParameterConstraintRow
     {
-        //# Returns true if the token is null, false otherwise.
-        bool IsNull { get; }
-
-        //# The meta-data table the token reference.
-        //# Throws: [InvalidOperationException] if [IsNull] returns true.
-        MetadataTable Table { get; }
-
-        //# The index within the encoded table. 
-        //# Throws: [InvalidOpeationException] if [IsNull] returns true.
-        int Index { get; }
-    }
-
-    static class TokenExtensions
-    {
-        public static IToken CheckValid(this IToken token, string parameterName, Func<IToken, bool> predicate, string message)
+        public uint GetOwner(PEFile peFile)
         {
-            return token.CheckNotNull(parameterName).Check(
-                x => !x.IsNull, 
-                "Token references null row", 
-                parameterName
-            ).Check(predicate, message, parameterName);
+            peFile.CheckNotNull("peFile");
+            fixed (GenericParameterConstraintRow* pThis = &this) {
+                if (MetadataTable.GenericParam.IndexSize(peFile) == 2) {
+                    return *(ushort*) pThis;
+                }
+                return *(uint*) pThis;
+            }
+        }
+
+        public TypeDefOrRef GetConstraint(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (GenericParameterConstraintRow* pThis = &this) {
+                var pConstraint = (byte*) pThis + MetadataTable.GenericParam.IndexSize(peFile);
+                uint index;
+                if (CodedIndex.TypeDefOrRef.IndexSize(peFile) == 2) {
+                    index = *(ushort*) pThis;
+                }
+                else {
+                    index = *(uint*) pThis;
+                }
+                return new TypeDefOrRef(index);
+            }
         }
     }
 }

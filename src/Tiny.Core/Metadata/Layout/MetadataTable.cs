@@ -26,7 +26,9 @@
 namespace Tiny.Metadata.Layout
 {
     //# Defines an enum identifying the meta-data tables present in a managed executable.
-    //# Reference: ECMA-335 Spec, 5th Edition, Partion II, §§ 22.2-22.39
+    //# Reference
+    //# ===================
+    //# * ECMA-335 Spec, 5th Edition, Partion II, §§ 22.2-22.39
     enum MetadataTable : byte
     {
         Assembly = 0x20,
@@ -71,6 +73,8 @@ namespace Tiny.Metadata.Layout
         MAX_TABLE_ID = 0x2c
     }
 
+    unsafe delegate T UnsafeSelector<out T>(void* pData);
+
     static class MetadataTableExtensions
     {
         public static uint IndexSize(this MetadataTable table, PEFile peFile)
@@ -83,9 +87,41 @@ namespace Tiny.Metadata.Layout
             return peFile.CheckNotNull("peFile").GetRowSize(table);
         }
 
-        public static uint RowCount(this MetadataTable table, PEFile peFile)
+        public static int RowCount(this MetadataTable table, PEFile peFile)
         {
-            return peFile.GetRowCount(table);
+            return peFile.CheckNotNull("peFile").GetRowCount(table);
+        }
+
+        public static unsafe void * GetRow(this MetadataTable table, int index, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").GetRow(index, table);
+        }
+
+        public unsafe static int RowIndex(this MetadataTable table, void * pRow, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").GetRowIndex(table, pRow);
+        }
+
+        public unsafe static int GreatestLowerBound<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").GreatestLowerBound(table, value, selector);
+        }
+
+        public unsafe static int LeastUpperBound<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").LeastUpperBound(table, value, selector);
+        }
+
+        public static bool CanReferenceType(this MetadataTable table)
+        {
+            switch (table) {
+                case MetadataTable.TypeDef:
+                case MetadataTable.TypeSpec:
+                case MetadataTable.TypeRef:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

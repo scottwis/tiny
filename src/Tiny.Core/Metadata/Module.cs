@@ -42,6 +42,7 @@ namespace Tiny.Metadata
         readonly bool m_containsMetadata;
         Guid? m_guid;
         volatile IReadOnlyList<TypeDefinition> m_types;
+        volatile IReadOnlyList<TypeDefinition> m_allTypes;
 
         private Module(ModuleRow* moduleRow, PEFile peFile)
         {
@@ -119,7 +120,7 @@ namespace Tiny.Metadata
 
         private void LoadTypes()
         {
-            var allTypes = new LiftedList<TypeDefinition>(
+            m_allTypes = new LiftedList<TypeDefinition>(
                 MetadataTable.TypeDef.RowCount(m_peFile),
                 (index) => m_peFile.GetRow(index, MetadataTable.TypeDef),
                 (pRow) => new TypeDefinition((TypeDefRow*)pRow, this),
@@ -132,18 +133,18 @@ namespace Tiny.Metadata
                 x=> {
                     var pRow = (NestedClassRow*) x;
                     return new NestedTypeInfo(
-                        allTypes[(int)(pRow->GetNestedClass(m_peFile) - 1)], 
-                        allTypes[(int)(pRow->GetEnclosingClass(m_peFile) - 1)]
+                        m_allTypes[(int)(pRow->GetNestedClass(m_peFile) - 1)], 
+                        m_allTypes[(int)(pRow->GetEnclosingClass(m_peFile) - 1)]
                     );
                 },
                 ()=>m_peFile.IsDisposed
             );
 
             var enclosingTypes = nestedTypes.Select(x => x.NestedType.DeclaringType = x.EnclosingType).ToHashSet();
-            allTypes.GroupBy(x => x.DeclaringType).ForEach(
+            m_allTypes.GroupBy(x => x.DeclaringType).ForEach(
                 x => (x.Key ?? (IMutableTypeContainer)this).Types = x.ToList().AsReadOnly()
             );
-            allTypes.Where(
+            m_allTypes.Where(
                 x => !enclosingTypes.Contains(x)
             ).ForEach(
                 (IMutableTypeContainer x) => x.Types = new List<TypeDefinition>().AsReadOnly()
@@ -155,14 +156,19 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                if (m_types == null) {
-                    lock(m_lockObject) {
-                        if (m_types == null) {
-                            LoadTypes();
-                        }
+                EnsureTypesLoaded();
+                return m_types;
+            }
+        }
+
+        void EnsureTypesLoaded()
+        {
+            if (m_types == null) {
+                lock (m_lockObject) {
+                    if (m_types == null) {
+                        LoadTypes();
                     }
                 }
-                return m_types;
             }
         }
 
@@ -185,6 +191,13 @@ namespace Tiny.Metadata
                 // ReSharper restore PossibleUnintendedReferenceComparison
                 #pragma warning restore 420
             }
+        }
+
+        internal TypeDefinition GetTypeDef(IToken token)
+        {
+            token.CheckValid("token", x => x.Table == MetadataTable.TypeDef, "Not a type def.");
+            EnsureTypesLoaded();
+            return m_allTypes[(int)token.Index];
         }
     }
 }

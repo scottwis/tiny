@@ -47,7 +47,7 @@ namespace Tiny.Metadata
                 m_peFile = new PEFile(fileName);
 
                 var assemblyRowCount = MetadataTable.Assembly.RowCount(m_peFile);
-                if (assemblyRowCount == 0) {
+                if (assemblyRowCount <= 0) {
                     throw new FileLoadException("Not an assembly", fileName);
                 }
                 if (assemblyRowCount > 1) {

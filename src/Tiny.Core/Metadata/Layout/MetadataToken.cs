@@ -52,12 +52,12 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        public uint Index
+        public int Index
         {
             get
             {
                 NullCheck();
-                return ((m_value) & 0x00FFFFFF) - 1;
+                return (int)(((m_value) & 0x00FFFFFF) - 1);
             }
         }
 
@@ -66,6 +66,51 @@ namespace Tiny.Metadata.Layout
             if (IsNull) {
                 throw new InvalidOperationException("The token is null");
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as IToken);
+        }
+
+        public override int GetHashCode()
+        {
+            if (IsNull) {
+                return 0.GetHashCode();
+            }
+            return m_value.GetHashCode();
+        }
+
+        public bool Equals(IToken token)
+        {
+            if (token == null) {
+                return false;
+            }
+            if (IsNull) {
+                return token.IsNull;
+            }
+            return ! token.IsNull && Table == token.Table && Index == token.Index;
+        }
+
+        public int CompareTo(IToken other)
+        {
+            if (other == null) {
+                return 1;
+            }
+
+            if (IsNull) {
+                return other.IsNull ? 0 : -1;
+            }
+
+            if (other.IsNull) {
+                return 1;
+            }
+
+            var ret = Table.CompareTo(other.Table);
+            if (ret == 0) {
+                ret = Index.CompareTo(other.Index);
+            }
+            return ret;
         }
     }
 }

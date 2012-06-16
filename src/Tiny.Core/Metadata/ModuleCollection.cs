@@ -92,7 +92,7 @@ namespace Tiny.Metadata
                 if (index == 0) {
                     return m_mainFile.Module;
                 }
-                LoadModule((uint)(index - 1));
+                LoadModule((index - 1));
                 var ret = m_otherModules[index - 1];
                 var peFile = ret as PEFile;
                 if (peFile != null) {
@@ -102,7 +102,7 @@ namespace Tiny.Metadata
             }
         }
 
-        unsafe void LoadModule(uint index)
+        unsafe void LoadModule(int index)
         {
             if (m_otherModules[index] == null) {
                 var f = (FileRow *)m_mainFile.GetRow(index,MetadataTable.File);
