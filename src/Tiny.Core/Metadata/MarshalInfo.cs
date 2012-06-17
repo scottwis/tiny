@@ -1,4 +1,4 @@
-﻿// IMember.cs
+// MarshalInfo.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -25,21 +25,7 @@
 
 namespace Tiny.Metadata
 {
-    public interface IMemberDefinition
+    public class MarshalInfo
     {
-        string Name { get; }
-        string FullName { get; }
-        TypeDefinition DeclaringType { get; }
-        bool IsPublic { get; }
-        bool IsPrivate { get; }
-        bool IsProtected { get; }
-        bool IsInternal { get; }
-        bool IsInternalOrProtected { get; }
-        bool IsInternalAndProtected { get; }
-        bool IsAbstract { get; }
-        bool IsSealed { get; }
-        bool HasSpecialName { get; }
-        bool HasRuntimeSpecialName { get; }
-        bool IsCompilerControlled { get; }
     }
 }

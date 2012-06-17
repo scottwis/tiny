@@ -1,4 +1,4 @@
-﻿// IMember.cs
+﻿// FieldRVARow.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,23 +23,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Tiny.Metadata
+using System.Runtime.InteropServices;
+
+namespace Tiny.Metadata.Layout
 {
-    public interface IMemberDefinition
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct FieldRVARow
     {
-        string Name { get; }
-        string FullName { get; }
-        TypeDefinition DeclaringType { get; }
-        bool IsPublic { get; }
-        bool IsPrivate { get; }
-        bool IsProtected { get; }
-        bool IsInternal { get; }
-        bool IsInternalOrProtected { get; }
-        bool IsInternalAndProtected { get; }
-        bool IsAbstract { get; }
-        bool IsSealed { get; }
-        bool HasSpecialName { get; }
-        bool HasRuntimeSpecialName { get; }
-        bool IsCompilerControlled { get; }
+        [FieldOffset(0)]
+        public readonly uint RVA;
+
+        public uint GetFieldIndex(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (FieldRVARow * pThis = &this) {
+                var pField = (byte*) pThis + 4;
+                if (MetadataTable.Field.IndexSize(peFile) == 2) {
+                    return *(ushort*) pField;
+                }
+                return *(uint*) pField;
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿// IMember.cs
+﻿// FieldRow.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,23 +23,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Tiny.Metadata
+using System.Runtime.InteropServices;
+
+namespace Tiny.Metadata.Layout
 {
-    public interface IMemberDefinition
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct FieldRow
     {
-        string Name { get; }
-        string FullName { get; }
-        TypeDefinition DeclaringType { get; }
-        bool IsPublic { get; }
-        bool IsPrivate { get; }
-        bool IsProtected { get; }
-        bool IsInternal { get; }
-        bool IsInternalOrProtected { get; }
-        bool IsInternalAndProtected { get; }
-        bool IsAbstract { get; }
-        bool IsSealed { get; }
-        bool HasSpecialName { get; }
-        bool HasRuntimeSpecialName { get; }
-        bool IsCompilerControlled { get; }
+        [FieldOffset(0)]
+        public readonly FieldAttributes Flags;
+
+        public uint GetNameOffset(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (FieldRow * pThis = &this) {
+                if (StreamID.Strings.IndexSize(peFile) == 2) {
+                    return *(ushort*) pThis;
+                }
+                return *(uint*) pThis;
+            }
+        }
+
+        public uint GetSignatureOffset(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (FieldRow * pThis = &this) {
+                var pSignature = (byte*) pThis + StreamID.Strings.IndexSize(peFile);
+                if (StreamID.Blob.IndexSize(peFile) == 2) {
+                    return *(ushort*) pSignature;
+                }
+                return *(uint*) pSignature;
+            }
+        }
     }
 }

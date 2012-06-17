@@ -428,7 +428,7 @@ namespace Tiny.Metadata.Layout
         private void * Resolve(RVAAndSize rva)
         {
             //1. Can we find the section containing the address
-            FluidAsserts.Assume(rva.IsConsistent());
+            FluentAsserts.Assume(rva.IsConsistent());
             if (rva.IsZero()) {
                 return null;
             }
@@ -644,7 +644,7 @@ namespace Tiny.Metadata.Layout
         public int GetRowCount(MetadataTable table)
         {
             CheckDisposed();
-            FluidAsserts.AssumeNotNull((void *)m_metadataTableHeader);
+            FluentAsserts.AssumeNotNull((void *)m_metadataTableHeader);
             return m_metadataTableHeader->GetRowCount(table);
         }
 
@@ -706,7 +706,7 @@ namespace Tiny.Metadata.Layout
         public int GetRowIndex(MetadataTable table, void* pRow)
         {
             table.CheckDefined("table");
-            FluidAsserts.CheckNotNull((void *)pRow, "pRow");
+            FluentAsserts.CheckNotNull((void *)pRow, "pRow");
 
             var pFirst = GetRow(0, table);
             if (

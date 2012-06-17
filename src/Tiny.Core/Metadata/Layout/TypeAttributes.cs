@@ -33,15 +33,15 @@ namespace Tiny.Metadata.Layout
     {
         //===========================================================
         //# A mask used to retreive accessibility information.
-        VisibilityMask= 0x00000007,
+        VisibilityMask = 0x00000007,
         //# Type type has no public scope.
         NotPublic = 0x00000000,
         //# The type is a top-level type and has public scope.
         Public = 0x00000001,
         //# The type is nested within another type and has public scope.
-        NestedPublic = 0x00000002, 
+        NestedPublic = 0x00000002,
         //# The type is nested within another type and has private scope.
-        NestedPrivate = 0x00000003, 
+        NestedPrivate = 0x00000003,
         //# The type has "protected" scope.
         NestedFamily = 0x00000004,
         //# The type is nested and has 'internal' accessibility

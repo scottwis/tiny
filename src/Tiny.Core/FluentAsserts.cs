@@ -1,4 +1,4 @@
-﻿// FluidAsserts.cs
+﻿// FluentAsserts.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -27,7 +27,7 @@ using System;
 
 namespace Tiny
 {
-    public static class FluidAsserts
+    public static class FluentAsserts
     {
         public static T AssumeGT<T>(this T lhs, T rhs) where T : IComparable<T>
         {

@@ -25,8 +25,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using Tiny.Collections;
 using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
@@ -42,12 +44,39 @@ namespace Tiny.Metadata
         volatile string m_name;
         volatile string m_namespace;
         readonly Module m_module;
+        readonly IReadOnlyList<FieldDefinition> m_fields;
 
         internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
             m_module = module.CheckNotNull("module");
-            FluidAsserts.CheckNotNull((void *)pRow, "pRow");
+            FluentAsserts.CheckNotNull((void *)pRow, "pRow");
             m_pRow = pRow;
+            m_fields = GetFields(pRow, module);
+        }
+
+        unsafe LiftedList<FieldDefinition> GetFields(TypeDefRow* pRow, Module module)
+        {
+            var firstFieldIndex = checked((int) pRow->GetFieldListToken(module.PEFile)).AssumeGTE(1) - 1;
+            int lastFieldIndex;
+            var tableIndex = MetadataTable.TypeDef.RowIndex(pRow, module.PEFile);
+            if (tableIndex == MetadataTable.TypeDef.RowCount(module.PEFile) - 1) {
+                lastFieldIndex = MetadataTable.Field.RowCount(module.PEFile);
+            }
+            else {
+                lastFieldIndex = checked(
+                    (int) ((TypeDefRow*) MetadataTable.TypeDef.GetRow(
+                        tableIndex + 1,
+                        module.PEFile
+                    ))->GetFieldListToken(module.PEFile).AssumeGTE(1U) - 1
+                );
+            }
+            var fields = new LiftedList<FieldDefinition>(
+                lastFieldIndex - firstFieldIndex,
+                index => MetadataTable.Field.GetRow(index + firstFieldIndex, module.PEFile),
+                x => new FieldDefinition((FieldRow*) x, this),
+                () => Module.PEFile.IsDisposed
+            );
+            return fields;
         }
 
         //# Returns the type containing this type, or null if the type is not nested.
@@ -108,6 +137,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 if (m_name == null) {
                     var name = Module.PEFile.ReadSystemString(m_pRow->GetTypeNameIndex(Module.PEFile));
                     #pragma warning disable 420
@@ -123,6 +153,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 if (DeclaringType != null) {
                     return DeclaringType.Namespace;
                 }
@@ -143,6 +174,7 @@ namespace Tiny.Metadata
 
         internal override void GetFullName(StringBuilder b)
         {
+            CheckDisposed();
             if (DeclaringType != null) {
                 DeclaringType.GetFullName(b);
                 b.AppendFormat("+{0}", Name);
@@ -158,11 +190,7 @@ namespace Tiny.Metadata
         //# The set of fields defined on the type. If the class defines no fields, this will be an empty list.
         public IReadOnlyList<FieldDefinition> Fields
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return m_fields; }
         }
 
         //# The set of methods defined on the type, or null if the type defines no methods.
@@ -239,6 +267,149 @@ namespace Tiny.Metadata
         public Module Module
         {
             get { return m_module; }
+        }
+
+        public bool IsInterface
+        {
+            get { 
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsClass
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsCompilerControlled
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsPublic
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsPrivate
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsProtected
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsInternal
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsInternalOrProtected
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsInternalAndProtected
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public LayoutKind Layout
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsAbstract
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsSealed
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public StringFormat StringFormat
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsBeforeFieldInit
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool HasSpecialName
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool HasRuntimeSpecialName
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         void CheckDisposed()

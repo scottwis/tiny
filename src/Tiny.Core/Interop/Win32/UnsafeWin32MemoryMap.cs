@@ -39,7 +39,7 @@ namespace Tiny.Interop.Win32
         {
             m_fileHandle = hFile.AssumeNotNull();
             m_mapHandle = hMapping.AssumeNotNull();
-            m_pData = FluidAsserts.AssumeNotNull(pData);
+            m_pData = FluentAsserts.AssumeNotNull(pData);
             m_size = size.AssumeGT(0U);
         }
 

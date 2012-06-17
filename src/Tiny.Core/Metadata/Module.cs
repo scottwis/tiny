@@ -65,7 +65,7 @@ namespace Tiny.Metadata
 
         internal static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
         {
-            FluidAsserts.CheckNotNull((void *)moduleRow, "moduleRow");
+            FluentAsserts.CheckNotNull((void *)moduleRow, "moduleRow");
             return new Module(moduleRow, peFile);
         }
 

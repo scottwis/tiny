@@ -1,4 +1,4 @@
-﻿// IMember.cs
+﻿// FieldMarshalRow.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,23 +23,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Tiny.Metadata
+using System.Runtime.InteropServices;
+
+namespace Tiny.Metadata.Layout
 {
-    public interface IMemberDefinition
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct FieldMarshalRow
     {
-        string Name { get; }
-        string FullName { get; }
-        TypeDefinition DeclaringType { get; }
-        bool IsPublic { get; }
-        bool IsPrivate { get; }
-        bool IsProtected { get; }
-        bool IsInternal { get; }
-        bool IsInternalOrProtected { get; }
-        bool IsInternalAndProtected { get; }
-        bool IsAbstract { get; }
-        bool IsSealed { get; }
-        bool HasSpecialName { get; }
-        bool HasRuntimeSpecialName { get; }
-        bool IsCompilerControlled { get; }
+        public HasFieldMarshal GetParent(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (FieldMarshalRow* pThis = &this) {
+                uint index;
+                if (CodedIndex.HasFieldMarshal.IndexSize(peFile) == 2) {
+                    index = *(ushort*) pThis;
+                }
+                else {
+                    index = *(uint*) pThis;
+                }
+                return new HasFieldMarshal(index);
+            }
+        }
+
+        public uint GetNativeTypeOffset(PEFile peFile)
+        {
+            peFile.CheckNotNull("peFile");
+            fixed (FieldMarshalRow * pThis = &this) {
+                var pNativeType = (byte*) pThis + CodedIndex.HasFieldMarshal.IndexSize(peFile);
+                if (StreamID.Blob.IndexSize(peFile) == 2) {
+                    return *(ushort*) pNativeType;
+                }
+                return *(uint*) pNativeType;
+            }
+        }
     }
 }

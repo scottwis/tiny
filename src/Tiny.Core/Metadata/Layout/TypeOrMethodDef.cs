@@ -62,7 +62,7 @@ namespace Tiny.Metadata.Layout
             get
             {
                 CheckNull();
-                return (int)((m_index & ~0x1U) >> 1);
+                return ((int)((m_index & ~0x1U) >> 1)) - 1;
             }
         }
 

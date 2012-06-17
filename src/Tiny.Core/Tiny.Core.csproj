@@ -100,7 +100,7 @@
     <Compile Include="Collections\LiftedList.cs" />
     <Compile Include="Collections\LiftedValueTypeList.cs" />
     <Compile Include="Collections\ReadonlyListBase.cs" />
-    <Compile Include="FluidAsserts.cs" />
+    <Compile Include="FluentAsserts.cs" />
     <Compile Include="InternalErrorException.cs" />
     <Compile Include="Interop\IUnsafeMemoryMap.cs" />
     <Compile Include="Interop\NativePlatform.cs" />
@@ -122,6 +122,11 @@
     <Compile Include="Metadata\FieldDefinition.cs" />
     <Compile Include="Metadata\GenericInstanceType.cs" />
     <Compile Include="Metadata\GenericParameter.cs" />
+    <Compile Include="Metadata\Layout\FieldAttributes.cs" />
+    <Compile Include="Metadata\Layout\FieldLayoutRow.cs" />
+    <Compile Include="Metadata\Layout\FieldMarshalRow.cs" />
+    <Compile Include="Metadata\Layout\FieldRow.cs" />
+    <Compile Include="Metadata\Layout\FieldRVARow.cs" />
     <Compile Include="Metadata\Layout\GenericParameterAttributes.cs" />
     <Compile Include="Metadata\Layout\GenericParameterConstraintRow.cs" />
     <Compile Include="Metadata\Layout\GenericParameterRow.cs" />
@@ -138,6 +143,7 @@
     <Compile Include="Metadata\Layout\File.cs" />
     <Compile Include="Metadata\Layout\FileAttributes.cs" />
     <Compile Include="Metadata\Layout\FileFormat.cs" />
+    <Compile Include="Metadata\Layout\HasFieldMarshal.cs" />
     <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
     <Compile Include="Metadata\Layout\ImageSubsystem.cs" />
     <Compile Include="Metadata\Layout\IToken.cs" />
@@ -164,12 +170,14 @@
     <Compile Include="Metadata\Layout\TypeDefOrRef.cs" />
     <Compile Include="Metadata\Layout\TypeDefRow.cs" />
     <Compile Include="Metadata\Layout\TypeOrMethodDef.cs" />
+    <Compile Include="Metadata\MarshalInfo.cs" />
     <Compile Include="Metadata\MethodDefinition.cs" />
     <Compile Include="Metadata\ModifiedType.cs" />
     <Compile Include="Metadata\Module.cs" />
     <Compile Include="Metadata\ModuleCollection.cs" />
     <Compile Include="Metadata\NestedTypeInfo.cs" />
     <Compile Include="Metadata\Property.cs" />
+    <Compile Include="Metadata\StringFormat.cs" />
     <Compile Include="Metadata\Type.cs" />
     <Compile Include="Metadata\TypeDefinition.cs" />
     <Compile Include="Metadata\TypeKind.cs" />

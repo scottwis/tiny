@@ -1,4 +1,4 @@
-﻿// TypeDefOrRef.cs
+// HasFieldMarshal.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -27,34 +27,32 @@ using System;
 
 namespace Tiny.Metadata.Layout
 {
-    struct TypeDefOrRef : IToken
+    struct HasFieldMarshal : IToken
     {
         readonly uint m_index;
 
-        public TypeDefOrRef(uint index)
+        public HasFieldMarshal(uint index)
         {
             m_index = index;
         }
 
         public bool IsNull
         {
-            get { return ((m_index & ~0x3u) >> 2) == 0; }
+            get { return ((m_index & ~0x1U) >> 1) == 0; }
         }
 
         public MetadataTable Table
         {
             get
             {
-                NullCheck();
-                switch (m_index & 0x3) {
+                CheckNull();
+                switch (m_index & ~0x1U) {
                     case 0:
-                        return MetadataTable.TypeDef;
+                        return MetadataTable.Field;
                     case 1:
-                        return MetadataTable.TypeRef;
-                    case 2:
-                        return MetadataTable.TypeSpec;
+                        return MetadataTable.Param;
                     default:
-                        throw new InvalidOperationException("Invalid metadata table.");
+                        throw new InternalErrorException("This code should be unreachable.");
                 }
             }
         }
@@ -63,15 +61,15 @@ namespace Tiny.Metadata.Layout
         {
             get
             {
-                NullCheck();
-                return ((int)((m_index & ~0x3u) >> 2)) - 1;
+                CheckNull();
+                return ((int) ((m_index & ~0x1U) >> 1)) - 1;
             }
         }
 
-        void NullCheck()
+        void CheckNull()
         {
             if (IsNull) {
-                throw new InvalidOperationException("The token is null.");
+                throw new InvalidOperationException("The token is null");
             }
         }
 
@@ -82,7 +80,8 @@ namespace Tiny.Metadata.Layout
 
         public override int GetHashCode()
         {
-            if (IsNull) {
+            if (IsNull)
+            {
                 return 0.GetHashCode();
             }
             return m_index.GetHashCode();
@@ -90,10 +89,12 @@ namespace Tiny.Metadata.Layout
 
         public bool Equals(IToken token)
         {
-            if (token == null) {
+            if (token == null)
+            {
                 return false;
             }
-            if (IsNull) {
+            if (IsNull)
+            {
                 return token.IsNull;
             }
             return !token.IsNull && Table == token.Table && Index == token.Index;
@@ -101,20 +102,24 @@ namespace Tiny.Metadata.Layout
 
         public int CompareTo(IToken other)
         {
-            if (other == null) {
+            if (other == null)
+            {
                 return 1;
             }
 
-            if (IsNull) {
+            if (IsNull)
+            {
                 return other.IsNull ? 0 : -1;
             }
 
-            if (other.IsNull) {
+            if (other.IsNull)
+            {
                 return 1;
             }
 
             var ret = Table.CompareTo(other.Table);
-            if (ret == 0) {
+            if (ret == 0)
+            {
                 ret = Index.CompareTo(other.Index);
             }
             return ret;

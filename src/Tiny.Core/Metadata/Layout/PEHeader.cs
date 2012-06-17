@@ -81,8 +81,8 @@ namespace Tiny.Metadata.Layout
         public bool Validate(byte * pFileBase, uint fileSize) {
             fileSize.AssumeGT(0U);
             fixed(PEHeader * pThis = &this) {
-                FluidAsserts.Assume(pThis >= pFileBase && pThis < checked(pFileBase + fileSize));
-                FluidAsserts.Assume(fileSize - ((byte *)pThis - pFileBase) >= sizeof(PEHeader));
+                FluentAsserts.Assume(pThis >= pFileBase && pThis < checked(pFileBase + fileSize));
+                FluentAsserts.Assume(fileSize - ((byte *)pThis - pFileBase) >= sizeof(PEHeader));
 
                 try {
                     //NOTE: This code could be made more consise using compound conditionals, but this orginization makes

@@ -44,7 +44,7 @@ namespace Tiny.Metadata
         internal GenericParameter(GenericParameterRow * pRow, PEFile peFile, IGenericParameterScope parent) : 
             base(TypeKind.GenericParameter)
         {
-            m_pRow = (GenericParameterRow *)FluidAsserts.CheckNotNull((void*) pRow, "pRow");
+            m_pRow = (GenericParameterRow *)FluentAsserts.CheckNotNull((void*) pRow, "pRow");
             m_peFile = peFile.CheckNotNull("peFile");
             m_parent = parent.CheckNotNull("parent");
         }
