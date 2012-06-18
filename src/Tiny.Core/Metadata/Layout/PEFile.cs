@@ -518,6 +518,7 @@ namespace Tiny.Metadata.Layout
         //Reference: ECMA-335, 5th Edition, Partition II, § 22
         public uint GetRowSize(MetadataTable table)
         {
+            CheckDisposed();
             switch (table) {
                 case MetadataTable.Assembly:
                     return 16 + StreamID.Blob.IndexSize(this) + 2*StreamID.Strings.IndexSize(this);
@@ -621,6 +622,7 @@ namespace Tiny.Metadata.Layout
 
         public uint GetCodedIndexSize(CodedIndex index)
         {
+            CheckDisposed();
             if (m_codedIndexSizes == null) {
                 throw new InvalidOperationException("Haven't computed coded index sizes yet");
             }
@@ -635,6 +637,7 @@ namespace Tiny.Metadata.Layout
 
         public uint GetTableIndexSize(MetadataTable table)
         {
+            CheckDisposed();
             if (GetRowCount(table) >= (1 << 17)) {
                 return 4;
             }
@@ -688,23 +691,27 @@ namespace Tiny.Metadata.Layout
         
         public IReadOnlyList<byte> ReadBlob(uint offset)
         {
+            CheckDisposed();
             //TODO: Implement this
             throw new NotImplementedException();
         }
 
         public Guid ReadGuid(uint offset)
         {
+            CheckDisposed();
             //TODO: Implement this
             throw new NotImplementedException();
         }
 
         public bool IsSorted(MetadataTable table)
         {
+            CheckDisposed();
             return (m_metadataTableHeader->ValidTables & (1UL << (int) table)) != 0;
         }
 
         public int GetRowIndex(MetadataTable table, void* pRow)
         {
+            CheckDisposed();
             table.CheckDefined("table");
             FluentAsserts.CheckNotNull((void *)pRow, "pRow");
 
@@ -735,6 +742,7 @@ namespace Tiny.Metadata.Layout
         //#     by selector.
         public int GreatestLowerBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
         {
+            CheckDisposed();
             table.CheckDefined("table");
             selector.CheckNotNull("selector");
 
@@ -783,6 +791,7 @@ namespace Tiny.Metadata.Layout
         //#     by selector.
         public int LeastUpperBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
         {
+            CheckDisposed();
             table.CheckDefined("table");
             selector.CheckNotNull("selector");
 
@@ -853,6 +862,12 @@ namespace Tiny.Metadata.Layout
         }
 
         public Type ResolveTypeRef(int index, Module module)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
+        public Type ParseFieldSignature(uint u, Module module)
         {
             //TODO: Implement this
             throw new NotImplementedException();

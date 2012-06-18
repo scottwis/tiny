@@ -36,6 +36,7 @@ namespace Tiny.Metadata
         volatile string m_name;
         readonly FieldRow * m_pRow;
         readonly TypeDefinition m_declaringType;
+        volatile Type m_fieldType;
 
         internal FieldDefinition(FieldRow * pRow, TypeDefinition declaringType)
         {
@@ -72,13 +73,36 @@ namespace Tiny.Metadata
 
         public TypeDefinition DeclaringType
         {
-            get { return m_declaringType; }
+            get
+            {
+                CheckDisposed();
+                return m_declaringType;
+            }
+        }
+
+        public Type FieldType
+        {
+            get
+            {
+                CheckDisposed();
+                if (m_fieldType == null ) {
+                    var type =DeclaringType.Module.PEFile.ParseFieldSignature(
+                        m_pRow->GetSignatureOffset(DeclaringType.Module.PEFile),
+                        DeclaringType.Module
+                    );
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_fieldType, type, null);
+                    #pragma warning restore 420
+                }
+                return m_fieldType;
+            }S
         }
 
         public IReadOnlyList<CustomAttribute> CustomAttributes
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -88,6 +112,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -97,6 +122,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -106,6 +132,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -115,6 +142,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -124,6 +152,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -133,6 +162,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -142,6 +172,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -151,6 +182,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -160,6 +192,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -169,8 +202,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return false;
             }
         }
 
@@ -178,8 +211,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return false;
             }
         }
 
@@ -187,6 +220,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -196,6 +230,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
