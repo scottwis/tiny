@@ -40,6 +40,8 @@ namespace Tiny.Metadata
         Single,
         Double,
         IntPtr,
-        UIntPtr
+        UIntPtr,
+        Object,
+        String
     }
 }

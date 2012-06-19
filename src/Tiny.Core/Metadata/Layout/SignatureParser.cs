@@ -123,10 +123,34 @@ namespace Tiny.Metadata.Layout
                     return new FunctionPointerType(ParseMethodSignature());
                 case ElementType.GenericInstantiaton:
                     return ParseGenericInstanceType();
+                case ElementType.MethodVariable:
+                    return ParseGenericMethodParameter();
+                case ElementType.Object:
+                    return m_module.Assembly.Project.GetWellKnownType(WellKnownTypeID.Object);
+                case ElementType.Pointer:
+                    return new ModifiedType(TypeKind.Pointer, null, ParseType());
+                case ElementType.String:
+                    return m_module.Assembly.Project.GetWellKnownType(WellKnownTypeID.String);
+                case ElementType.Vector:
+                    return new ModifiedType(TypeKind.Vector, null, ParseType());
+                case ElementType.ValueType:
+                    return ParseTypeReference();
+                case ElementType.TypeVariable:
+                    return ParseGenericTypeParameter();
                 default:
                     //TODO: Finish implementing  this
                     throw new NotImplementedException();
             }
+        }
+
+        Type ParseGenericTypeParameter()
+        {
+            throw new NotImplementedException();
+        }
+
+        Type ParseGenericMethodParameter()
+        {
+            throw new NotImplementedException();
         }
 
         Type ParseGenericInstanceType()
