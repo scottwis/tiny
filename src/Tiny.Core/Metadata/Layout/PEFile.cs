@@ -65,11 +65,13 @@ namespace Tiny.Metadata.Layout
         MetadataTableHeader* m_metadataTableHeader;
         byte*[] m_tables;
         volatile Module m_module;
+        Assembly m_assembly;
         uint[] m_codedIndexSizes;
 
-        public PEFile(String fileName)
+        public PEFile(Assembly assembly, String fileName)
         {
             try {
+                m_assembly = assembly.CheckNotNull("assembly");
                 m_fullPath = new FileInfo(fileName).FullName;
                 m_memoryMap = NativePlatform.Default.MemoryMapFile(fileName);
                 m_pData = (byte *)m_memoryMap.Data;
@@ -506,7 +508,7 @@ namespace Tiny.Metadata.Layout
                     if (GetRowCount(MetadataTable.Module) == 0 || m_tables == null || m_tables[(int)MetadataTable.Module] == null) {
                         throw new InvalidOperationException("Missing module table.");
                     }
-                    var m = Module.CreateMetadataModule((ModuleRow *)m_tables[(int)MetadataTable.Module], this);
+                    var m = Module.CreateMetadataModule(m_assembly, (ModuleRow *)m_tables[(int)MetadataTable.Module], this);
                     #pragma warning disable 420
                     Interlocked.CompareExchange(ref m_module, m, null);
                     #pragma warning restore 420
@@ -831,6 +833,7 @@ namespace Tiny.Metadata.Layout
 
         public void Dispose()
         {
+            m_assembly = null;
             m_metadataTableHeader = null;
             m_pData = null;
             m_fileSize = 0;
@@ -867,10 +870,11 @@ namespace Tiny.Metadata.Layout
             throw new NotImplementedException();
         }
 
-        public Type ParseFieldSignature(uint u, Module module)
+        public Type ParseFieldSignature(uint offset, TypeDefinition declaringType)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            CheckDisposed();
+            var blob = ReadBlob(offset);
+            return SignatureParser.ParseFieldSignature(blob, declaringType);
         }
     }
 }

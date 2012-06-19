@@ -28,7 +28,7 @@ namespace Tiny.Metadata
             if (m_resolved == null) {
                 if (m_token.Table == MetadataTable.TypeDef) {
                     #pragma warning disable 420
-                    Interlocked.CompareExchange(ref m_resolved, m_module.GetTypeDef(m_token), null);
+                    Interlocked.CompareExchange(ref m_resolved, m_module.AllTypes[m_token.Index], null);
                     #pragma warning restore 420
                 }
                 else if (m_token.Table == MetadataTable.TypeSpec) {

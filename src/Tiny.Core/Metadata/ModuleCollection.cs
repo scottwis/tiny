@@ -43,10 +43,12 @@ namespace Tiny.Metadata
         //# The list of other modules (besides the main module) in an asssembly. The array is loaded lazily. Each
         //# element will either be a PEFile (for meta-data modules) or a Module (for non meta-data modules).
         object[] m_otherModules;
+        Assembly m_assembly;
 
-        public ModuleCollection(PEFile mainFile)
+        internal ModuleCollection(Assembly assembly, PEFile mainFile)
         {
             try {
+                m_assembly = assembly.CheckNotNull("assembly");
                 m_mainFile = mainFile.CheckNotNull("mainFile");
                 m_otherModules = new object[MetadataTable.File.RowCount(m_mainFile)];
                 m_lockObject = new object();
@@ -108,12 +110,13 @@ namespace Tiny.Metadata
                 var f = (FileRow *)m_mainFile.GetRow(index,MetadataTable.File);
                 if ((f->Flags & FileAttributes.ContainsNoMetadata) != 0) {
                     m_otherModules[index] = Module.CreateNonMetadataModule(
+                        m_assembly,
                         m_mainFile.ReadSystemString(
                             f->GetNameOffset(m_mainFile)
                         ));
                 }
                 else {
-                    m_otherModules[index] = new PEFile(m_mainFile.ReadSystemString(f->GetNameOffset(m_mainFile)));
+                    m_otherModules[index] = new PEFile(m_assembly, m_mainFile.ReadSystemString(f->GetNameOffset(m_mainFile)));
                 }
             }
         }
@@ -137,6 +140,7 @@ namespace Tiny.Metadata
             }
             m_otherModules = null;
             m_mainFile = null;
+            m_assembly = null;
         }
     }
 }

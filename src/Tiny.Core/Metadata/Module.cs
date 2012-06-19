@@ -35,6 +35,7 @@ namespace Tiny.Metadata
     //# Represents a module in a managed assembly.
     public sealed unsafe class Module : ITypeContainer, IMutableTypeContainer
     {
+        readonly Assembly m_assembly;
         readonly Object m_lockObject;
         readonly ModuleRow* m_pModuleRow;
         readonly PEFile m_peFile;
@@ -44,29 +45,30 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<TypeDefinition> m_types;
         volatile IReadOnlyList<TypeDefinition> m_allTypes;
 
-        private Module(ModuleRow* moduleRow, PEFile peFile)
+        private Module(Assembly assembly, ModuleRow* moduleRow, PEFile peFile)
         {
             m_lockObject = new object();
-            m_pModuleRow = moduleRow;
-            m_peFile = peFile;
+            m_assembly = assembly.CheckNotNull("assembly");
+            m_pModuleRow = (ModuleRow *)FluentAsserts.CheckNotNull((void *)moduleRow, "moduleRow");
+            m_peFile = peFile.CheckNotNull("peFile");
             m_containsMetadata = true;
         }
 
-        private Module(string name)
+        private Module(Assembly assembly, string name)
         {
+            m_assembly = assembly;
             m_name = name;
             m_containsMetadata = false;
         }
 
-        internal static Module CreateNonMetadataModule(string name)
+        internal static Module CreateNonMetadataModule(Assembly assembly, string name)
         {
-            return new Module(name.CheckNotNull("name"));
+            return new Module(assembly, name.CheckNotNull("name"));
         }
 
-        internal static Module CreateMetadataModule(ModuleRow* moduleRow, PEFile peFile)
+        internal static Module CreateMetadataModule(Assembly assembly, ModuleRow* moduleRow, PEFile peFile)
         {
-            FluentAsserts.CheckNotNull((void *)moduleRow, "moduleRow");
-            return new Module(moduleRow, peFile);
+            return new Module(assembly, moduleRow, peFile);
         }
 
         //# Indicates wether or not the module contains meta-data. We model
@@ -151,6 +153,7 @@ namespace Tiny.Metadata
             );
         }
         
+        //#Returns the top-level (non nested) types defined in the module.
         public IReadOnlyList<TypeDefinition> Types
         {
             get
@@ -158,6 +161,16 @@ namespace Tiny.Metadata
                 CheckDisposed();
                 EnsureTypesLoaded();
                 return m_types;
+            }
+        }
+
+        //# Returns the set of all types defined in the module, including nested types.
+        public IReadOnlyList<TypeDefinition> AllTypes
+        {
+            get
+            {
+                EnsureTypesLoaded();
+                return m_allTypes;
             }
         }
 
@@ -193,11 +206,9 @@ namespace Tiny.Metadata
             }
         }
 
-        internal TypeDefinition GetTypeDef(IToken token)
+        public Assembly Assembly
         {
-            token.CheckValid("token", x => x.Table == MetadataTable.TypeDef, "Not a type def.");
-            EnsureTypesLoaded();
-            return m_allTypes[(int)token.Index];
+            get { return m_assembly; }
         }
     }
 }

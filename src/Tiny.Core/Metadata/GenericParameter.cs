@@ -133,7 +133,7 @@ namespace Tiny.Metadata
             if (m_constraints == null) {
                 //It is valid for the generic parameter constraints table to not be sorted, but I don't expect such a case to occur in practice.
                 //I imagine that this could maybe happen with ENC, but we don't need to be able to decompile enc assemblies,
-                m_peFile.IsSorted(MetadataTable.GenericParamConstraint).AssumeTrue("The generic param constraint table is not sorted.");
+                m_peFile.IsSorted(MetadataTable.GenericParamConstraint).Assume("The generic param constraint table is not sorted.");
 
                 var rowIndex = MetadataTable.GenericParamConstraint.RowIndex(m_pRow, m_peFile);
                 var glb = MetadataTable.GenericParamConstraint.GreatestLowerBound(

@@ -53,7 +53,9 @@ namespace Tiny.Metadata
                     var name = DeclaringType.Module.PEFile.ReadSystemString(
                         m_pRow->GetNameOffset(DeclaringType.Module.PEFile)
                     );
+                    #pragma warning disable 420
                     Interlocked.CompareExchange(ref m_name, name, null);
+                    #pragma warning restore 420
                 }
                 return m_name;
             }
@@ -88,14 +90,14 @@ namespace Tiny.Metadata
                 if (m_fieldType == null ) {
                     var type =DeclaringType.Module.PEFile.ParseFieldSignature(
                         m_pRow->GetSignatureOffset(DeclaringType.Module.PEFile),
-                        DeclaringType.Module
+                        DeclaringType
                     );
                     #pragma warning disable 420
                     Interlocked.CompareExchange(ref m_fieldType, type, null);
                     #pragma warning restore 420
                 }
                 return m_fieldType;
-            }S
+            }
         }
 
         public IReadOnlyList<CustomAttribute> CustomAttributes

@@ -40,27 +40,38 @@ namespace Tiny.Metadata
         string m_name;
         IReadOnlyList<byte> m_publicKey;
         string m_culture;
+        Project m_project;
 
-        public Assembly(string fileName)
+        //# Creates a new assembly, inserting it into a new project with default options.
+        public Assembly(string fileName) : this(new Project(), fileName)
+        {
+        }
+
+        //# Creates a new assembly, inserting it into the provided project.
+        public Assembly(Project project, string fileName)
         {
             try {
-                m_peFile = new PEFile(fileName);
+                m_project = project.CheckNotNull("project");
+                m_peFile = new PEFile(this, fileName);
 
                 var assemblyRowCount = MetadataTable.Assembly.RowCount(m_peFile);
-                if (assemblyRowCount <= 0) {
+                if (assemblyRowCount <= 0)
+                {
                     throw new FileLoadException("Not an assembly", fileName);
                 }
-                if (assemblyRowCount > 1) {
+                if (assemblyRowCount > 1)
+                {
                     throw new FileLoadException("Too many rows in the assembly table.");
                 }
-                
-                m_modules = new ModuleCollection(m_peFile);
+
+                m_modules = new ModuleCollection(this, m_peFile);
+                project.Add(this);
             }
-            catch {
+            catch
+            {
                 Dispose();
                 throw;
             }
-            
         }
 
         public IReadOnlyList<Module> Modules
@@ -184,6 +195,12 @@ namespace Tiny.Metadata
             m_modules = null;
             m_peFile = null;
             m_assemblyRow = null;
+            m_project = null;
+        }
+
+        public Project Project
+        {
+            get { return m_project; }
         }
     }
 }
