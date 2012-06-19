@@ -137,10 +137,19 @@ namespace Tiny.Metadata.Layout
                     return ParseTypeReference();
                 case ElementType.TypeVariable:
                     return ParseGenericTypeParameter();
+                case ElementType.ModOpt:
+                    return ParseModifier(TypeKind.ModOpt);
+                case ElementType.ModReq:
+                    return ParseModifier(TypeKind.ModReq);
                 default:
                     //TODO: Finish implementing  this
                     throw new NotImplementedException();
             }
+        }
+
+        Type ParseModifier(TypeKind modOpt)
+        {
+            throw new NotImplementedException();
         }
 
         Type ParseGenericTypeParameter()
