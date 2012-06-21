@@ -32,16 +32,16 @@ namespace Tiny.Metadata
     //# List<int>.
     public sealed class GenericInstanceType : Type
     {
-        readonly TypeDefinition m_baseType;
+        readonly Type m_baseType;
         readonly IReadOnlyList<Type> m_parameters;
 
-        public GenericInstanceType(TypeDefinition baseType, IReadOnlyList<Type> parameters) : base(TypeKind.GenericInstance)
+        internal GenericInstanceType(Type baseType, IReadOnlyList<Type> parameters) : base(TypeKind.GenericInstance)
         {
             m_baseType = baseType.CheckNotNull("baseType");
             m_parameters = parameters.CheckNotNull("parameters");
         }
 
-        public TypeDefinition BaseType
+        public Type BaseType
         {
             get { return m_baseType; }
         }

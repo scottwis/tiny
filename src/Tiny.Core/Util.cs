@@ -79,6 +79,13 @@ namespace Tiny
             value = (value + (value >> 4)) & m4;
             return (int)((value * 0x0101010101010101UL) >> 56);
         }
+
+        public static void Times(this uint n, Action action)
+        {
+            for (var i = 0; i < n; ++i) {
+                action();
+            }
+        }
     }
 }
 

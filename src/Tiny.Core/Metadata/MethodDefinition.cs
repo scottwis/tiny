@@ -23,9 +23,90 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Collections.Generic;
+
 namespace Tiny.Metadata
 {
-    public class MethodDefinition
+    public class MethodDefinition : IGenericParameterScope
     {
+        public string Name
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public string FullName
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public TypeDefinition DeclaringType
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsPublic
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsPrivate
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsProtected
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsInternal
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsInternalOrProtected
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsInternalAndProtected
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsAbstract
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsSealed
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool HasSpecialName
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool HasRuntimeSpecialName
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public bool IsCompilerControlled
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public IReadOnlyList<GenericParameter> GenericParameters
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public Module Module
+        {
+            get { throw new System.NotImplementedException(); }
+        }
     }
 }

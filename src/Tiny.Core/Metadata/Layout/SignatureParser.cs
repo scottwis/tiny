@@ -25,6 +25,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using BclExtras.Collections;
 
 namespace Tiny.Metadata.Layout
 {
@@ -81,6 +83,12 @@ namespace Tiny.Metadata.Layout
                 | (((uint)ReadByte()) << 16)
                 | (((uint)ReadByte()) << 8)
                 | ((uint)ReadByte());
+        }
+
+        int ReadInt()
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
         }
 
         Type ParseType()
@@ -147,29 +155,38 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        Type ParseModifier(TypeKind modOpt)
+        Type ParseModifier(TypeKind kind)
         {
-            throw new NotImplementedException();
+            return new ModifiedType(
+                kind, 
+                ParseTypeReference(),
+                ParseType()
+            );
         }
 
         Type ParseGenericTypeParameter()
         {
-            throw new NotImplementedException();
+            if (!(m_genericParameterScope is TypeDefinition)) {
+                throw new InvalidOperationException("Generic method parameter not expected!");
+            }
+            return m_genericParameterScope.GenericParameters[checked((int)ReadUInt())];
         }
 
         Type ParseGenericMethodParameter()
         {
-            throw new NotImplementedException();
+            if (!(m_genericParameterScope is MethodDefinition)) {
+                throw new InvalidOperationException("Generic method parameter not expected!");
+            }
+            return m_genericParameterScope.GenericParameters[checked((int) ReadUInt())];
         }
 
         Type ParseGenericInstanceType()
         {
-            throw new NotImplementedException();
-        }
-
-        MethodReference ParseMethodSignature()
-        {
-            throw new NotImplementedException();
+            var baseType = ParseType();
+            var argCount = ReadUInt();
+            var args = new List<Type>();
+            argCount.Times(()=>args.Add(ParseType()));
+            return new GenericInstanceType(baseType, args.AsReadOnly());
         }
 
         Type ParseTypeReference()
@@ -178,6 +195,51 @@ namespace Tiny.Metadata.Layout
         }
 
         Type ParseArrayType()
+        {
+            var baseType = ParseType();
+            var rank = ReadUInt();
+            var sizes = ParseArraySizes();
+            var lowerBounds = ParseArrayLowerBounds();
+            var dimensions = sizes.Select(x => new uint?(x))
+                .ZipExtend(lowerBounds.Select(x => new int?(x)))
+                .Select(x => CreateDimension(x.First, x.Second))
+                .ZipExtend(Enumerable.Repeat(0, checked((int) rank)))
+                .Select(x => x.First ?? new Dimension())
+                .ToList().AsReadOnly();
+            return new ArrayType(baseType, dimensions);
+        }
+
+        Dimension? CreateDimension(uint? size, int? lowerBound)
+        {
+            if (size == null && lowerBound == null) {
+                return new Dimension();
+            }
+            //NOTE: This relies on null propagation to work correctly. That is,
+            //if size is null, then lowerBound + size - 1 will yield null, even if lowerBound is not null.
+            return new Dimension(lowerBound ?? 0, lowerBound + checked((int?)size) - 1);
+        }
+
+        int[] ParseArrayLowerBounds()
+        {
+            var count = ReadUInt();
+            var ret = new int[count];
+            for (int i = 0; i < ret.Length; ++i) {
+                ret[i] = ReadInt();
+            }
+            return ret;
+        }
+
+        uint[] ParseArraySizes()
+        {
+            var count = ReadUInt();
+            var ret = new uint[count];
+            for (int i = 0; i < ret.Length; ++i) {
+                ret[i] = ReadUInt();
+            }
+            return ret;
+        }
+
+        MethodReference ParseMethodSignature()
         {
             throw new NotImplementedException();
         }
