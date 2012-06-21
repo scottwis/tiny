@@ -120,8 +120,9 @@
     <Compile Include="Metadata\Dimension.cs" />
     <Compile Include="Metadata\Event.cs" />
     <Compile Include="Metadata\FieldDefinition.cs" />
-    <Compile Include="Metadata\GenericInstanceType.cs" />
+    <Compile Include="Metadata\GenericMethodInstance.cs" />
     <Compile Include="Metadata\GenericParameter.cs" />
+    <Compile Include="Metadata\GenericTypeInstance.cs" />
     <Compile Include="Metadata\Layout\ElementType.cs" />
     <Compile Include="Metadata\Layout\FieldAttributes.cs" />
     <Compile Include="Metadata\Layout\FieldLayoutRow.cs" />
@@ -174,12 +175,14 @@
     <Compile Include="Metadata\Layout\TypeDefRow.cs" />
     <Compile Include="Metadata\Layout\TypeOrMethodDef.cs" />
     <Compile Include="Metadata\MarshalInfo.cs" />
+    <Compile Include="Metadata\Method.cs" />
     <Compile Include="Metadata\MethodDefinition.cs" />
     <Compile Include="Metadata\MethodReference.cs" />
     <Compile Include="Metadata\ModifiedType.cs" />
     <Compile Include="Metadata\Module.cs" />
     <Compile Include="Metadata\ModuleCollection.cs" />
     <Compile Include="Metadata\NestedTypeInfo.cs" />
+    <Compile Include="Metadata\Parameter.cs" />
     <Compile Include="Metadata\Project.cs" />
     <Compile Include="Metadata\Property.cs" />
     <Compile Include="Metadata\StringFormat.cs" />

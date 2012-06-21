@@ -1,4 +1,4 @@
-// FunctionPointerType.cs
+﻿// GenericMethodInstance.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,39 +23,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Text;
+using System.Collections.Generic;
 
 namespace Tiny.Metadata
 {
-    public class FunctionPointerType : Type
+    public sealed class GenericMethodInstance : Method
     {
-        readonly Method m_signature;
+        //TODO: Finish defining this type.
 
-        public FunctionPointerType(Method signature) : base(TypeKind.FunctionPointer)
+        public override string Name
         {
-            m_signature = signature.CheckNotNull("signature");
-        }
-
-        internal override void GetFullName(StringBuilder b)
-        {
-            Signature.ReturnType.GetFullName(b);
-            b.Append(" (*)(");
-            var first = true;
-            foreach (var item in Signature.Parameters) {
-                if (first) {
-                    first = false;
-                }
-                else {
-                    b.Append(",");
-                }
-                item.ParameterType.GetFullName(b);
-                b.AppendFormat(" {0}", item.Name);
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
             }
         }
 
-        public Method Signature
+        public override Type ReturnType
         {
-            get { return m_signature; }
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
+            }
+        }
+
+        public override IReadOnlyList<Parameter> Parameters
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
+            }
+        }
+
+        public Method Base
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
+            }
         }
     }
 }

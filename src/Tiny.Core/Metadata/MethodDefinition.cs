@@ -27,9 +27,9 @@ using System.Collections.Generic;
 
 namespace Tiny.Metadata
 {
-    public class MethodDefinition : IGenericParameterScope
+    public sealed class MethodDefinition : Method, IGenericParameterScope
     {
-        public string Name
+        public override string Name
         {
             get { throw new System.NotImplementedException(); }
         }
@@ -105,6 +105,16 @@ namespace Tiny.Metadata
         }
 
         public Module Module
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public override Type ReturnType
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public override IReadOnlyList<Parameter> Parameters
         {
             get { throw new System.NotImplementedException(); }
         }

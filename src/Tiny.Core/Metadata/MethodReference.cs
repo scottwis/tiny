@@ -23,9 +23,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Collections.Generic;
+
 namespace Tiny.Metadata
 {
-    public class MethodReference
+    public sealed class MethodReference : Method
     {
+        //TODO: Finish defining this class
+
+        public override string Name
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
+            }
+        }
+
+        public override Type ReturnType
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
+            }
+        }
+
+        public override IReadOnlyList<Parameter> Parameters
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
+            }
+        }
+
+        public MethodDefinition Resolve()
+        {
+
+            throw new System.NotImplementedException();
+        }
     }
 }

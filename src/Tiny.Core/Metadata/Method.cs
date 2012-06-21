@@ -1,4 +1,4 @@
-// FunctionPointerType.cs
+﻿// Method.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,39 +23,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Text;
+using System.Collections.Generic;
 
 namespace Tiny.Metadata
 {
-    public class FunctionPointerType : Type
+    public abstract class Method
     {
-        readonly Method m_signature;
+        //TODO: Finish defining this
 
-        public FunctionPointerType(Method signature) : base(TypeKind.FunctionPointer)
-        {
-            m_signature = signature.CheckNotNull("signature");
-        }
-
-        internal override void GetFullName(StringBuilder b)
-        {
-            Signature.ReturnType.GetFullName(b);
-            b.Append(" (*)(");
-            var first = true;
-            foreach (var item in Signature.Parameters) {
-                if (first) {
-                    first = false;
-                }
-                else {
-                    b.Append(",");
-                }
-                item.ParameterType.GetFullName(b);
-                b.AppendFormat(" {0}", item.Name);
-            }
-        }
-
-        public Method Signature
-        {
-            get { return m_signature; }
-        }
+        public abstract string Name { get; }
+        public abstract Type ReturnType { get; }
+        public abstract IReadOnlyList<Parameter> Parameters { get; }
     }
 }

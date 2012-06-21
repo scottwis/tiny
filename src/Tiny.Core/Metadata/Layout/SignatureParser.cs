@@ -239,7 +239,7 @@ namespace Tiny.Metadata.Layout
             return ret;
         }
 
-        MethodReference ParseMethodSignature()
+        Method ParseMethodSignature()
         {
             throw new NotImplementedException();
         }

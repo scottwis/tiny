@@ -1,4 +1,4 @@
-// FunctionPointerType.cs
+// Parameter.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,39 +23,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Text;
-
 namespace Tiny.Metadata
 {
-    public class FunctionPointerType : Type
+    public class Parameter
     {
-        readonly Method m_signature;
+        //TODO: Finish defining this class
 
-        public FunctionPointerType(Method signature) : base(TypeKind.FunctionPointer)
+        public Type ParameterType
         {
-            m_signature = signature.CheckNotNull("signature");
-        }
-
-        internal override void GetFullName(StringBuilder b)
-        {
-            Signature.ReturnType.GetFullName(b);
-            b.Append(" (*)(");
-            var first = true;
-            foreach (var item in Signature.Parameters) {
-                if (first) {
-                    first = false;
-                }
-                else {
-                    b.Append(",");
-                }
-                item.ParameterType.GetFullName(b);
-                b.AppendFormat(" {0}", item.Name);
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
             }
         }
 
-        public Method Signature
+        public string Name
         {
-            get { return m_signature; }
+            get
+            {
+                //TODO: Implement this
+                throw new System.NotImplementedException();
+            }
         }
     }
 }
