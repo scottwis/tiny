@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 
 namespace Tiny.Metadata
@@ -31,92 +32,200 @@ namespace Tiny.Metadata
     {
         public override string Name
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public string FullName
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public TypeDefinition DeclaringType
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsPublic
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsPrivate
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsProtected
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsInternal
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsInternalOrProtected
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsInternalAndProtected
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsAbstract
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsSealed
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool HasSpecialName
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool HasRuntimeSpecialName
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public bool IsCompilerControlled
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public IReadOnlyList<GenericParameter> GenericParameters
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public Module Module
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public override Type ReturnType
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
 
         public override IReadOnlyList<Parameter> Parameters
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public override bool HasThis
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public override bool ExplicitThis
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public override CallingConvention CallingConvention
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public override int GenericParameterCount
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
     }
 }

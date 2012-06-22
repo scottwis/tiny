@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 
 namespace Tiny.Metadata
@@ -36,7 +37,7 @@ namespace Tiny.Metadata
             get
             {
                 //TODO: Implement this
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
 
@@ -45,7 +46,7 @@ namespace Tiny.Metadata
             get
             {
                 //TODO: Implement this
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
 
@@ -54,7 +55,7 @@ namespace Tiny.Metadata
             get
             {
                 //TODO: Implement this
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
 
@@ -63,7 +64,43 @@ namespace Tiny.Metadata
             get
             {
                 //TODO: Implement this
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
+            }
+        }
+
+        public override bool HasThis
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public override bool ExplicitThis
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public override CallingConvention CallingConvention
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public override int GenericParameterCount
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
             }
         }
     }

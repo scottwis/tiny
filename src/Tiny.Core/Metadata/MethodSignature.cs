@@ -1,4 +1,4 @@
-// MethodReference.cs
+// MethodSignature.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,82 +23,69 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 
 namespace Tiny.Metadata
 {
-    public sealed class MethodReference : Method
+    class MethodSignature : Method
     {
-        //TODO: Finish defining this class
+        readonly IReadOnlyList<Parameter> m_parameters;
+        readonly bool m_hasThis;
+        readonly bool m_explicitThis;
+        readonly CallingConvention m_callingConvention;
+        readonly int m_genericParamCount;
+        readonly Type m_retType;
+
+        public MethodSignature(
+            bool hasThis,
+            bool explicitThis,
+            CallingConvention callingConvention,
+            int genericParamCount,
+            IReadOnlyList<Parameter> parameters,
+            Type retType
+            )
+        {
+            m_hasThis = hasThis;
+            m_explicitThis = explicitThis;
+            m_callingConvention = callingConvention.CheckDefined("callingConvention");
+            m_genericParamCount = genericParamCount.CheckGTE(0, "genericParamCount");
+            m_parameters = parameters.CheckNotNull("parameters");
+            m_retType = retType.CheckNotNull("retType");
+        }
 
         public override string Name
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return null; }
         }
 
         public override Type ReturnType
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return m_retType; }
         }
 
         public override IReadOnlyList<Parameter> Parameters
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
-        }
-
-        public MethodDefinition Resolve()
-        {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            get { return m_parameters; }
         }
 
         public override bool HasThis
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return m_hasThis; }
         }
 
         public override bool ExplicitThis
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return m_explicitThis; }
         }
 
         public override CallingConvention CallingConvention
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return m_callingConvention; }
         }
 
         public override int GenericParameterCount
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return m_genericParamCount; }
         }
     }
 }

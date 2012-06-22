@@ -26,6 +26,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using BclExtras.Collections;
 
 namespace Tiny.Metadata.Layout
@@ -33,7 +34,9 @@ namespace Tiny.Metadata.Layout
     class SignatureParser : IDisposable
     {
         const byte FIELD = 0x6;
-
+        const byte HASTHIS = 0x20;
+        const byte EXPLICIT_THIS = 0x40;
+        
         readonly IEnumerator<byte> m_enumerator;
         readonly Module m_module;
         readonly IGenericParameterScope m_genericParameterScope;
@@ -149,6 +152,14 @@ namespace Tiny.Metadata.Layout
                     return ParseModifier(TypeKind.ModOpt);
                 case ElementType.ModReq:
                     return ParseModifier(TypeKind.ModReq);
+                case ElementType.ByRef:
+                    return new ModifiedType(TypeKind.ByRef, null, ParseType());
+                case ElementType.TypedByRef:
+                    return m_module.Assembly.Project.GetWellKnownType(WellKnownTypeID.TypedByRef);
+                case ElementType.Void:
+                    return m_module.Assembly.Project.GetWellKnownType(WellKnownTypeID.Void);
+                case ElementType.Pinned:
+                    return new ModifiedType(TypeKind.Pinned, null, ParseType());
                 default:
                     //TODO: Finish implementing  this
                     throw new NotImplementedException();
@@ -241,7 +252,23 @@ namespace Tiny.Metadata.Layout
 
         Method ParseMethodSignature()
         {
-            throw new NotImplementedException();
+            var b = ReadByte();
+            var hasThis = (b & HASTHIS) != 0;
+            var explicitThis = (b & EXPLICIT_THIS) != 0;
+            var callingConvention = (CallingConvention) (b & 0x1F);
+            var genericParamCount = callingConvention == CallingConvention.Generic ? checked((int)ReadUInt()) : 0;
+            var parameters = new List<Parameter>(checked((int)ReadUInt()));
+            var retType = ParseType();
+            for (var i = 0; i < parameters.Count; ++i) {
+                parameters.Add(ParseParameter());
+            }
+
+            return new MethodSignature(hasThis, explicitThis, callingConvention, genericParamCount, parameters.AsReadOnly(), retType);
+        }
+
+        Parameter ParseParameter()
+        {
+            return new Parameter(ParseType());
         }
 
         public void Dispose()

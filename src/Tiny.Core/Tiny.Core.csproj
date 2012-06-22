@@ -116,6 +116,7 @@
     <Compile Include="Interop\Win32\Win32Platform.cs" />
     <Compile Include="Metadata\ArrayType.cs" />
     <Compile Include="Metadata\Assembly.cs" />
+    <Compile Include="Metadata\CallingConvention.cs" />
     <Compile Include="Metadata\CustomAttribute.cs" />
     <Compile Include="Metadata\Dimension.cs" />
     <Compile Include="Metadata\Event.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Metadata\Layout\MetadataTable.cs" />
     <Compile Include="Metadata\Layout\MetadataTableHeader.cs" />
     <Compile Include="Metadata\Layout\MetadataToken.cs" />
+    <Compile Include="Metadata\MethodSignature.cs" />
     <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\NestedClassRow.cs" />
     <Compile Include="Metadata\Layout\OptionalHeader.cs" />

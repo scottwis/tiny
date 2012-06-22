@@ -34,5 +34,9 @@ namespace Tiny.Metadata
         public abstract string Name { get; }
         public abstract Type ReturnType { get; }
         public abstract IReadOnlyList<Parameter> Parameters { get; }
+        public abstract bool HasThis { get; }
+        public abstract bool ExplicitThis { get; }
+        public abstract CallingConvention CallingConvention { get; }
+        public abstract int GenericParameterCount { get; }
     }
 }

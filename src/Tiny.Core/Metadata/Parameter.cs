@@ -27,6 +27,11 @@ namespace Tiny.Metadata
 {
     public class Parameter
     {
+        internal Parameter(Type parseType)
+        {
+            throw new System.NotImplementedException();
+        }
+
         //TODO: Finish defining this class
 
         public Type ParameterType

@@ -42,6 +42,8 @@ namespace Tiny.Metadata
         IntPtr,
         UIntPtr,
         Object,
-        String
+        String,
+        TypedByRef,
+        Void
     }
 }
