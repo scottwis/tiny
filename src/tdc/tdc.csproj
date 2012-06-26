@@ -72,7 +72,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
-    <OS>Linux</OS>
+    <IsPosix>true</IsPosix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86-Linux' ">
     <DebugType>none</DebugType>
@@ -84,7 +84,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>linux</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
-    <OS>Linux</OS>
+    <IsPosix>true</IsPosix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Linux' ">
     <DebugSymbols>true</DebugSymbols>
@@ -98,7 +98,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <PlatformTarget>x64</PlatformTarget>
-    <OS>Linux</OS>
+    <IsPosix>true</IsPosix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64-Linux' ">
     <DebugType>none</DebugType>
@@ -110,13 +110,65 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>linux;TINY_64</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
-    <OS>Linux</OS>
+    <IsPosix>true</IsPosix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Mac' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;__APPLE__;posix</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Externalconsole>true</Externalconsole>
+    <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+    <IsPosix>true</IsPosix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86-Mac' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Externalconsole>true</Externalconsole>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>__APPLE__;posix</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+    <IsPosix>true</IsPosix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Mac' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;__APPLE__;posix;TINY_64</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Externalconsole>true</Externalconsole>
+    <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>x64</PlatformTarget>
+    <IsPosix>true</IsPosix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64-Mac' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Externalconsole>true</Externalconsole>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>__APPLE__;posix;TINY_64</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <IsPosix>true</IsPosix>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\bin\$(Platform)\$(Configuration)</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(OS)' == 'Linux' ">
-    <!-- For linux builds, we want to generate fully qualifed path names in error messages. This can slow down
+  <PropertyGroup Condition=" '$(IsPosix)' == 'true' ">
+    <!-- For posix builds, we want to generate fully qualifed path names in error messages. This can slow down
     Visual Studio, so we don't do it with windows builds.-->
     <GenerateFullPaths>true</GenerateFullPaths>
   </PropertyGroup>
