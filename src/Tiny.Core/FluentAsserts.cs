@@ -262,6 +262,15 @@ namespace Tiny
             return null;
         }
 
+        public static T CheckGT<T>(this T lhs, T rhs, string parameterName) where T : IComparable<T>
+        {
+            if (lhs.CompareTo(rhs) <= 0) {
+                throw new ArgumentOutOfRangeException(parameterName, String.Format("Expected a value > {0}", rhs));
+            }
+            return lhs;
+        }
+
+
         public static T CheckGTE<T>(this T lhs, T rhs, string parameterName) where T : IComparable<T>
         {
             if (lhs.CompareTo(rhs) < 0) {

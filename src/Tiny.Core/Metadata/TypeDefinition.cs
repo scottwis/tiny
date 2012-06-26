@@ -79,7 +79,7 @@ namespace Tiny.Metadata
             return fields;
         }
 
-        //# Returns the type containing this type, or null if the type is not nested.
+       //# Returns the type containing this type, or null if the type is not nested.
         public TypeDefinition DeclaringType
         {
             get

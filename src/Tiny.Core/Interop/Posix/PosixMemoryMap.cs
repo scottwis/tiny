@@ -23,25 +23,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if linx
+#if linux
 
-namespace Tiny.Decompiler.Interop.Posix
+using Mono.Unix.Native;
+using System;
+
+namespace Tiny.Interop.Posix
 {
-    public sealed class PosixMemoryMap : IUnsafeMemoryMap
+    sealed unsafe class PosixMemoryMap : IUnsafeMemoryMap
     {
+        void * m_pMemory;
+        readonly uint m_size;
+
+        public PosixMemoryMap(void* pMemory, uint size)
+        {
+            m_pMemory = FluentAsserts.CheckNotNull(pMemory, "pMemory");
+            m_size = size.CheckGT(0U, "size");
+        }
         public void Dispose()
         {
-            throw new System.NotImplementedException();
+            if (m_pMemory != null) {
+                Syscall.munmap((IntPtr)m_pMemory,m_size);
+            }
+            m_pMemory = null;
         }
 
         public unsafe void* Data
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                CheckDisposed();
+                return m_pMemory;
+            }
         }
 
         public unsafe uint Size
         {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                CheckDisposed();
+                return m_size;
+            }
+        }
+
+        private void CheckDisposed()
+        {
+            if (m_pMemory == null) {
+                throw new ObjectDisposedException("PosixMemoryMap");
+            }
         }
     }
 }

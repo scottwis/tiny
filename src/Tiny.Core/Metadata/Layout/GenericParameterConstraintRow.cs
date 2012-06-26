@@ -48,10 +48,10 @@ namespace Tiny.Metadata.Layout
                 var pConstraint = (byte*) pThis + MetadataTable.GenericParam.IndexSize(peFile);
                 uint index;
                 if (CodedIndex.TypeDefOrRef.IndexSize(peFile) == 2) {
-                    index = *(ushort*) pThis;
+                    index = *(ushort*) pConstraint;
                 }
                 else {
-                    index = *(uint*) pThis;
+                    index = *(uint*) pConstraint;
                 }
                 return new TypeDefOrRef(index);
             }

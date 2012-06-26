@@ -72,6 +72,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
+    <OS>Linux</OS>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86-Linux' ">
     <DebugType>none</DebugType>
@@ -83,6 +84,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>linux</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
+    <OS>Linux</OS>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Linux' ">
     <DebugSymbols>true</DebugSymbols>
@@ -96,6 +98,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <PlatformTarget>x64</PlatformTarget>
+    <OS>Linux</OS>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64-Linux' ">
     <DebugType>none</DebugType>
@@ -107,9 +110,15 @@
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>linux;TINY_64</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
+    <OS>Linux</OS>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\bin\$(Platform)\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(OS)' == 'Linux' ">
+    <!-- For linux builds, we want to generate fully qualifed path names in error messages. This can slow down
+    Visual Studio, so we don't do it with windows builds.-->
+    <GenerateFullPaths>true</GenerateFullPaths>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

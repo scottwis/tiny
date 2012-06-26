@@ -25,20 +25,70 @@
 
 #if linux
 
-using Tiny.Decompiler.Interop.Win32;
+using Mono.Unix.Native;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
 
-namespace Tiny.Decompiler.Interop.Posix
+namespace Tiny.Interop.Posix
 {
-    public sealed unsafe class PosixPlatform : NativePlatform
+    sealed unsafe class PosixPlatform : NativePlatform
     {
-        public override UnsafeWin32MemoryMap MemoryMapFile(string fileName)
+        [DllImport("libc", EntryPoint="strnlen", CallingConvention=CallingConvention.Cdecl)]
+        [return:MarshalAs(UnmanagedType.SysUInt)]
+        public static extern UIntPtr StrNLen(byte * pData, UIntPtr maxCount);
+        
+        public override IUnsafeMemoryMap MemoryMapFile(string fileName)
         {
-            #error Implement this
+            int file = Syscall.open(fileName, OpenFlags.O_RDONLY);
+            Stat fileStat = new Stat();
+            void * pMem = null;
+            try{
+                if (file == -1) {
+                    throw new FileLoadException("Unable to load file",fileName, new PosixException(Stdlib.GetLastError()));
+                }
+
+                int res = Syscall.fstat(file, out fileStat);
+
+                if (res == -1) {
+                    Syscall.close(file);
+                    throw new FileLoadException("Unable to load file",fileName, new PosixException(Stdlib.GetLastError()));
+                }
+
+                pMem = (void *)Syscall.mmap(
+                    IntPtr.Zero,
+                    (ulong)fileStat.st_size,
+                    MmapProts.PROT_READ,
+                    MmapFlags.MAP_PRIVATE,
+                    file,
+                    0
+                );
+                
+                if (pMem==null) {
+                    throw new FileLoadException(
+                        "Unable to load file",
+                        fileName,
+                        new PosixException(Stdlib.GetLastError())
+                    );
+                }
+
+                return new PosixMemoryMap(pMem, checked((uint)fileStat.st_size));
+            }
+            catch {
+                if (file != -1) {
+                    Syscall.close(file);
+                }
+                if (pMem != null) {
+                    Syscall.munmap((IntPtr)pMem,checked((ulong)fileStat.st_size));
+                }
+                throw;
+            }
         }
 
-        public override int StrLen(byte* name, int i)
+        public override int StrLen(byte* pName, int maxLength)
         {
-            #error Implement this
+            maxLength.CheckGTE(0, "maxLength");
+            return checked((int)StrNLen(pName, (UIntPtr)maxLength));
         }
     }
 }

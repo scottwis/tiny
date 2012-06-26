@@ -1,0 +1,18 @@
+We need to implement reflection in the CLR.
+It's also desirable on non-mobile platforms to support dynamic loading of assemblies.
+Dynamic loading of assemblies requires the ability to do dynamic code generation, in order to properly support generics. 
+Once we have support for dynamic code generation, we could also implement Reflection.Emit, which would be a huge fit.
+
+Ideally, we could reuse the contents of Tiny.Metadata to do this.
+
+Our current architecture mostly supports this, except for the way the PEFile / assembly classes are constructed. We currently always use memory mapped IO to load an assembly.
+
+For reflection / dynamic code generation scenarios we would want to emit metadata tables using the same format as the CLR, and then use the address of the metadata root inside the image. The construction of the PEFile class will be a little different at runtime then it would at compile time, because it won't read the metadata roots from the "data directory list" in a pe image. This is mostly because we will generate native images for the platforms we run on.
+
+The definition of ModuleCollection will also need to change slightly too. It will need to create non-manifest modules by using LoadLibrary or it's equivalent, rather than by mapping in a dll.
+
+We also need to ensure that the dllmain / elf constructors register a managed library with it's hosting exe file on dll attach.
+
+We will need to use different sets of llvm optimizations at runtime and compile time, and we would have to host llvm inside of mscorlib (but not inside of tdc),
+
+However, those changes should be sufficient to allow Tiny.Metadata to be reused for Reflection / Generics at runtime.

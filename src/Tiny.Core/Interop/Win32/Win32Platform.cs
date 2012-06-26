@@ -153,7 +153,7 @@ namespace Tiny.Interop.Win32
 
         public override int StrLen(byte* pData, int maxLength)
         {
-            maxLength.AssumeGTE(0);
+            maxLength.CheckGTE(0, "maxLength");
             return checked((int)StrNLen(pData, (UIntPtr) maxLength));
         }
     }

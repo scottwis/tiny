@@ -28,7 +28,7 @@ using System;
 
 namespace Tiny.Interop.Win32
 {
-    public sealed unsafe class UnsafeWin32MemoryMap : IUnsafeMemoryMap
+    sealed unsafe class UnsafeWin32MemoryMap : IUnsafeMemoryMap
     {
         IntPtr m_fileHandle;
         IntPtr m_mapHandle;

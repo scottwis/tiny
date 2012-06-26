@@ -107,16 +107,31 @@ namespace Tiny.Metadata
         unsafe void LoadModule(int index)
         {
             if (m_otherModules[index] == null) {
-                var f = (FileRow *)m_mainFile.GetRow(index,MetadataTable.File);
-                if ((f->Flags & FileAttributes.ContainsNoMetadata) != 0) {
-                    m_otherModules[index] = Module.CreateNonMetadataModule(
-                        m_assembly,
-                        m_mainFile.ReadSystemString(
-                            f->GetNameOffset(m_mainFile)
-                        ));
-                }
-                else {
-                    m_otherModules[index] = new PEFile(m_assembly, m_mainFile.ReadSystemString(f->GetNameOffset(m_mainFile)));
+                lock (m_lockObject) {
+                    if (m_otherModules[index] == null) {
+                        var f = (FileRow *)m_mainFile.GetRow(index,MetadataTable.File);
+                        if ((f->Flags & FileAttributes.ContainsNoMetadata) != 0) {
+                            m_otherModules[index] = Module.CreateNonMetadataModule(
+                                m_assembly,
+                                m_mainFile.ReadSystemString(
+                                    f->GetNameOffset(m_mainFile)
+                                )
+                            );
+                        }
+                        else {
+                            PEFile peFile = null;
+                            try {
+                                peFile = new PEFile(m_assembly, m_mainFile.ReadSystemString(f->GetNameOffset(m_mainFile)));
+                                m_otherModules[index] = peFile;
+                            }
+                            catch {
+                                if (peFile != null) {
+                                    peFile.Dispose();
+                                }
+                                throw;
+                            }
+                        }
+                    }
                 }
             }
         }
