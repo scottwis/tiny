@@ -208,6 +208,7 @@
     <Compile Include="Metadata\Layout\HasFieldMarshal.cs" />
     <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
     <Compile Include="Metadata\Layout\ImageSubsystem.cs" />
+    <Compile Include="Metadata\Layout\InterfaceImplRow.cs" />
     <Compile Include="Metadata\Layout\IToken.cs" />
     <Compile Include="Metadata\Layout\MachineType.cs" />
     <Compile Include="Metadata\Layout\MetadataRoot.cs" />
@@ -217,6 +218,7 @@
     <Compile Include="Metadata\Layout\MethodAttributes.cs" />
     <Compile Include="Metadata\Layout\MethodDefRow.cs" />
     <Compile Include="Metadata\Layout\MethodImplAttributes.cs" />
+    <Compile Include="Metadata\Layout\TChild.cs" />
     <Compile Include="Metadata\MethodSignature.cs" />
     <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\NestedClassRow.cs" />

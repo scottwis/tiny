@@ -131,30 +131,14 @@ namespace Tiny.Metadata
         void LoadConstraints()
         {
             if (m_constraints == null) {
-                //It is valid for the generic parameter constraints table to not be sorted, but I don't expect such a case to occur in practice.
-                //I imagine that this could maybe happen with ENC, but we don't need to be able to decompile enc assemblies,
-                m_peFile.IsSorted(MetadataTable.GenericParamConstraint).Assume("The generic param constraint table is not sorted.");
-
-                var rowIndex = MetadataTable.GenericParamConstraint.RowIndex(m_pRow, m_peFile);
-                var glb = MetadataTable.GenericParamConstraint.GreatestLowerBound(
-                    (uint)rowIndex,
-                    x => ((GenericParameterConstraintRow*) x)->GetOwner(m_peFile),
-                    m_peFile
-                );
-                var lub = MetadataTable.GenericParamConstraint.LeastUpperBound(
-                    (uint)rowIndex,
-                    x => ((GenericParameterConstraintRow*) x)->GetOwner(m_peFile),
-                    m_peFile
-                );
-
-                var constraints = new LiftedList<TypeReference>(
-                    (glb - lub - 1),
-                    index => MetadataTable.GenericParamConstraint.GetRow(index + lub + 1, m_peFile),
-                    x => new TypeReference(
-                        ((GenericParameterConstraintRow*)x)->GetConstraint(m_peFile),
+                var constraints = m_peFile.LoadIndirectChildren(
+                    (uint)MetadataTable.GenericParam.RowIndex(m_pRow, m_peFile),
+                    MetadataTable.GenericParamConstraint,
+                    pRow=>((GenericParameterConstraintRow *)pRow)->GetOwner(m_peFile),
+                    pRow=>new TypeReference(
+                        ((GenericParameterConstraintRow *)pRow)->GetConstraint(m_peFile),
                         Parent.Module
-                    ),
-                    () => m_peFile.IsDisposed
+                    )
                 );
 
                 #pragma warning disable 420

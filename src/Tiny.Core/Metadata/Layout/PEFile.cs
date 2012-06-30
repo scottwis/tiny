@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+
+using Tiny.Collections;
 using Tiny.Interop;
 
 namespace Tiny.Metadata.Layout
@@ -875,6 +877,40 @@ namespace Tiny.Metadata.Layout
             CheckDisposed();
             var blob = ReadBlob(offset);
             return SignatureParser.ParseFieldSignature(blob, declaringType);
+        }
+
+        public LiftedList<TChild> LoadIndirectChildren<TChild, TParentField>(
+            TParentField parent,
+            MetadataTable childTable,
+            UnsafeSelector<TParentField> parentSelector,
+            CreateObjectDelegate<TChild> factory
+        ) where TChild : class
+        {
+            //It is valid for the child table to not be sorted, but I don't expect such a case to occur in practice.
+            //I imagine that this could maybe happen with ENC, but we don't need to be able to decompile enc assemblies.
+            //In either case, if we do end up needing to support assemblies with unsorted meta-data tables, then we should probably
+            //add our best attempt at an efficent fallback in that case. For now we just throw.
+            IsSorted(childTable).Assume("The generic param constraint table is not sorted.");
+
+            var glb = GreatestLowerBound(
+                childTable,
+                parent,
+                parentSelector
+            );
+            var lub = LeastUpperBound(
+                childTable,
+                parent,
+                parentSelector
+            );
+
+            var ret = new LiftedList<TChild>(
+                (glb - lub - 1),
+                index => GetRow(index + lub + 1, childTable),
+                factory,
+                () => IsDisposed
+            );
+
+            return ret;
         }
     }
 }
