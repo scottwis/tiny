@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -142,7 +142,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup Condition=" '$(IsPosix)' == 'true' ">
-    <Reference Include="Mono.Posix"/>
+    <Reference Include="Mono.Posix" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(IsPosix)' == 'true' ">
     <!-- For linux builds, we want to generate fully qualifed path names in error messages. This can slow down
@@ -154,12 +154,12 @@
     <Compile Include="Collections\LiftedList.cs" />
     <Compile Include="Collections\LiftedValueTypeList.cs" />
     <Compile Include="Collections\ReadonlyListBase.cs" />
-    <Compile Include="Collections\ReadOnlyDictionary.cs"/>
+    <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="FluentAsserts.cs" />
     <Compile Include="InternalErrorException.cs" />
     <Compile Include="Interop\IUnsafeMemoryMap.cs" />
     <Compile Include="Interop\NativePlatform.cs" />
-    <Compile Include="Interop\Posix\ErrnoExtensions.cs"/>
+    <Compile Include="Interop\Posix\ErrnoExtensions.cs" />
     <Compile Include="Interop\Posix\PosixException.cs" />
     <Compile Include="Interop\Posix\PosixMemoryMap.cs" />
     <Compile Include="Interop\Posix\PosixPlatform.cs" />
@@ -181,6 +181,7 @@
     <Compile Include="Metadata\GenericMethodInstance.cs" />
     <Compile Include="Metadata\GenericParameter.cs" />
     <Compile Include="Metadata\GenericTypeInstance.cs" />
+    <Compile Include="Metadata\Instruction.cs" />
     <Compile Include="Metadata\Layout\ElementType.cs" />
     <Compile Include="Metadata\Layout\FieldAttributes.cs" />
     <Compile Include="Metadata\Layout\FieldLayoutRow.cs" />
@@ -213,9 +214,9 @@
     <Compile Include="Metadata\Layout\MetadataTable.cs" />
     <Compile Include="Metadata\Layout\MetadataTableHeader.cs" />
     <Compile Include="Metadata\Layout\MetadataToken.cs" />
-    <Compile Include="Metadata\Layout\MethodAttributes.cs"/>
-    <Compile Include="Metadata\Layout\MethodDefRow.cs"/>
-    <Compile Include="Metadata\Layout\MethodImplAttributes.cs"/>
+    <Compile Include="Metadata\Layout\MethodAttributes.cs" />
+    <Compile Include="Metadata\Layout\MethodDefRow.cs" />
+    <Compile Include="Metadata\Layout\MethodImplAttributes.cs" />
     <Compile Include="Metadata\MethodSignature.cs" />
     <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\NestedClassRow.cs" />

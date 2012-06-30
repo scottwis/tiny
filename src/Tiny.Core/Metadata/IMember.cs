@@ -41,5 +41,6 @@ namespace Tiny.Metadata
         bool HasSpecialName { get; }
         bool HasRuntimeSpecialName { get; }
         bool IsCompilerControlled { get; }
+        bool IsStatic { get;  }
     }
 }

@@ -39,18 +39,16 @@ namespace Tiny.Metadata
         internal override void GetFullName(StringBuilder b)
         {
             Signature.ReturnType.GetFullName(b);
-            b.Append(" (*)(");
-            var first = true;
-            foreach (var item in Signature.Parameters) {
-                if (first) {
-                    first = false;
-                }
-                else {
-                    b.Append(",");
-                }
-                item.ParameterType.GetFullName(b);
-                b.AppendFormat(" {0}", item.Name);
-            }
+
+            Signature.Parameters.Print(
+                b, 
+                ",", 
+                " (*)(",
+                ")",
+                (item, builder)=> {
+                item.ParameterType.GetFullName(builder);
+                builder.AppendFormat(" {0}", item.Name);
+            });
         }
 
         public Method Signature

@@ -25,17 +25,39 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
 {
-    public sealed class MethodDefinition : Method, IGenericParameterScope
+    public sealed unsafe class MethodDefinition : Method, IGenericParameterScope
     {
+        readonly TypeDefinition m_declaringType;
+        readonly MethodDefRow* m_pRow;
+        volatile string m_name;
+        volatile MethodSignature m_signature;
+
+        internal MethodDefinition(MethodDefRow * pRow, TypeDefinition declaringType)
+        {
+            m_pRow = (MethodDefRow*)FluentAsserts.CheckNotNull((void *)pRow, "pRow");
+            m_declaringType = declaringType.CheckNotNull("declaringType");
+        }
+
         public override string Name
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                if (m_name == null) {
+                    var peFile = DeclaringType.Module.PEFile;
+                    var name = peFile.ReadSystemString(m_pRow->GetNameOffset(peFile));
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_name, name, null);
+                    #pragma warning restore 420
+                }
+                return m_name;
             }
         }
 
@@ -43,8 +65,41 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                var builder = new StringBuilder();
+                DeclaringType.GetFullName(builder);
+                builder.AppendFormat(".{0}", Name);
+                PrintGenericParameters(builder);
+                PrintParameters(builder);
+                return builder.ToString();
+            }
+        }
+
+        void CheckDisposed()
+        {
+            if (Module.PEFile.IsDisposed) {
+                throw new ObjectDisposedException("MethodDefinition");
+            }
+        }
+
+        void PrintParameters(StringBuilder builder)
+        {
+            Parameters.Print(
+                builder, 
+                ",", 
+                "(", 
+                ")",
+                (p, b)=> {
+                    p.ParameterType.GetFullName(b);
+                    b.AppendFormat(" {0}", p.Name);
+                }
+            );
+        }
+
+        void PrintGenericParameters(StringBuilder builder)
+        {
+            if (GenericParameterCount != 0) {
+                GenericParameters.Print(builder, ",", "<", ">", (gp, b) => b.Append(gp.Name));
             }
         }
 
@@ -52,8 +107,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return m_declaringType;
             }
         }
 
@@ -61,8 +116,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.Public;
             }
         }
 
@@ -70,8 +125,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.Private;
             }
         }
 
@@ -79,8 +134,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.Family;
             }
         }
 
@@ -88,8 +143,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.Assembly;
             }
         }
 
@@ -97,8 +152,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.FamilyOrAssembly;
             }
         }
 
@@ -106,8 +161,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.FamilyAndAssembly;
             }
         }
 
@@ -115,8 +170,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.Abstract) != 0;
             }
         }
 
@@ -124,8 +179,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.Final) != 0;
             }
         }
 
@@ -133,8 +188,8 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.SpecialName) != 0;
             }
         }
 
@@ -142,24 +197,21 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.RTSpecialName) != 0;
             }
         }
 
         public bool IsCompilerControlled
         {
-            get
-            {
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
+            get { return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.CompilerControlled; }
         }
 
         public IReadOnlyList<GenericParameter> GenericParameters
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -169,6 +221,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -178,6 +231,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -187,6 +241,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -196,6 +251,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -205,6 +261,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -214,6 +271,7 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
@@ -223,9 +281,112 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
+                return GenericParameters.Count;
+            }
+        }
+
+        public IReadOnlyList<Method> ImplementedMethods
+        {
+            get
+            {
+                CheckDisposed();
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
+        }
+
+        public IReadOnlyList<Instruction> Body
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool HasBody
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsNewSlot
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.VtableLayoutMask) == MethodAttributes.NewSlot;
+            }
+        }
+
+        public bool IsVirtual
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.Virtual) != 0;
+            }
+        }
+
+        public bool IsHideByName
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.HideBySig) == 0;
+            }
+        }
+
+        public bool IsPinvoke
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.PInvokeImpl) != 0;
+            }
+        }
+
+        public bool HasDeclarativeSecurity
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.HasSecurity) != 0;
+            }
+        }
+
+        public bool RequiresSecureObject
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.RequireSecObject) != 0;
+            }
+        }
+
+        public bool IsStatic
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.Static) != 0;
+            }
+        }
+
+        public MethodImplOptions ImplementationOptions
+        {
+            get { return (MethodImplOptions)(m_pRow->ImplFlags & ~(MethodImplAttributes.CodeTypeMask)); }
+        }
+
+        public MethodCodeType CodeType
+        {
+            get { return (MethodCodeType) (m_pRow->ImplFlags & (MethodImplAttributes.CodeTypeMask)); }
         }
     }
 }

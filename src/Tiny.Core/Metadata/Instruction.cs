@@ -1,4 +1,4 @@
-﻿// GenericInstanceType.cs
+// Instruction.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,38 +23,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Collections.Generic;
-using System.Text;
-
 namespace Tiny.Metadata
 {
-    //# Represents an instanstation of a generic type, such as IEnumerable<Sting> or
-    //# List<int>.
-    public sealed class GenericInstanceType : Type
+    public class Instruction
     {
-        readonly Type m_baseType;
-        readonly IReadOnlyList<Type> m_genericArguments;
-
-        internal GenericInstanceType(Type baseType, IReadOnlyList<Type> parameters) : base(TypeKind.GenericInstance)
-        {
-            m_baseType = baseType.CheckNotNull("baseType");
-            m_genericArguments = parameters.CheckNotNull("parameters");
-        }
-
-        public Type BaseType
-        {
-            get { return m_baseType; }
-        }
-
-        public IReadOnlyList<Type> GenericArguments
-        {
-            get { return m_genericArguments; }
-        }
-
-        internal override void GetFullName(StringBuilder b)
-        {
-            BaseType.GetFullName(b);
-            GenericArguments.Print(b, ",", "<", ">", (type,builder)=>type.GetFullName(builder));
-        }
     }
 }

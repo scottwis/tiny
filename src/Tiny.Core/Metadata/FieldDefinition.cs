@@ -238,6 +238,16 @@ namespace Tiny.Metadata
             }
         }
 
+        public bool IsStatic
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
         private void CheckDisposed()
         {
             if (m_declaringType.Module.PEFile.IsDisposed) {

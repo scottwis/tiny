@@ -44,30 +44,29 @@ namespace Tiny.Metadata
         volatile string m_name;
         volatile string m_namespace;
         readonly Module m_module;
-        readonly IReadOnlyList<FieldDefinition> m_fields;
+        volatile IReadOnlyList<FieldDefinition> m_fields;
 
         internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
             m_module = module.CheckNotNull("module");
             FluentAsserts.CheckNotNull((void *)pRow, "pRow");
             m_pRow = pRow;
-            m_fields = GetFields(pRow, module);
         }
 
-        unsafe LiftedList<FieldDefinition> GetFields(TypeDefRow* pRow, Module module)
+        unsafe LiftedList<FieldDefinition> GetFields()
         {
-            var firstFieldIndex = checked((int) pRow->GetFieldListToken(module.PEFile)).AssumeGTE(1) - 1;
+            var firstFieldIndex = checked((int) m_pRow->GetFieldListToken(m_module.PEFile)).AssumeGTE(1) - 1;
             int lastFieldIndex;
-            var tableIndex = MetadataTable.TypeDef.RowIndex(pRow, module.PEFile);
-            if (tableIndex == MetadataTable.TypeDef.RowCount(module.PEFile) - 1) {
-                lastFieldIndex = MetadataTable.Field.RowCount(module.PEFile);
+            var tableIndex = MetadataTable.TypeDef.RowIndex(m_pRow, m_module.PEFile);
+            if (tableIndex == MetadataTable.TypeDef.RowCount(m_module.PEFile) - 1) {
+                lastFieldIndex = MetadataTable.Field.RowCount(m_module.PEFile);
             }
             else {
                 lastFieldIndex = checked(
                     (int) ((TypeDefRow*) MetadataTable.TypeDef.GetRow(
                         tableIndex + 1,
-                        module.PEFile
-                    ))->GetFieldListToken(module.PEFile).AssumeGTE(1U) - 1
+                        m_module.PEFile
+                    ))->GetFieldListToken(m_module.PEFile).AssumeGTE(1U) - 1
                 );
             }
             var fields = new LiftedList<FieldDefinition>(
@@ -185,12 +184,24 @@ namespace Tiny.Metadata
             else  {
                 b.AppendFormat("{0}.{1}", Namespace, Name);
             }
+            if (GenericParameters.Count != 0) {
+                GenericParameters.Print(b, ",", "<", ">", (gp, builder)=>builder.Append(gp.Name));
+            }
         }
 
         //# The set of fields defined on the type. If the class defines no fields, this will be an empty list.
         public IReadOnlyList<FieldDefinition> Fields
         {
-            get { return m_fields; }
+            get
+            {
+                if (m_fields == null) {
+                    var fields = GetFields();
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_fields, fields, null);
+                    #pragma warning restore 420
+                }
+                return m_fields;
+            }
         }
 
         //# The set of methods defined on the type, or null if the type defines no methods.
@@ -404,6 +415,15 @@ namespace Tiny.Metadata
         }
 
         public bool HasRuntimeSpecialName
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsStatic
         {
             get
             {

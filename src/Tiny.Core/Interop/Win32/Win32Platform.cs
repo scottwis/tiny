@@ -86,7 +86,7 @@ namespace Tiny.Interop.Win32
             UIntPtr maxCount
         );
 
-        public override UnsafeWin32MemoryMap MemoryMapFile(string fileName)
+        public override IUnsafeMemoryMap MemoryMapFile(string fileName)
         {
             fileName.AssumeNotNull();
             IntPtr hFile = IntPtr.Zero;

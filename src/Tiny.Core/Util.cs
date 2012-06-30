@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace Tiny
 {
@@ -85,6 +86,43 @@ namespace Tiny
             for (var i = 0; i < n; ++i) {
                 action();
             }
+        }
+
+        public static void Print<T>(
+            this IEnumerable<T> items,
+            StringBuilder builder,
+            String seperator,
+            String prefix,
+            String suffix,
+            Action<T, StringBuilder> formatter
+        )
+        {
+            seperator = seperator ?? "";
+            prefix = prefix ?? "";
+            suffix = suffix ?? "";
+
+            builder.Append(prefix);
+            var first = true;
+            foreach (var item in items) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    builder.Append(seperator);
+                }
+                formatter(item, builder);
+            }
+            builder.Append(suffix);
+        }
+
+        public static void Print<T>(
+            this IEnumerable<T> items,
+            StringBuilder builder,
+            String seperator,
+            Action<T, StringBuilder> formatter
+        )
+        {
+            Print(items, builder, seperator, null, null, formatter);
         }
     }
 }
