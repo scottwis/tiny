@@ -45,37 +45,13 @@ namespace Tiny.Metadata
         volatile string m_namespace;
         readonly Module m_module;
         volatile IReadOnlyList<FieldDefinition> m_fields;
+        volatile IReadOnlyList<MethodDefinition> m_methods;
 
         internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
             m_module = module.CheckNotNull("module");
             FluentAsserts.CheckNotNull((void *)pRow, "pRow");
             m_pRow = pRow;
-        }
-
-        unsafe LiftedList<FieldDefinition> GetFields()
-        {
-            var firstFieldIndex = checked((int) m_pRow->GetFieldListToken(m_module.PEFile)).AssumeGTE(1) - 1;
-            int lastFieldIndex;
-            var tableIndex = MetadataTable.TypeDef.RowIndex(m_pRow, m_module.PEFile);
-            if (tableIndex == MetadataTable.TypeDef.RowCount(m_module.PEFile) - 1) {
-                lastFieldIndex = MetadataTable.Field.RowCount(m_module.PEFile);
-            }
-            else {
-                lastFieldIndex = checked(
-                    (int) ((TypeDefRow*) MetadataTable.TypeDef.GetRow(
-                        tableIndex + 1,
-                        m_module.PEFile
-                    ))->GetFieldListToken(m_module.PEFile).AssumeGTE(1U) - 1
-                );
-            }
-            var fields = new LiftedList<FieldDefinition>(
-                lastFieldIndex - firstFieldIndex,
-                index => MetadataTable.Field.GetRow(index + firstFieldIndex, module.PEFile),
-                x => new FieldDefinition((FieldRow*) x, this),
-                () => Module.PEFile.IsDisposed
-            );
-            return fields;
         }
 
        //# Returns the type containing this type, or null if the type is not nested.
@@ -189,13 +165,46 @@ namespace Tiny.Metadata
             }
         }
 
+        delegate uint GetTokenDelegate(void* pRow, PEFile peFile);
+
+        LiftedList<T> GetMembers<T>(
+            MetadataTable table,
+            GetTokenDelegate getToken,
+            CreateObjectDelegate<T> createObject
+        ) where T : class
+        {
+            var firstFieldIndex = checked((int) getToken(m_pRow, Module.PEFile)).AssumeGTE(1) - 1;
+            int lastFieldIndex;
+            var tableIndex = MetadataTable.TypeDef.RowIndex(m_pRow, m_module.PEFile);
+            if (tableIndex == MetadataTable.TypeDef.RowCount(m_module.PEFile) - 1) {
+                lastFieldIndex = table.RowCount(m_module.PEFile);
+            }
+            else {
+                lastFieldIndex = checked(
+                    (int)getToken(MetadataTable.TypeDef.GetRow(tableIndex + 1, m_module.PEFile), m_module.PEFile)
+                ).AssumeGTE(1) - 1;
+            }
+            var fields = new LiftedList<T>(
+                lastFieldIndex - firstFieldIndex,
+                index => table.GetRow(index + firstFieldIndex, m_module.PEFile),
+                createObject,
+                () => Module.PEFile.IsDisposed
+            );
+            return fields;
+        }
+
         //# The set of fields defined on the type. If the class defines no fields, this will be an empty list.
         public IReadOnlyList<FieldDefinition> Fields
         {
             get
             {
+                CheckDisposed();
                 if (m_fields == null) {
-                    var fields = GetFields();
+                    var fields = GetMembers(
+                        MetadataTable.Field,
+                        (pRow, peFile)=>((TypeDefRow *)pRow)->GetFieldListToken(peFile),
+                        x => new FieldDefinition((FieldRow*)x, this)
+                    );
                     #pragma warning disable 420
                     Interlocked.CompareExchange(ref m_fields, fields, null);
                     #pragma warning restore 420
@@ -209,8 +218,18 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                if (m_methods == null) {
+                    var methods = GetMembers(
+                        MetadataTable.MethodDef,
+                        (pRow, peFile) => ((TypeDefRow*)pRow)->GetMethodListToken(peFile),
+                        pRow => new MethodDefinition((MethodDefRow*)pRow, this)
+                    );
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_methods, methods, null);
+                    #pragma warning restore 420
+                }
+                return m_methods;
             }
         }
 
