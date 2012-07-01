@@ -1,4 +1,4 @@
-// Type.cs
+﻿// EventMapRow.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,39 +23,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Text;
+using System.Runtime.InteropServices;
 
-namespace Tiny.Metadata
+namespace Tiny.Metadata.Layout
 {
-    public abstract class Type
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct EventMapRow
     {
-        readonly TypeKind m_kind;
-
-        internal Type(TypeKind kind)
+        public uint GetParent(PEFile peFile)
         {
-            m_kind = kind.CheckDefined("kind");
-        }
-
-        internal abstract void GetFullName(StringBuilder b);
-
-        public override string ToString()
-        {
-            return FullName;
-        }
-
-        //# The fully qualified name of the type.
-        public virtual string FullName
-        {
-            get { 
-                var b = new StringBuilder();
-                GetFullName(b);
-                return b.ToString();
+            peFile.CheckNotNull("peFile");
+            fixed (EventMapRow * pThis = &this) {
+                if (MetadataTable.TypeDef.IndexSize(peFile) == 2) {
+                    return *(ushort*) pThis;
+                }
+                return *(uint*) pThis;
             }
         }
 
-        public TypeKind Kind
+        public uint GetEventListIndex(PEFile peFile)
         {
-            get { return m_kind; }
+            peFile.CheckNotNull("peFile");
+            fixed (EventMapRow* pThis = &this) {
+                var pEventList = (byte*) pThis + MetadataTable.TypeDef.IndexSize(peFile);
+                if (MetadataTable.Event.IndexSize(peFile) == 2) {
+                    return *(ushort*) pThis;
+                }
+                return *(uint*) pThis;
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-// Type.cs
+﻿// EventAttributes.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,39 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Text;
-
-namespace Tiny.Metadata
+namespace Tiny.Metadata.Layout
 {
-    public abstract class Type
+    enum EventAttributes : ushort
     {
-        readonly TypeKind m_kind;
-
-        internal Type(TypeKind kind)
-        {
-            m_kind = kind.CheckDefined("kind");
-        }
-
-        internal abstract void GetFullName(StringBuilder b);
-
-        public override string ToString()
-        {
-            return FullName;
-        }
-
-        //# The fully qualified name of the type.
-        public virtual string FullName
-        {
-            get { 
-                var b = new StringBuilder();
-                GetFullName(b);
-                return b.ToString();
-            }
-        }
-
-        public TypeKind Kind
-        {
-            get { return m_kind; }
-        }
+        SpecialName = 0x0200,
+        RTSpecialName = 0x0400
     }
 }

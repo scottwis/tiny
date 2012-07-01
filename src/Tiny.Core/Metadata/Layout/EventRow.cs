@@ -1,4 +1,4 @@
-// Type.cs
+﻿// EventRow.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,39 +23,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Text;
+using System.Runtime.InteropServices;
 
-namespace Tiny.Metadata
+namespace Tiny.Metadata.Layout
 {
-    public abstract class Type
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe struct EventRow
     {
-        readonly TypeKind m_kind;
+        [FieldOffset(0)]
+        public readonly EventAttributes EventFlags;
 
-        internal Type(TypeKind kind)
+        public uint GetNameIndex(PEFile peFile)
         {
-            m_kind = kind.CheckDefined("kind");
-        }
-
-        internal abstract void GetFullName(StringBuilder b);
-
-        public override string ToString()
-        {
-            return FullName;
-        }
-
-        //# The fully qualified name of the type.
-        public virtual string FullName
-        {
-            get { 
-                var b = new StringBuilder();
-                GetFullName(b);
-                return b.ToString();
+            peFile.CheckNotNull("peFile");
+            fixed (EventRow * pThis = &this) {
+                var pName = (byte*) pThis + 2;
+                if (StreamID.Strings.IndexSize(peFile) == 2) {
+                    return *(ushort*) pName;
+                }
+                return *(uint*) pName;
             }
         }
 
-        public TypeKind Kind
+        public TypeDefOrRef GetEventType(PEFile peFile)
         {
-            get { return m_kind; }
+            peFile.CheckNotNull("peFile");
+            fixed (EventRow * pThis = &this) {
+                var pType = (byte*) pThis + 2 + StreamID.Strings.IndexSize(peFile);
+                uint index;
+                if (CodedIndex.TypeDefOrRef.IndexSize(peFile) == 2) {
+                    index = *(ushort*) pType;
+                }
+                else {
+                    index = *(uint*) pType;
+                }
+                return new TypeDefOrRef(index);
+            }
         }
     }
 }

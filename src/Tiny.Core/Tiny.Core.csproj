@@ -183,6 +183,9 @@
     <Compile Include="Metadata\GenericTypeInstance.cs" />
     <Compile Include="Metadata\Instruction.cs" />
     <Compile Include="Metadata\Layout\ElementType.cs" />
+    <Compile Include="Metadata\Layout\EventAttributes.cs" />
+    <Compile Include="Metadata\Layout\EventMapRow.cs" />
+    <Compile Include="Metadata\Layout\EventRow.cs" />
     <Compile Include="Metadata\Layout\FieldAttributes.cs" />
     <Compile Include="Metadata\Layout\FieldLayoutRow.cs" />
     <Compile Include="Metadata\Layout\FieldMarshalRow.cs" />
@@ -218,7 +221,6 @@
     <Compile Include="Metadata\Layout\MethodAttributes.cs" />
     <Compile Include="Metadata\Layout\MethodDefRow.cs" />
     <Compile Include="Metadata\Layout\MethodImplAttributes.cs" />
-    <Compile Include="Metadata\Layout\TChild.cs" />
     <Compile Include="Metadata\MethodSignature.cs" />
     <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\NestedClassRow.cs" />

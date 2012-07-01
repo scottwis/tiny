@@ -260,8 +260,8 @@ namespace Tiny.Metadata
                 CheckDisposed();
                 if (m_implementedInterfaces == null) {
                     var implementedInterfaces = Module.PEFile.LoadIndirectChildren(
-                        (uint)MetadataTable.GenericParam.RowIndex(m_pRow, Module.PEFile),
-                        MetadataTable.GenericParamConstraint,
+                        (uint)MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile),
+                        MetadataTable.InterfaceImpl,
                         pRow => ((InterfaceImplRow*)pRow)->GetClass(Module.PEFile),
                         pRow => new TypeReference(
                             ((InterfaceImplRow*)pRow)->GetInterface(Module.PEFile),

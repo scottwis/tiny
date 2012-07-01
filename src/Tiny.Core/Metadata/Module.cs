@@ -165,7 +165,7 @@ namespace Tiny.Metadata
         }
 
         //# Returns the set of all types defined in the module, including nested types.
-        public IReadOnlyList<TypeDefinition> AllTypes
+        internal IReadOnlyList<TypeDefinition> AllTypes
         {
             get
             {

@@ -37,7 +37,6 @@ namespace Tiny.Metadata
         readonly TypeDefinition m_declaringType;
         readonly MethodDefRow* m_pRow;
         volatile string m_name;
-        volatile MethodSignature m_signature;
 
         internal MethodDefinition(MethodDefRow * pRow, TypeDefinition declaringType)
         {
