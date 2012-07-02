@@ -112,6 +112,11 @@ namespace Tiny.Metadata.Layout
             return peFile.CheckNotNull("peFile").LeastUpperBound(table, value, selector);
         }
 
+        public unsafe static int Find<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
+        {
+            return peFile.CheckNotNull("peFile").Find(table, value, selector);
+        }
+
         public static bool CanReferenceType(this MetadataTable table)
         {
             switch (table) {
@@ -122,6 +127,11 @@ namespace Tiny.Metadata.Layout
                 default:
                     return false;
             }
+        }
+
+        public static bool IsSorted(this MetadataTable table, PEFile peFile)
+        {
+            return peFile.IsSorted(table);
         }
     }
 }

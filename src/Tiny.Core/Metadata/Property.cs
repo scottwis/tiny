@@ -23,9 +23,116 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Text;
+using Tiny.Metadata.Layout;
+
 namespace Tiny.Metadata
 {
-    public class Property
+    public unsafe class Property : IMemberDefinitionInternal
     {
+        internal Property(PropertyRow* pRow, TypeDefinition typeDefinition)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
+        public string Name
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        void IMemberDefinitionInternal.GetFullName(StringBuilder b)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string FullName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public TypeDefinition DeclaringType
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsPublic
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsPrivate
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsProtected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsInternal
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsInternalOrProtected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsInternalAndProtected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool HasSpecialName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsAbstract
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsSealed
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool HasRuntimeSpecialName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsCompilerControlled
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsStatic
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public MethodDefinition GetMethod
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public MethodDefinition SetMethod
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
     }
 }

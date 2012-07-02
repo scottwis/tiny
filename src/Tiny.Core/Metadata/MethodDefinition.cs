@@ -32,7 +32,7 @@ using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
 {
-    public sealed unsafe class MethodDefinition : Method, IGenericParameterScope
+    public sealed unsafe class MethodDefinition : Method, IGenericParameterScope, IMemberDefinitionInternal
     {
         readonly TypeDefinition m_declaringType;
         readonly MethodDefRow* m_pRow;
@@ -66,12 +66,17 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 var builder = new StringBuilder();
-                DeclaringType.GetFullName(builder);
-                builder.AppendFormat(".{0}", Name);
-                PrintGenericParameters(builder);
-                PrintParameters(builder);
+                ((IMemberDefinitionInternal)this).GetFullName(builder);
                 return builder.ToString();
             }
+        }
+
+        void IMemberDefinitionInternal.GetFullName(StringBuilder builder)
+        {
+            DeclaringType.GetFullName(builder);
+            builder.AppendFormat(".{0}", Name);
+            PrintGenericParameters(builder);
+            PrintParameters(builder);
         }
 
         void CheckDisposed()

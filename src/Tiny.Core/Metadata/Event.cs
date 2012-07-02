@@ -23,9 +23,113 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Text;
+using Tiny.Metadata.Layout;
+
 namespace Tiny.Metadata
 {
-    public class Event
+    public unsafe class Event : IMemberDefinitionInternal
     {
+        internal Event(EventRow* pRow, TypeDefinition declaringType)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
+        public string Name
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string FullName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public TypeDefinition DeclaringType
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsPublic
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsPrivate
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsProtected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsInternal
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsInternalOrProtected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsInternalAndProtected
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsAbstract
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsSealed
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool HasSpecialName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool HasRuntimeSpecialName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsCompilerControlled
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool IsStatic
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        void IMemberDefinitionInternal.GetFullName(StringBuilder b)
+        {
+            throw new NotImplementedException();
+        }
+
+        public MethodDefinition AddMethod
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public MethodDefinition RemoveMethod
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public MethodDefinition FireMethod
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

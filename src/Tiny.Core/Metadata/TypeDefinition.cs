@@ -48,6 +48,8 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<MethodDefinition> m_methods;
         volatile Type m_baseType;
         volatile IReadOnlyList<Type> m_implementedInterfaces;
+        volatile IReadOnlyList<Event> m_events;
+        volatile IReadOnlyList<Property> m_properties;
 
         internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
@@ -170,29 +172,76 @@ namespace Tiny.Metadata
         delegate uint GetTokenDelegate(void* pRow, PEFile peFile);
 
         LiftedList<T> GetMembers<T>(
-            MetadataTable table,
-            GetTokenDelegate getToken,
+            MetadataTable childTable,
+            GetTokenDelegate tokenSelector,
             CreateObjectDelegate<T> createObject
         ) where T : class
         {
-            var firstFieldIndex = checked((int) getToken(m_pRow, Module.PEFile)).AssumeGTE(1) - 1;
+            return GetMembers(childTable, tokenSelector, createObject, MetadataTable.TypeDef, m_pRow);
+        }
+
+        LiftedList<T> GetMembers<T>(
+            MetadataTable childTable,
+            GetTokenDelegate tokenSelector,
+            CreateObjectDelegate<T> createObject,
+            MetadataTable parentTable,
+            void* parentRow
+        ) where T : class
+        {
+            var firstFieldIndex = checked((int) tokenSelector(parentRow, Module.PEFile)).AssumeGTE(1) - 1;
             int lastFieldIndex;
-            var tableIndex = MetadataTable.TypeDef.RowIndex(m_pRow, m_module.PEFile);
-            if (tableIndex == MetadataTable.TypeDef.RowCount(m_module.PEFile) - 1) {
-                lastFieldIndex = table.RowCount(m_module.PEFile);
+            var tableIndex = parentTable.RowIndex(parentRow, m_module.PEFile);
+            if (tableIndex == parentTable.RowCount(m_module.PEFile) - 1) {
+                lastFieldIndex = childTable.RowCount(m_module.PEFile);
             }
             else {
                 lastFieldIndex = checked(
-                    (int)getToken(MetadataTable.TypeDef.GetRow(tableIndex + 1, m_module.PEFile), m_module.PEFile)
+                    (int)tokenSelector(parentTable.GetRow(tableIndex + 1, m_module.PEFile), m_module.PEFile)
                 ).AssumeGTE(1) - 1;
             }
             var fields = new LiftedList<T>(
                 lastFieldIndex - firstFieldIndex,
-                index => table.GetRow(index + firstFieldIndex, m_module.PEFile),
+                index => childTable.GetRow(index + firstFieldIndex, m_module.PEFile),
                 createObject,
                 () => Module.PEFile.IsDisposed
             );
             return fields;
+        }
+
+        IReadOnlyList<T> GetMembersIndirect<T>(
+            MetadataTable mapTable,
+            MetadataTable childTable,
+            UnsafeSelector<uint> parentSelector,
+            GetTokenDelegate tokenSelector,
+            CreateObjectDelegate<T> factory
+        ) where T : class
+        {
+            //It is valid for the map table to not be sorted. However, I don't expect this to happen in
+            //practice, so for now we throw an exception in that case. If we do end up needing to support
+            //assemblies with unsorted meta-data tables then we will need to add some sort of fallback
+            //here.
+            mapTable.IsSorted(Module.PEFile).Assume("The table is not sorted");
+
+            var mapIndex = mapTable.Find(
+                (uint) MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile).AssumeGTE(0),
+                parentSelector,
+                Module.PEFile
+            );
+
+            IReadOnlyList<T> ret;
+            if (mapIndex < 0) {
+                ret = new List<T>(0).AsReadOnly();
+            }
+            else {
+                ret = GetMembers(
+                    childTable,
+                    tokenSelector,
+                    factory,
+                    mapTable,
+                    mapTable.GetRow(mapIndex, Module.PEFile)
+                );
+            }
+            return ret;
         }
 
         //# The set of fields defined on the type. If the class defines no fields, this will be an empty list.
@@ -284,8 +333,19 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                if (m_events == null) {
+                    var events = GetMembersIndirect(
+                        MetadataTable.EventMap, 
+                        MetadataTable.Event, pRow => ((EventMapRow*) pRow)->GetParent(Module.PEFile),
+                        (pRow, peFile) => ((EventMapRow*) pRow)->GetEventListIndex(peFile),
+                        pRow => new Event((EventRow*) pRow, this)
+                    );
+
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_events, events, null);
+                    #pragma warning restore 420
+                }
+                return m_events;
             }
         }
 
@@ -295,8 +355,20 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                if (m_properties == null) {
+                    var properties = GetMembersIndirect(
+                        MetadataTable.PropertyMap,
+                        MetadataTable.Property,
+                        pRow => ((PropertyMapRow*) pRow)->GetParent(Module.PEFile),
+                        (pRow, peFile) => ((PropertyMapRow*) pRow)->GetPropertyListIndex(peFile),
+                        pRow => new Property((PropertyRow*) pRow, this)
+                    );
+
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_properties, properties, null);
+                    #pragma warning restore 420
+                }
+                return m_properties;
             }
         }
 

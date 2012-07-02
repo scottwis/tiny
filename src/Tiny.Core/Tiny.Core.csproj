@@ -221,6 +221,9 @@
     <Compile Include="Metadata\Layout\MethodAttributes.cs" />
     <Compile Include="Metadata\Layout\MethodDefRow.cs" />
     <Compile Include="Metadata\Layout\MethodImplAttributes.cs" />
+    <Compile Include="Metadata\Layout\PropertyAttributes.cs" />
+    <Compile Include="Metadata\Layout\PropertyMapRow.cs" />
+    <Compile Include="Metadata\Layout\PropertyRow.cs" />
     <Compile Include="Metadata\MethodSignature.cs" />
     <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\NestedClassRow.cs" />

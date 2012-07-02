@@ -833,31 +833,11 @@ namespace Tiny.Metadata.Layout
             return last + 1;
         }
 
-        public void Dispose()
+        public int Find<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
         {
-            m_assembly = null;
-            m_metadataTableHeader = null;
-            m_pData = null;
-            m_fileSize = 0;
-            m_peHeader = null;
-            m_optionalHeader = null;
-            m_clrHeader = null;
-            m_streams = null;
-            m_fullPath = null;
-
-            if (m_tables != null) {
-                for (var i = 0; i < m_tables.Length; ++i) {
-                    m_tables[i] = null;
-                }
-                m_tables = null;
-            }
-
-            if (m_memoryMap != null) {
-                m_memoryMap.Dispose();
-                m_memoryMap = null;
-            }
-
-            GC.SuppressFinalize(this);
+            CheckDisposed();
+            //TODO Implement this
+            throw new NotImplementedException();
         }
 
         public Type ParseTypeSpec(int index, Module module)
@@ -886,6 +866,7 @@ namespace Tiny.Metadata.Layout
             CreateObjectDelegate<TChild> factory
         ) where TChild : class
         {
+            CheckDisposed();
             //It is valid for the child table to not be sorted, but I don't expect such a case to occur in practice.
             //I imagine that this could maybe happen with ENC, but we don't need to be able to decompile enc assemblies.
             //In either case, if we do end up needing to support assemblies with unsorted meta-data tables, then we should probably
@@ -911,6 +892,33 @@ namespace Tiny.Metadata.Layout
             );
 
             return ret;
+        }
+
+        public void Dispose()
+        {
+            m_assembly = null;
+            m_metadataTableHeader = null;
+            m_pData = null;
+            m_fileSize = 0;
+            m_peHeader = null;
+            m_optionalHeader = null;
+            m_clrHeader = null;
+            m_streams = null;
+            m_fullPath = null;
+
+            if (m_tables != null) {
+                for (var i = 0; i < m_tables.Length; ++i) {
+                    m_tables[i] = null;
+                }
+                m_tables = null;
+            }
+
+            if (m_memoryMap != null) {
+                m_memoryMap.Dispose();
+                m_memoryMap = null;
+            }
+
+            GC.SuppressFinalize(this);
         }
     }
 }
