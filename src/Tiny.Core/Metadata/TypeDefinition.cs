@@ -51,6 +51,7 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<Event> m_events;
         volatile IReadOnlyList<Property> m_properties;
         volatile IReadOnlyList<GenericParameter> m_genericParameters;
+        volatile IReadOnlyList<CustomAttribute> m_customAttributes;
 
         internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
@@ -407,8 +408,20 @@ namespace Tiny.Metadata
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                if (m_customAttributes == null) {
+                    var attributes = Module.PEFile.LoadIndirectChildren(
+                        new HasCustomAttribute(MetadataTable.TypeDef, MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile)),
+                        MetadataTable.CustomAttribute,
+                        pRow=>((CustomAttributeRow *)pRow)->GetParent(Module.PEFile),
+                        pRow=>new CustomAttribute((CustomAttributeRow *)pRow, Module.PEFile)
+                    );
+
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_customAttributes, attributes, null);
+                    #pragma warning restore 420
+                }
+                return m_customAttributes;
             }
         }
 

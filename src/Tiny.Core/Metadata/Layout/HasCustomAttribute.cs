@@ -154,19 +154,11 @@ namespace Tiny.Metadata.Layout
                 return 1;
             }
 
-            var ret = Table.CompareTo(other.Table);
+            var ret = Index.CompareTo(other.Index);
             if (ret == 0) {
-                ret = Index.CompareTo(other.Index);
+                ret = Table.CompareTo(other.Table);
             }
             return ret;
-        }
-
-        public static explicit operator uint(HasCustomAttribute attribute)
-        {
-            if (attribute.IsNull) {
-                return 0;
-            }
-            return attribute.m_index.Value;
         }
     }
 }
