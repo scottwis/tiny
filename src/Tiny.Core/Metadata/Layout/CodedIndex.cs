@@ -39,7 +39,7 @@ namespace Tiny.Metadata.Layout
         MethodDefOrRef,
         MemberForwarded,
         Implementation,
-        CustomAttributeType,
+        CustomAttributeConstructor,
         ResolutionScope,
         TypeOrMethodDef,
         NUMBER_OF_CODED_INDEX_TYPES

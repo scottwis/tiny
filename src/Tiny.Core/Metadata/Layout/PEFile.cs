@@ -221,7 +221,7 @@ namespace Tiny.Metadata.Layout
                 MetadataTable.AssemblyRef,
                 MetadataTable.ExportedType
             );
-            m_codedIndexSizes[(int)CodedIndex.CustomAttributeType] = ComputeCodedIndexSize(
+            m_codedIndexSizes[(int)CodedIndex.CustomAttributeConstructor] = ComputeCodedIndexSize(
                 3,
                 MetadataTable.MemberRef
             );
@@ -543,7 +543,7 @@ namespace Tiny.Metadata.Layout
                 case MetadataTable.CustomAttribute:
                     return
                         CodedIndex.HasCustomAttribute.IndexSize(this)
-                        + CodedIndex.CustomAttributeType.IndexSize(this)
+                        + CodedIndex.CustomAttributeConstructor.IndexSize(this)
                         + StreamID.Blob.IndexSize(this);
                 case MetadataTable.DeclSecurity:
                     return 2 + CodedIndex.HasDeclSecurity.IndexSize(this) + StreamID.Blob.IndexSize(this);
@@ -892,6 +892,18 @@ namespace Tiny.Metadata.Layout
             );
 
             return ret;
+        }
+
+        private IntPtr GetRowSafe(int index, MetadataTable table)
+        {
+            return (IntPtr) GetRow(index, table);
+        }
+
+        public IEnumerable<IntPtr> GenericParameterRows()
+        {
+            for (int i = 0; i < GetRowCount(MetadataTable.GenericParam); ++i) {
+                yield return GetRowSafe(i, MetadataTable.GenericParam);
+            }
         }
 
         public void Dispose()

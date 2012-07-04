@@ -44,6 +44,7 @@ namespace Tiny.Metadata
         Guid? m_guid;
         volatile IReadOnlyList<TypeDefinition> m_types;
         volatile IReadOnlyList<TypeDefinition> m_allTypes;
+        volatile IReadOnlyDictionary<TypeOrMethodDef, IReadOnlyList<IntPtr>> m_genericParameterRows;
 
         private Module(Assembly assembly, ModuleRow* moduleRow, PEFile peFile)
         {
@@ -204,6 +205,29 @@ namespace Tiny.Metadata
                 // ReSharper restore PossibleUnintendedReferenceComparison
                 #pragma warning restore 420
             }
+        }
+
+        private void LoadGenericParameterRows()
+        {
+            if (m_genericParameterRows == null) {
+                lock (m_lockObject) {
+                    if (m_genericParameterRows == null) {
+                        m_genericParameterRows = (
+                            from p in PEFile.GenericParameterRows()
+                            group p by ((GenericParameterRow *)p)->GetOwner(PEFile)
+                        ).ToDictionary(x=>x.Key, x=>x.ToList().AsReadOnly() as IReadOnlyList<IntPtr>);
+                    }
+                }
+            }
+        }
+
+        internal IReadOnlyList<IntPtr> GetGenericParameterRows(TypeOrMethodDef owner)
+        {
+            CheckDisposed();
+            LoadGenericParameterRows();
+            IReadOnlyList<IntPtr> ret;
+            m_genericParameterRows.TryGetValue(owner, out ret);
+            return ret ?? (new List<IntPtr>(0).AsReadOnly());
         }
 
         public Assembly Assembly

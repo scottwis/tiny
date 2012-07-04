@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Tiny.Collections;
 using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata

@@ -50,6 +50,7 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<Type> m_implementedInterfaces;
         volatile IReadOnlyList<Event> m_events;
         volatile IReadOnlyList<Property> m_properties;
+        volatile IReadOnlyList<GenericParameter> m_genericParameters;
 
         internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
@@ -188,20 +189,20 @@ namespace Tiny.Metadata
             void* parentRow
         ) where T : class
         {
-            var firstFieldIndex = checked((int) tokenSelector(parentRow, Module.PEFile)).AssumeGTE(1) - 1;
-            int lastFieldIndex;
+            var firstMemberIndex = checked((int) tokenSelector(parentRow, Module.PEFile)).AssumeGTE(1) - 1;
+            int lastMemberIndex;
             var tableIndex = parentTable.RowIndex(parentRow, m_module.PEFile);
             if (tableIndex == parentTable.RowCount(m_module.PEFile) - 1) {
-                lastFieldIndex = childTable.RowCount(m_module.PEFile);
+                lastMemberIndex = childTable.RowCount(m_module.PEFile);
             }
             else {
-                lastFieldIndex = checked(
+                lastMemberIndex = checked(
                     (int)tokenSelector(parentTable.GetRow(tableIndex + 1, m_module.PEFile), m_module.PEFile)
                 ).AssumeGTE(1) - 1;
             }
             var fields = new LiftedList<T>(
-                lastFieldIndex - firstFieldIndex,
-                index => childTable.GetRow(index + firstFieldIndex, m_module.PEFile),
+                lastMemberIndex - firstMemberIndex,
+                index => childTable.GetRow(index + firstMemberIndex, m_module.PEFile),
                 createObject,
                 () => Module.PEFile.IsDisposed
             );
@@ -378,8 +379,24 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                if (m_genericParameters == null) {
+                    var rows = Module.GetGenericParameterRows(new TypeOrMethodDef(
+                        MetadataTable.TypeDef,
+                        MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile)
+                    ));
+
+                    var genericParameters = new LiftedList<GenericParameter>(
+                        rows.Count,
+                        index => (void*)rows[index],
+                        pRow => new GenericParameter((GenericParameterRow*)pRow, Module.PEFile, this),
+                        () => Module.PEFile.IsDisposed
+                    );
+
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_genericParameters, genericParameters, null);
+                    #pragma warning restore 420
+                }
+                return m_genericParameters;
             }
         }
 

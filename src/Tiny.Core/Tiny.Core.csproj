@@ -182,6 +182,8 @@
     <Compile Include="Metadata\GenericParameter.cs" />
     <Compile Include="Metadata\GenericTypeInstance.cs" />
     <Compile Include="Metadata\Instruction.cs" />
+    <Compile Include="Metadata\Layout\CustomAttributeConstructor.cs" />
+    <Compile Include="Metadata\Layout\CustomAttributeRow.cs" />
     <Compile Include="Metadata\Layout\ElementType.cs" />
     <Compile Include="Metadata\Layout\EventAttributes.cs" />
     <Compile Include="Metadata\Layout\EventMapRow.cs" />
@@ -208,6 +210,7 @@
     <Compile Include="Metadata\Layout\File.cs" />
     <Compile Include="Metadata\Layout\FileAttributes.cs" />
     <Compile Include="Metadata\Layout\FileFormat.cs" />
+    <Compile Include="Metadata\Layout\HasCustomAttribute.cs" />
     <Compile Include="Metadata\Layout\HasFieldMarshal.cs" />
     <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
     <Compile Include="Metadata\Layout\ImageSubsystem.cs" />

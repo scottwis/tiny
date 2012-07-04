@@ -1,4 +1,4 @@
-// TypeOrMethodDef.cs
+// CustomAttributeConstructor.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -27,27 +27,18 @@ using System;
 
 namespace Tiny.Metadata.Layout
 {
-    struct TypeOrMethodDef : IToken
+    struct CustomAttributeConstructor : IToken
     {
         readonly uint m_index;
 
-        public TypeOrMethodDef(uint index) : this()
+        public CustomAttributeConstructor(uint index)
         {
             m_index = index;
         }
 
-        public TypeOrMethodDef(MetadataTable table, int index)
-        {
-            if (table != MetadataTable.TypeDef && table != MetadataTable.MethodDef) {
-                throw new ArgumentException("Expected TypeDef or MethodDef", "table");
-            }
-            var tableId = (table == MetadataTable.TypeDef) ? 0 : 1;
-            m_index = (uint) (index << 1) | (uint) table;
-        }
-
         public bool IsNull
         {
-            get { return ((m_index & ~0x1U) >> 1) == 0; }
+            get { return ((m_index & ~0x7u) >> 3) == 0; }
         }
 
         public MetadataTable Table
@@ -55,30 +46,30 @@ namespace Tiny.Metadata.Layout
             get
             {
                 CheckNull();
-                switch (m_index & 0x1) {
-                    case 0:
-                        return MetadataTable.TypeDef;
-                    case 1:
+                switch (m_index & 0x7u) {
+                    case 2:
                         return MetadataTable.MethodDef;
+                    case 3:
+                        return MetadataTable.MemberRef;
                     default:
-                        throw new InternalErrorException("This code should be unreachable.S");
+                        throw new InvalidOperationException("Invalid metadata table.");
                 }
             }
         }
 
         public int Index
         {
-            get
+            get 
             {
                 CheckNull();
-                return ((int)((m_index & ~0x1U) >> 1)) - 1;
+                return ((int)(m_index & ~0x7u) >> 3) - 1;
             }
         }
 
-        void CheckNull()
+        private void CheckNull()
         {
             if (IsNull) {
-                throw new InvalidOperationException("The index is null");
+                throw new InvalidOperationException("The token is null.");
             }
         }
 
