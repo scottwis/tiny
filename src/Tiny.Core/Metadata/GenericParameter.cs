@@ -133,7 +133,7 @@ namespace Tiny.Metadata
                 var constraints = m_peFile.LoadIndirectChildren(
                     (uint)MetadataTable.GenericParam.RowIndex(m_pRow, m_peFile),
                     MetadataTable.GenericParamConstraint,
-                    pRow=>((GenericParameterConstraintRow *)pRow)->GetOwner(m_peFile),
+                    pRow=>((GenericParameterConstraintRow *)pRow)->GetOwner(m_peFile) - 1,
                     pRow=>new TypeReference(
                         ((GenericParameterConstraintRow *)pRow)->GetConstraint(m_peFile),
                         Parent.Module

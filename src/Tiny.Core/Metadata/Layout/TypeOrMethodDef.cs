@@ -42,7 +42,7 @@ namespace Tiny.Metadata.Layout
                 throw new ArgumentException("Expected TypeDef or MethodDef", "table");
             }
             var tableId = (table == MetadataTable.TypeDef) ? 0 : 1;
-            m_index = (uint) (index << 1) | (uint) table;
+            m_index = (uint) ((index + 1) << 1) | (uint) table;
         }
 
         public bool IsNull

@@ -23,9 +23,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using Tiny.Metadata.Layout;
+
 namespace Tiny.Metadata
 {
-    public class CustomAttribute
+    public unsafe class CustomAttribute
     {
+        internal CustomAttribute(CustomAttributeRow * pRow, PEFile peFile)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+        
     }
 }
