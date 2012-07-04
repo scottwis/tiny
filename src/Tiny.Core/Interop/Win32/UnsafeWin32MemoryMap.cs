@@ -64,6 +64,7 @@ namespace Tiny.Interop.Win32
                 Win32Platform.CloseHandle(m_fileHandle);
                 m_fileHandle = IntPtr.Zero;
             }
+            GC.SuppressFinalize(this);
         }
 
         public void* Data

@@ -30,26 +30,26 @@ namespace Tiny.Metadata.Layout
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct PropertyMapRow
     {
-        public uint GetParent(PEFile peFile)
+        public OneBasedIndex GetParent(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (PropertyMapRow * pThis = &this) {
                 if (MetadataTable.TypeDef.IndexSize(peFile) == 2) {
-                    return *(ushort*) pThis;
+                    return new OneBasedIndex(*(ushort*) pThis);
                 }
-                return *(uint*) pThis;
+                return new OneBasedIndex(*(uint*) pThis);
             }
         }
 
-        public uint GetPropertyListIndex(PEFile peFile)
+        public OneBasedIndex GetPropertyListIndex(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (PropertyMapRow * pThis = &this) {
                 var pPropertyList = (byte*) pThis + MetadataTable.TypeDef.IndexSize(peFile);
                 if (MetadataTable.Property.IndexSize(peFile) == 2) {
-                    return *(ushort*) pPropertyList;
+                    return new OneBasedIndex(*(ushort*) pPropertyList);
                 }
-                return *(uint*) pThis;
+                return new OneBasedIndex(*(uint*) pThis);
             }
         }
     }

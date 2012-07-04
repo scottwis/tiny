@@ -33,15 +33,15 @@ namespace Tiny.Metadata.Layout
         [FieldOffset(0)]
         public readonly uint RVA;
 
-        public uint GetFieldIndex(PEFile peFile)
+        public OneBasedIndex GetFieldIndex(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (FieldRVARow * pThis = &this) {
                 var pField = (byte*) pThis + 4;
                 if (MetadataTable.Field.IndexSize(peFile) == 2) {
-                    return *(ushort*) pField;
+                    return new OneBasedIndex(*(ushort*) pField);
                 }
-                return *(uint*) pField;
+                return new OneBasedIndex(*(uint*) pField);
             }
         }
     }

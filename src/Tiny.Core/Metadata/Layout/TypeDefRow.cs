@@ -68,11 +68,11 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pExtends;
                 }
-                return new TypeDefOrRef(index);
+                return new TypeDefOrRef(new OneBasedIndex(index));
             }
         }
 
-        public uint GetFieldListToken(PEFile peFile)
+        public OneBasedIndex GetFieldListToken(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (TypeDefRow* pThis = &this) {
@@ -83,13 +83,13 @@ namespace Tiny.Metadata.Layout
                     + CodedIndex.TypeDefOrRef.IndexSize(peFile)
                 );
                 if (MetadataTable.Field.IndexSize(peFile) == 2) {
-                    return *(ushort*) pFieldList;
+                    return new OneBasedIndex(*(ushort*) pFieldList);
                 }
-                return *(uint*) pFieldList;
+                return new OneBasedIndex(*(uint*) pFieldList);
             }
         }
 
-        public uint GetMethodListToken(PEFile peFile)
+        public OneBasedIndex GetMethodListToken(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (TypeDefRow* pThis = &this) {
@@ -100,9 +100,9 @@ namespace Tiny.Metadata.Layout
                     + CodedIndex.TypeDefOrRef.IndexSize(peFile)
                 );
                 if (MetadataTable.MethodDef.IndexSize(peFile) == 2) {
-                    return *(ushort*) pFieldList;
+                    return new OneBasedIndex(*(ushort*) pFieldList);
                 }
-                return *(uint*) pFieldList;
+                return new OneBasedIndex(*(uint*) pFieldList);
             }
         }
     }

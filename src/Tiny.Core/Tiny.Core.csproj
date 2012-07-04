@@ -194,6 +194,7 @@
     <Compile Include="Metadata\Layout\FieldRow.cs" />
     <Compile Include="Metadata\Layout\FieldRVARow.cs" />
     <Compile Include="Metadata\FunctionPointerType.cs" />
+    <Compile Include="Metadata\Layout\FileRow.cs" />
     <Compile Include="Metadata\Layout\GenericParameterAttributes.cs" />
     <Compile Include="Metadata\Layout\GenericParameterConstraintRow.cs" />
     <Compile Include="Metadata\Layout\GenericParameterRow.cs" />
@@ -207,7 +208,6 @@
     <Compile Include="Metadata\Layout\CLRHeaderFlags.cs" />
     <Compile Include="Metadata\Layout\CodedIndex.cs" />
     <Compile Include="Metadata\Layout\DllCharacteristics.cs" />
-    <Compile Include="Metadata\Layout\File.cs" />
     <Compile Include="Metadata\Layout\FileAttributes.cs" />
     <Compile Include="Metadata\Layout\FileFormat.cs" />
     <Compile Include="Metadata\Layout\HasCustomAttribute.cs" />
@@ -224,9 +224,11 @@
     <Compile Include="Metadata\Layout\MethodAttributes.cs" />
     <Compile Include="Metadata\Layout\MethodDefRow.cs" />
     <Compile Include="Metadata\Layout\MethodImplAttributes.cs" />
+    <Compile Include="Metadata\Layout\OneBasedIndex.cs" />
     <Compile Include="Metadata\Layout\PropertyAttributes.cs" />
     <Compile Include="Metadata\Layout\PropertyMapRow.cs" />
     <Compile Include="Metadata\Layout\PropertyRow.cs" />
+    <Compile Include="Metadata\Layout\ZeroBasedIndex.cs" />
     <Compile Include="Metadata\MethodSignature.cs" />
     <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\NestedClassRow.cs" />

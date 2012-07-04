@@ -170,7 +170,7 @@ namespace Tiny.Metadata
             }
         }
 
-        delegate uint GetTokenDelegate(void* pRow, PEFile peFile);
+        delegate OneBasedIndex GetTokenDelegate(void* pRow, PEFile peFile);
 
         LiftedList<T> GetMembers<T>(
             MetadataTable childTable,
@@ -189,20 +189,19 @@ namespace Tiny.Metadata
             void* parentRow
         ) where T : class
         {
-            var firstMemberIndex = checked((int) tokenSelector(parentRow, Module.PEFile)).AssumeGTE(1) - 1;
-            int lastMemberIndex;
-            var tableIndex = parentTable.RowIndex(parentRow, m_module.PEFile);
-            if (tableIndex == parentTable.RowCount(m_module.PEFile) - 1) {
-                lastMemberIndex = childTable.RowCount(m_module.PEFile);
+            var firstMemberIndex = (ZeroBasedIndex)tokenSelector(parentRow, Module.PEFile);
+            ZeroBasedIndex lastMemberIndex;
+            var peFile = m_module.PEFile;
+            var tableIndex = parentTable.RowIndex(parentRow, peFile);
+            if (tableIndex == parentTable.RowCount(peFile) - 1) {
+                lastMemberIndex = new ZeroBasedIndex(childTable.RowCount(peFile));
             }
             else {
-                lastMemberIndex = checked(
-                    (int)tokenSelector(parentTable.GetRow(tableIndex + 1, m_module.PEFile), m_module.PEFile)
-                ).AssumeGTE(1) - 1;
+                lastMemberIndex = (ZeroBasedIndex)tokenSelector(parentTable.GetRow(tableIndex + 1, peFile), peFile);
             }
             var fields = new LiftedList<T>(
-                lastMemberIndex - firstMemberIndex,
-                index => childTable.GetRow(index + firstMemberIndex, m_module.PEFile),
+                (lastMemberIndex - firstMemberIndex).Value,
+                index => childTable.GetRow(firstMemberIndex + index, peFile),
                 createObject,
                 () => Module.PEFile.IsDisposed
             );
@@ -212,7 +211,7 @@ namespace Tiny.Metadata
         IReadOnlyList<T> GetMembersIndirect<T>(
             MetadataTable mapTable,
             MetadataTable childTable,
-            UnsafeSelector<uint> parentSelector,
+            UnsafeSelector<OneBasedIndex> parentSelector,
             GetTokenDelegate tokenSelector,
             CreateObjectDelegate<T> factory
         ) where T : class
@@ -224,7 +223,7 @@ namespace Tiny.Metadata
             mapTable.IsSorted(Module.PEFile).Assume("The table is not sorted");
 
             var mapIndex = mapTable.Find(
-                (uint) MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile).AssumeGTE(0),
+                (OneBasedIndex)MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile),
                 parentSelector,
                 Module.PEFile
             );
@@ -292,10 +291,13 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 if (m_baseType == null) {
-                    var baseType = new TypeReference(m_pRow->GetExtendsToken(Module.PEFile), Module);
-                    #pragma warning disable 420
-                    Interlocked.CompareExchange(ref m_baseType, baseType, null);
-                    #pragma warning restore 420
+                    var token = m_pRow->GetExtendsToken(Module.PEFile);
+                    if (!token.IsNull) {
+                        var baseType = new TypeReference(token, Module);
+                        #pragma warning disable 420
+                        Interlocked.CompareExchange(ref m_baseType, baseType, null);
+                        #pragma warning restore 420
+                    }
                 }
                 return BaseType;
             }
@@ -310,9 +312,9 @@ namespace Tiny.Metadata
                 CheckDisposed();
                 if (m_implementedInterfaces == null) {
                     var implementedInterfaces = Module.PEFile.LoadIndirectChildren(
-                        (uint)MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile),
+                        (OneBasedIndex)MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile),
                         MetadataTable.InterfaceImpl,
-                        pRow => ((InterfaceImplRow*)pRow)->GetClass(Module.PEFile)  - 1,
+                        pRow => ((InterfaceImplRow*)pRow)->GetClass(Module.PEFile),
                         pRow => new TypeReference(
                             ((InterfaceImplRow*)pRow)->GetInterface(Module.PEFile),
                             Module

@@ -125,19 +125,19 @@ namespace Tiny.Metadata
         {
             m_allTypes = new LiftedList<TypeDefinition>(
                 MetadataTable.TypeDef.RowCount(m_peFile),
-                (index) => m_peFile.GetRow(index, MetadataTable.TypeDef),
+                (index) => m_peFile.GetRow(new ZeroBasedIndex(index), MetadataTable.TypeDef),
                 (pRow) => new TypeDefinition((TypeDefRow*)pRow, this),
                 () => m_peFile.IsDisposed
             );
 
             var nestedTypes = new LiftedValueTypeList<NestedTypeInfo>(
                 MetadataTable.NestedClass.RowCount(m_peFile),
-                index=>m_peFile.GetRow(index, MetadataTable.NestedClass),
+                index=>m_peFile.GetRow(new ZeroBasedIndex(index), MetadataTable.NestedClass),
                 x=> {
                     var pRow = (NestedClassRow*) x;
                     return new NestedTypeInfo(
-                        m_allTypes[(int)(pRow->GetNestedClass(m_peFile) - 1)], 
-                        m_allTypes[(int)(pRow->GetEnclosingClass(m_peFile) - 1)]
+                        m_allTypes[((ZeroBasedIndex)(pRow->GetNestedClass(m_peFile))).Value], 
+                        m_allTypes[((ZeroBasedIndex)(pRow->GetEnclosingClass(m_peFile))).Value]
                     );
                 },
                 ()=>m_peFile.IsDisposed
@@ -166,13 +166,10 @@ namespace Tiny.Metadata
         }
 
         //# Returns the set of all types defined in the module, including nested types.
-        internal IReadOnlyList<TypeDefinition> AllTypes
+        internal TypeDefinition GetType(ZeroBasedIndex typeDefIndex)
         {
-            get
-            {
-                EnsureTypesLoaded();
-                return m_allTypes;
-            }
+            EnsureTypesLoaded();
+            return m_allTypes[typeDefIndex.Value];
         }
 
         void EnsureTypesLoaded()

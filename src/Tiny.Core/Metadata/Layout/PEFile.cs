@@ -680,7 +680,7 @@ namespace Tiny.Metadata.Layout
             return m_metadataTableHeader->GetHeapIndexSize(streamID);
         }
 
-        public void * GetRow(int index, MetadataTable table)
+        public void * GetRow(ZeroBasedIndex index, MetadataTable table)
         {
             CheckDisposed();
             table.CheckDefined("table");
@@ -690,7 +690,7 @@ namespace Tiny.Metadata.Layout
             if (m_tables == null || m_tables[(int)table] == null) {
                 throw new InvalidOperationException("Missing meta-data table.");
             }
-            return checked(m_tables[(int)table] + GetRowSize(table)*index);
+            return checked(m_tables[(int)table] + index.Value*GetRowSize(table));
         }
         
         public IReadOnlyList<byte> ReadBlob(uint offset)
@@ -713,13 +713,13 @@ namespace Tiny.Metadata.Layout
             return (m_metadataTableHeader->ValidTables & (1UL << (int) table)) != 0;
         }
 
-        public int GetRowIndex(MetadataTable table, void* pRow)
+        public ZeroBasedIndex GetRowIndex(MetadataTable table, void* pRow)
         {
             CheckDisposed();
             table.CheckDefined("table");
             FluentAsserts.CheckNotNull((void *)pRow, "pRow");
 
-            var pFirst = GetRow(0, table);
+            var pFirst = GetRow(0.ToZB(), table);
             if (
                 pRow < pFirst 
                 || (((byte*)pRow - (byte*)pFirst) % GetRowSize(table)) != 0
@@ -732,7 +732,7 @@ namespace Tiny.Metadata.Layout
                 throw new ArgumentException(string.Format("Not a valid row in {0}", table), "pRow");
             }
 
-            return (int)index;
+            return ((int)index).ToZB();
         }
 
         //# Returns the index of the largest item in [table] strictly less than (<) [value], or -1 if no such value exists.
@@ -744,7 +744,7 @@ namespace Tiny.Metadata.Layout
         //# [selector]
         //#     A function that projects the desired sort field(s) from the rows of the table. The table must be sorted\
         //#     by selector.
-        public int GreatestLowerBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
+        public ZeroBasedIndex GreatestLowerBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
         {
             CheckDisposed();
             table.CheckDefined("table");
@@ -755,11 +755,11 @@ namespace Tiny.Metadata.Layout
             }
 
             if (GetRowCount(table) == 0) {
-                return -1;
+                return new ZeroBasedIndex(-1);
             }
 
-            var min = 0;
-            var max = GetRowCount(table) - 1;
+            var min = 0.ToZB();
+            var max = GetRowCount(table).ToZB() - 1;
             var comparer = Comparer<T>.Default;
 
             while (max > 0 && max != min) {
@@ -774,13 +774,13 @@ namespace Tiny.Metadata.Layout
             }
 
             if (max < 0) {
-                return -1;
+                return (-1).ToZB();
             }
 
             if (min > 0 || comparer.Compare(value, selector(GetRow(min, table))) > 0) {
                 return min;
             }
-            return -1;
+            return (-1).ToZB();
         }
 
         //# Returns the index of the smallest item in [table] strictly greater than (>) [value]. If no such element
@@ -793,7 +793,7 @@ namespace Tiny.Metadata.Layout
         //# [selector]
         //#     A function that projects the desired sort field(s) from the rows of the table. The table must be sorted\
         //#     by selector.
-        public int LeastUpperBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
+        public ZeroBasedIndex LeastUpperBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
         {
             CheckDisposed();
             table.CheckDefined("table");
@@ -804,11 +804,11 @@ namespace Tiny.Metadata.Layout
             }
 
             if (GetRowCount(table) == 0) {
-                return 1;
+                return 1.ToZB();
             }
 
-            var min = 0;
-            var max = GetRowCount(table) - 1;
+            var min = 0.ToZB();
+            var max = GetRowCount(table).ToZB() - 1;
             var last = max;
             var comparer = Comparer<T>.Default;
 
@@ -833,20 +833,20 @@ namespace Tiny.Metadata.Layout
             return last + 1;
         }
 
-        public int Find<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
+        public ZeroBasedIndex Find<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
         {
             CheckDisposed();
             //TODO Implement this
             throw new NotImplementedException();
         }
 
-        public Type ParseTypeSpec(int index, Module module)
+        public Type ParseTypeSpec(ZeroBasedIndex index, Module module)
         {
             //TODO: Implement this
             throw new NotImplementedException();
         }
 
-        public Type ResolveTypeRef(int index, Module module)
+        public Type ResolveTypeRef(ZeroBasedIndex index, Module module)
         {
             //TODO: Implement this
             throw new NotImplementedException();
@@ -885,8 +885,8 @@ namespace Tiny.Metadata.Layout
             );
 
             var ret = new LiftedList<TChild>(
-                (glb - lub - 1),
-                index => GetRow(index + lub + 1, childTable),
+                (glb - lub - 1).Value,
+                index => GetRow(index.ToZB() + lub + 1, childTable),
                 factory,
                 () => IsDisposed
             );
@@ -894,7 +894,7 @@ namespace Tiny.Metadata.Layout
             return ret;
         }
 
-        private IntPtr GetRowSafe(int index, MetadataTable table)
+        private IntPtr GetRowSafe(ZeroBasedIndex index, MetadataTable table)
         {
             return (IntPtr) GetRow(index, table);
         }
@@ -902,7 +902,7 @@ namespace Tiny.Metadata.Layout
         public IEnumerable<IntPtr> GenericParameterRows()
         {
             for (int i = 0; i < GetRowCount(MetadataTable.GenericParam); ++i) {
-                yield return GetRowSafe(i, MetadataTable.GenericParam);
+                yield return GetRowSafe(i.ToZB(), MetadataTable.GenericParam);
             }
         }
 
@@ -929,8 +929,6 @@ namespace Tiny.Metadata.Layout
                 m_memoryMap.Dispose();
                 m_memoryMap = null;
             }
-
-            GC.SuppressFinalize(this);
         }
     }
 }

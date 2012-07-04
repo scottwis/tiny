@@ -31,16 +31,16 @@ namespace Tiny.Metadata.Layout
     //# The most-signifigant byte is used to decode the associated table.
     struct MetadataToken : IToken
     {
-        readonly uint m_value;
+        readonly OneBasedIndex m_value;
 
-        public MetadataToken(uint value)
+        public MetadataToken(OneBasedIndex value)
         {
             m_value = value;
         }
 
         public bool IsNull
         {
-            get { return (0x00FFFFFF & m_value) == 0; }
+            get { return (m_value & 0x00FFFFFF) == 0; }
         }
 
         public MetadataTable Table
@@ -48,16 +48,16 @@ namespace Tiny.Metadata.Layout
             get
             {
                 NullCheck();
-                return (MetadataTable)(((0xFF000000) & m_value) >> 24).AssumeDefined("Invalid meta-data table.");
+                return ((MetadataTable) ((m_value & 0xFF000000) >> 24).Value).AssumeDefined("Invalid meta-data table.");
             }
         }
 
-        public int Index
+        public ZeroBasedIndex Index
         {
             get
             {
                 NullCheck();
-                return (int)(((m_value) & 0x00FFFFFF) - 1);
+                return (ZeroBasedIndex) (m_value & 0x00FFFFFF);
             }
         }
 

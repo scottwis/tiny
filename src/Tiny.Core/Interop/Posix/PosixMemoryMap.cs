@@ -40,12 +40,19 @@ namespace Tiny.Interop.Posix
             m_pMemory = FluentAsserts.CheckNotNull(pMemory, "pMemory");
             m_size = size.CheckGT(0U, "size");
         }
+
+        ~PosixMemoryMap()
+        {
+            Dispose();
+        }
+
         public void Dispose()
         {
             if (m_pMemory != null) {
                 Syscall.munmap((IntPtr)m_pMemory,m_size);
             }
             m_pMemory = null;
+            GC.SuppressFinalize(this);
         }
 
         public unsafe void* Data

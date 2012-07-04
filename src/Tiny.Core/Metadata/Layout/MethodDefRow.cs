@@ -63,7 +63,7 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        public uint GetParamListIndex(PEFile peFile)
+        public OneBasedIndex GetParamListIndex(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (MethodDefRow * pThis = &this) {
@@ -73,9 +73,9 @@ namespace Tiny.Metadata.Layout
                     + StreamID.Strings.IndexSize(peFile)
                     + StreamID.Blob.IndexSize(peFile);
                 if (MetadataTable.MethodDef.IndexSize(peFile) == 2) {
-                    return *(uint *)pParamList;
+                    return new OneBasedIndex(*(uint *)pParamList);
                 }
-                return *(ushort *)pParamList;
+                return new OneBasedIndex(*(ushort *)pParamList);
             }
         }
     }

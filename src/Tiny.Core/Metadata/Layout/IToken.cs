@@ -42,7 +42,7 @@ namespace Tiny.Metadata.Layout
 
         //# The index within the encoded table. 
         //# Throws: [InvalidOpeationException] if [IsNull] returns true.
-        int Index { get; }
+        ZeroBasedIndex Index { get; }
     }
 
     static class TokenExtensions

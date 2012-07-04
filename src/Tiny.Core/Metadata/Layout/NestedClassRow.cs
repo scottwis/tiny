@@ -30,26 +30,26 @@ namespace Tiny.Metadata.Layout
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct NestedClassRow
     {
-        public uint GetNestedClass(PEFile peFile)
+        public OneBasedIndex GetNestedClass(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (NestedClassRow* pThis = &this) {
                 if (MetadataTable.TypeDef.IndexSize(peFile) == 2) {
-                    return *(ushort*) pThis;
+                    return new OneBasedIndex(*(ushort*) pThis);
                 }
-                return *(uint*) pThis;
+                return new OneBasedIndex(*(uint*) pThis);
             }
         }
 
-        public uint GetEnclosingClass(PEFile peFile)
+        public OneBasedIndex GetEnclosingClass(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (NestedClassRow* pThis = &this) {
                 var pEnclosingClass = (byte*) pThis + MetadataTable.TypeDef.IndexSize(peFile);
                 if (MetadataTable.TypeDef.IndexSize(peFile) == 2) {
-                    return *(ushort*) pEnclosingClass;
+                    return new OneBasedIndex(*(ushort*) pEnclosingClass);
                 }
-                return *(uint*) pEnclosingClass;
+                return new OneBasedIndex(*(uint*) pEnclosingClass);
             }
         }
     }

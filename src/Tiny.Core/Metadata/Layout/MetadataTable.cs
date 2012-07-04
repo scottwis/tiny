@@ -92,27 +92,27 @@ namespace Tiny.Metadata.Layout
             return peFile.CheckNotNull("peFile").GetRowCount(table);
         }
 
-        public static unsafe void * GetRow(this MetadataTable table, int index, PEFile peFile)
+        public static unsafe void * GetRow(this MetadataTable table, ZeroBasedIndex index, PEFile peFile)
         {
             return peFile.CheckNotNull("peFile").GetRow(index, table);
         }
 
-        public unsafe static int RowIndex(this MetadataTable table, void * pRow, PEFile peFile)
+        public unsafe static ZeroBasedIndex RowIndex(this MetadataTable table, void * pRow, PEFile peFile)
         {
             return peFile.CheckNotNull("peFile").GetRowIndex(table, pRow);
         }
 
-        public unsafe static int GreatestLowerBound<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
+        public unsafe static ZeroBasedIndex GreatestLowerBound<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
         {
             return peFile.CheckNotNull("peFile").GreatestLowerBound(table, value, selector);
         }
 
-        public unsafe static int LeastUpperBound<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
+        public unsafe static ZeroBasedIndex LeastUpperBound<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
         {
             return peFile.CheckNotNull("peFile").LeastUpperBound(table, value, selector);
         }
 
-        public unsafe static int Find<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
+        public unsafe static ZeroBasedIndex Find<T>(this MetadataTable table, T value, UnsafeSelector<T> selector, PEFile peFile)
         {
             return peFile.CheckNotNull("peFile").Find(table, value, selector);
         }

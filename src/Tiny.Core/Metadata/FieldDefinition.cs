@@ -248,6 +248,16 @@ namespace Tiny.Metadata
             }
         }
 
+        public uint RVA
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
         private void CheckDisposed()
         {
             if (m_declaringType.Module.PEFile.IsDisposed) {

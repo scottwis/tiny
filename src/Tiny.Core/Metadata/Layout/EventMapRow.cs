@@ -30,26 +30,26 @@ namespace Tiny.Metadata.Layout
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct EventMapRow
     {
-        public uint GetParent(PEFile peFile)
+        public OneBasedIndex GetParent(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (EventMapRow * pThis = &this) {
                 if (MetadataTable.TypeDef.IndexSize(peFile) == 2) {
-                    return *(ushort*) pThis;
+                    return new OneBasedIndex(*(ushort*) pThis);
                 }
-                return *(uint*) pThis;
+                return new OneBasedIndex(*(uint*) pThis);
             }
         }
 
-        public uint GetEventListIndex(PEFile peFile)
+        public OneBasedIndex GetEventListIndex(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (EventMapRow* pThis = &this) {
                 var pEventList = (byte*) pThis + MetadataTable.TypeDef.IndexSize(peFile);
                 if (MetadataTable.Event.IndexSize(peFile) == 2) {
-                    return *(ushort*) pThis;
+                    return new OneBasedIndex(*(ushort*) pThis);
                 }
-                return *(uint*) pThis;
+                return new OneBasedIndex(*(uint*) pThis);
             }
         }
     }

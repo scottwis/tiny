@@ -29,9 +29,9 @@ namespace Tiny.Metadata.Layout
 {
     struct HasFieldMarshal : IToken
     {
-        readonly uint m_index;
+        readonly OneBasedIndex m_index;
 
-        public HasFieldMarshal(uint index)
+        public HasFieldMarshal(OneBasedIndex index)
         {
             m_index = index;
         }
@@ -46,7 +46,7 @@ namespace Tiny.Metadata.Layout
             get
             {
                 CheckNull();
-                switch (m_index & ~0x1U) {
+                switch ((m_index & ~0x1U).Value) {
                     case 0:
                         return MetadataTable.Field;
                     case 1:
@@ -57,12 +57,12 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        public int Index
+        public ZeroBasedIndex Index
         {
             get
             {
                 CheckNull();
-                return ((int) ((m_index & ~0x1U) >> 1)) - 1;
+                return (ZeroBasedIndex)((m_index & ~0x1U) >> 1);
             }
         }
 

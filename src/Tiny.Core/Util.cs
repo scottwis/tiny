@@ -28,12 +28,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using Tiny.Metadata.Layout;
 
 namespace Tiny
 {
     public static class Util
     {
-        public static IDictionary<K,V> AsReadOnly<K, V>(this IDictionary<K,V> d)
+        public static IReadOnlyDictionary<K,V> AsReadOnly<K, V>(this IDictionary<K,V> d)
         {
             d.CheckNotNull("d");
             return new ReadOnlyDictionary<K, V>(d.CheckNotNull("d"));
@@ -123,6 +124,11 @@ namespace Tiny
         )
         {
             Print(items, builder, seperator, null, null, formatter);
+        }
+
+        internal static ZeroBasedIndex ToZB(this int value)
+        {
+            return new ZeroBasedIndex(value);
         }
     }
 }

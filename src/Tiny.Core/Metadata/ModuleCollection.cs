@@ -109,7 +109,7 @@ namespace Tiny.Metadata
             if (m_otherModules[index] == null) {
                 lock (m_lockObject) {
                     if (m_otherModules[index] == null) {
-                        var f = (FileRow *)m_mainFile.GetRow(index,MetadataTable.File);
+                        var f = (FileRow *)m_mainFile.GetRow(new ZeroBasedIndex(index),MetadataTable.File);
                         if ((f->Flags & FileAttributes.ContainsNoMetadata) != 0) {
                             m_otherModules[index] = Module.CreateNonMetadataModule(
                                 m_assembly,

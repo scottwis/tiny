@@ -202,7 +202,7 @@ namespace Tiny.Metadata.Layout
 
         Type ParseTypeReference()
         {
-            return new TypeReference(new TypeDefOrRef(ReadUInt()),m_module);
+            return new TypeReference(new TypeDefOrRef(new OneBasedIndex(ReadUInt())),m_module);
         }
 
         Type ParseArrayType()

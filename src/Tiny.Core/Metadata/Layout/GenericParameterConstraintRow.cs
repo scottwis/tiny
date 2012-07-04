@@ -30,14 +30,14 @@ namespace Tiny.Metadata.Layout
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct GenericParameterConstraintRow
     {
-        public uint GetOwner(PEFile peFile)
+        public OneBasedIndex GetOwner(PEFile peFile)
         {
             peFile.CheckNotNull("peFile");
             fixed (GenericParameterConstraintRow* pThis = &this) {
                 if (MetadataTable.GenericParam.IndexSize(peFile) == 2) {
-                    return *(ushort*) pThis;
+                    return new OneBasedIndex(*(ushort*) pThis);
                 }
-                return *(uint*) pThis;
+                return new OneBasedIndex(*(uint*) pThis);
             }
         }
 
@@ -53,7 +53,7 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pConstraint;
                 }
-                return new TypeDefOrRef(index);
+                return new TypeDefOrRef(new OneBasedIndex(index));
             }
         }
     }

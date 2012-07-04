@@ -41,7 +41,7 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pThis;
                 }
-                return new HasFieldMarshal(index);
+                return new HasFieldMarshal(new OneBasedIndex(index));
             }
         }
 

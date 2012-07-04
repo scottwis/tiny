@@ -30,13 +30,13 @@ namespace Tiny.Metadata.Layout
     [StructLayout(LayoutKind.Explicit)]
     unsafe struct InterfaceImplRow
     {
-        public uint GetClass(PEFile peFile)
+        public OneBasedIndex GetClass(PEFile peFile)
         {
             fixed (InterfaceImplRow * pThis = &this) {
                 if (MetadataTable.TypeDef.IndexSize(peFile) == 2) {
-                    return *(ushort*) pThis;
+                    return new OneBasedIndex(*(ushort*) pThis);
                 }
-                return *(uint*) pThis;
+                return new OneBasedIndex(*(uint*) pThis);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pInterface;
                 }
-                return new TypeDefOrRef(index);
+                return new TypeDefOrRef(new OneBasedIndex(index));
             }
         }
     }

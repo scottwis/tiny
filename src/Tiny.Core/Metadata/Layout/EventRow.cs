@@ -57,7 +57,7 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pType;
                 }
-                return new TypeDefOrRef(index);
+                return new TypeDefOrRef(new OneBasedIndex(index));
             }
         }
     }

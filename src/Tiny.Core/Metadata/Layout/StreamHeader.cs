@@ -37,7 +37,7 @@ namespace Tiny.Metadata.Layout
     {
         public static uint MinSize = 12;
 
-        public readonly static IDictionary<string, StreamID> StreamNames = new Dictionary<string, StreamID>() {
+        public readonly static IReadOnlyDictionary<string, StreamID> StreamNames = new Dictionary<string, StreamID>() {
             {"#Strings", StreamID.Strings},
             {"#US", StreamID.UserStrings},
             {"#Blob", StreamID.Blob},

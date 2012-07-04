@@ -45,7 +45,7 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pOwner;
                 }
-                return new TypeOrMethodDef(index);
+                return new TypeOrMethodDef(new OneBasedIndex(index));
             }
         }
 

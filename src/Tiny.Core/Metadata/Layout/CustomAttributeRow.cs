@@ -41,7 +41,7 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pThis;
                 }
-                return new HasCustomAttribute(index);
+                return new HasCustomAttribute(new OneBasedIndex(index));
             }
         }
 
@@ -57,7 +57,7 @@ namespace Tiny.Metadata.Layout
                 else {
                     index = *(uint*) pConstructor;
                 }
-                return new CustomAttributeConstructor(index);
+                return new CustomAttributeConstructor(new OneBasedIndex(index));
             }
         }
 

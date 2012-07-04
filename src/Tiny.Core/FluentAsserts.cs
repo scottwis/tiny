@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 
 using System;
+using Tiny.Metadata.Layout;
 
 namespace Tiny
 {
@@ -279,6 +280,15 @@ namespace Tiny
             return lhs;
         }
 
+        internal static ZeroBasedIndex CheckGTE(this ZeroBasedIndex lhs, int rhs, string parameterName)
+        {
+            if (lhs < rhs)
+            {
+                throw new ArgumentOutOfRangeException(parameterName, String.Format("Expected a value >= {0}", rhs));
+            }
+            return lhs;
+        }
+
         public static T CheckLTE<T>(this T lhs, T rhs, string parameterName) where T : IComparable<T>
         {
             if (lhs.CompareTo(rhs) > 0) {
@@ -288,6 +298,14 @@ namespace Tiny
         }
 
         public static T CheckLT<T>(this T lhs, T rhs, string parameterName) where T : IComparable<T>
+        {
+            if (lhs.CompareTo(rhs) >= 0) {
+                throw new ArgumentOutOfRangeException(parameterName, String.Format("Expected a value < {0}", rhs));
+            }
+            return lhs;
+        }
+
+        internal static ZeroBasedIndex CheckLT(this ZeroBasedIndex lhs, int rhs, string parameterName)
         {
             if (lhs.CompareTo(rhs) >= 0) {
                 throw new ArgumentOutOfRangeException(parameterName, String.Format("Expected a value < {0}", rhs));

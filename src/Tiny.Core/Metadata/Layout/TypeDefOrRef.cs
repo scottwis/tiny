@@ -29,9 +29,9 @@ namespace Tiny.Metadata.Layout
 {
     struct TypeDefOrRef : IToken
     {
-        readonly uint m_index;
+        readonly OneBasedIndex m_index;
 
-        public TypeDefOrRef(uint index)
+        public TypeDefOrRef(OneBasedIndex index)
         {
             m_index = index;
         }
@@ -46,7 +46,7 @@ namespace Tiny.Metadata.Layout
             get
             {
                 NullCheck();
-                switch (m_index & 0x3) {
+                switch ((m_index & 0x3).Value) {
                     case 0:
                         return MetadataTable.TypeDef;
                     case 1:
@@ -59,12 +59,12 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        public int Index
+        public ZeroBasedIndex Index
         {
             get
             {
                 NullCheck();
-                return ((int)((m_index & ~0x3u) >> 2)) - 1;
+                return (ZeroBasedIndex)((m_index & ~0x3u) >> 2);
             }
         }
 

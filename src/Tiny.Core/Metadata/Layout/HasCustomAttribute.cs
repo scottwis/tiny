@@ -24,12 +24,13 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 
 namespace Tiny.Metadata.Layout
 {
     struct HasCustomAttribute : IToken
     {
-        static MetadataTable[] s_tables = new MetadataTable[] {
+        static readonly MetadataTable[] s_tables = new MetadataTable[] {
             MetadataTable.MethodDef,
             MetadataTable.Field,
             MetadataTable.TypeRef,
@@ -54,11 +55,31 @@ namespace Tiny.Metadata.Layout
             MetadataTable.MethodSpec,
         };
 
-        readonly uint m_index;
+        static readonly IReadOnlyDictionary<MetadataTable, uint> s_inverseTables;
 
-        public HasCustomAttribute(uint index)
+        static HasCustomAttribute()
+        {
+            var d = new Dictionary<MetadataTable, uint>();
+            for (uint i = 0; i < s_tables.Length; ++i) {
+                d.Add(s_tables[i], i);
+            }
+            s_inverseTables = d.AsReadOnly();
+        }
+
+        readonly OneBasedIndex m_index;
+
+        public HasCustomAttribute(OneBasedIndex index)
         {
             m_index = index;
+        }
+
+        public HasCustomAttribute(MetadataTable table, ZeroBasedIndex index)
+        {
+            uint value;
+            if (! s_inverseTables.TryGetValue(table, out value)) {
+                throw new ArgumentException("HasCustomAttributes does not support the provided meta-data table", "table");
+            }
+            m_index = (OneBasedIndex) index | (value << 5);
         }
 
         public bool IsNull
@@ -71,7 +92,7 @@ namespace Tiny.Metadata.Layout
             get
             {
                 NullCheck();
-                var table = m_index & 0x1F;
+                var table = (m_index & 0x1F).Value;
                 if (table < s_tables.Length) {
                     return s_tables[table];
                 }
@@ -79,12 +100,12 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        public int Index
+        public ZeroBasedIndex Index
         {
             get
             {
                 NullCheck();
-                return ((int)((m_index & ~0x1F) >> 5)) - 1;
+                return (ZeroBasedIndex)((m_index & ~0x1FU) >> 5);
             }
         }
 
@@ -145,7 +166,7 @@ namespace Tiny.Metadata.Layout
             if (attribute.IsNull) {
                 return 0;
             }
-            return attribute.m_index;
+            return attribute.m_index.Value;
         }
     }
 }

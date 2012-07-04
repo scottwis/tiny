@@ -29,9 +29,9 @@ namespace Tiny.Metadata.Layout
 {
     struct CustomAttributeConstructor : IToken
     {
-        readonly uint m_index;
+        readonly OneBasedIndex m_index;
 
-        public CustomAttributeConstructor(uint index)
+        public CustomAttributeConstructor(OneBasedIndex index)
         {
             m_index = index;
         }
@@ -46,7 +46,7 @@ namespace Tiny.Metadata.Layout
             get
             {
                 CheckNull();
-                switch (m_index & 0x7u) {
+                switch ((m_index & 0x7u).Value) {
                     case 2:
                         return MetadataTable.MethodDef;
                     case 3:
@@ -57,12 +57,12 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        public int Index
+        public ZeroBasedIndex Index
         {
             get 
             {
                 CheckNull();
-                return ((int)(m_index & ~0x7u) >> 3) - 1;
+                return (ZeroBasedIndex)((m_index & ~0x7u) >> 3);
             }
         }
 

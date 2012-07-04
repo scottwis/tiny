@@ -29,20 +29,20 @@ namespace Tiny.Metadata.Layout
 {
     struct TypeOrMethodDef : IToken
     {
-        readonly uint m_index;
+        readonly OneBasedIndex m_index;
 
-        public TypeOrMethodDef(uint index) : this()
+        public TypeOrMethodDef(OneBasedIndex index)
         {
             m_index = index;
         }
 
-        public TypeOrMethodDef(MetadataTable table, int index)
+        public TypeOrMethodDef(MetadataTable table, ZeroBasedIndex index)
         {
             if (table != MetadataTable.TypeDef && table != MetadataTable.MethodDef) {
                 throw new ArgumentException("Expected TypeDef or MethodDef", "table");
             }
-            var tableId = (table == MetadataTable.TypeDef) ? 0 : 1;
-            m_index = (uint) ((index + 1) << 1) | (uint) table;
+            var tableId = (table == MetadataTable.TypeDef) ? 0u : 1u;
+            m_index = ((OneBasedIndex) index << 1) | tableId;
         }
 
         public bool IsNull
@@ -55,7 +55,7 @@ namespace Tiny.Metadata.Layout
             get
             {
                 CheckNull();
-                switch (m_index & 0x1) {
+                switch ((m_index & 0x1).Value) {
                     case 0:
                         return MetadataTable.TypeDef;
                     case 1:
@@ -66,12 +66,12 @@ namespace Tiny.Metadata.Layout
             }
         }
 
-        public int Index
+        public ZeroBasedIndex Index
         {
             get
             {
                 CheckNull();
-                return ((int)((m_index & ~0x1U) >> 1)) - 1;
+                return (ZeroBasedIndex) ((m_index & ~0x1U) >> 1);
             }
         }
 
