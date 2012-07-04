@@ -434,8 +434,7 @@ namespace Tiny.Metadata
         {
             get {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.ClassSemanticsMask) == TypeAttributes.Interface;
             }
         }
 
@@ -444,8 +443,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.ClassSemanticsMask) == TypeAttributes.Class;
             }
         }
 
@@ -454,8 +452,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return false;
             }
         }
 
@@ -464,8 +461,8 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                var accessibility = (m_pRow->Flags & TypeAttributes.VisibilityMask) ;
+                return accessibility == TypeAttributes.Public || accessibility == TypeAttributes.NestedPublic;
             }
         }
 
@@ -474,8 +471,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.VisibilityMask) == TypeAttributes.NestedPrivate;
             }
         }
 
@@ -484,8 +480,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.VisibilityMask) == TypeAttributes.NestedFamily;
             }
         }
 
@@ -494,8 +489,8 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                var accessibility = (m_pRow->Flags & TypeAttributes.VisibilityMask);
+                return accessibility == TypeAttributes.NotPublic || accessibility == TypeAttributes.NestedFamily;
             }
         }
 
@@ -504,8 +499,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.VisibilityMask) == TypeAttributes.NestedFamORAssem;
             }
         }
 
@@ -514,8 +508,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.VisibilityMask) == TypeAttributes.NestedFamANDAssem;
             }
         }
 
@@ -524,8 +517,8 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                var ret = (LayoutKind)(((int)(m_pRow->Flags & TypeAttributes.LayoutMask)) >> 7);
+                return ret.AssumeDefined("Invalid Layout Kind");
             }
         }
 
@@ -534,8 +527,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.Abstract) != 0;
             }
         }
 
@@ -544,8 +536,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.Sealed) != 0;
             }
         }
 
@@ -554,8 +545,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (StringFormat) (m_pRow->Flags & TypeAttributes.StringFormatMask);
             }
         }
 
@@ -564,8 +554,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.BeforeFieldInit) != 0;
             }
         }
 
@@ -574,8 +563,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.SpecialName) != 0;
             }
         }
 
@@ -584,18 +572,16 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & TypeAttributes.RTSpecialName) != 0;
             }
         }
 
-        public bool IsStatic
+        bool IMemberDefinition.IsStatic
         {
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return false;
             }
         }
 
