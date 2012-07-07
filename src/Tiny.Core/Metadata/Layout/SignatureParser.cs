@@ -26,7 +26,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using BclExtras.Collections;
 
 namespace Tiny.Metadata.Layout
@@ -48,10 +47,24 @@ namespace Tiny.Metadata.Layout
             m_module = scope.Module;
         }
 
+        SignatureParser(IReadOnlyList<byte> signature)
+        {
+            m_enumerator = signature.CheckNotNull("signature").GetEnumerator();
+            m_module = null;
+            m_genericParameterScope = null;
+        }
+
         public static Type ParseFieldSignature(IReadOnlyList<byte> signature, TypeDefinition declaringType)
         {
             using (var parser = new SignatureParser(signature, declaringType)) {
                 return parser.ParseFieldSignature();
+            }
+        }
+
+        public static MarshalInfo ParseMarshalDescriptor(IReadOnlyList<byte> signature)
+        {
+            using (var parser = new SignatureParser(signature)) {
+                return parser.ParseMashalDescriptor();
             }
         }
 
@@ -269,6 +282,28 @@ namespace Tiny.Metadata.Layout
         Parameter ParseParameter()
         {
             return new Parameter(ParseType());
+        }
+
+        MarshalInfo ParseMashalDescriptor()
+        {
+            var b = ReadByte();
+            if (b == (int)NativeType.Array) {
+                var elementType = ReadByte();
+                if (((NativeType)elementType).IsIntrinsic()) {
+                    var paramNum = TryReadUInt();
+                    var numElements = TryReadUInt();
+                    return new ArrayMarshalInfo((NativeType)elementType, paramNum, numElements);
+                }
+                else {
+                    throw new InvalidOperationException("Unable to parse marhsal descriptor: the array element type is not an intrinsic type.");
+                }
+            }
+            else if (((NativeType)b).IsIntrinsic()) {
+                return new MarshalInfo((NativeType) b);
+            }
+            else {
+                throw new InvalidOperationException("Unable to parse marshal descriptor");
+            }
         }
 
         public void Dispose()

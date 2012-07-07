@@ -127,6 +127,16 @@ namespace Tiny.Metadata
             }
         }
 
+        public IReadOnlyList<CustomAttribute> CustomAttributes
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
         void LoadConstraints()
         {
             if (m_constraints == null) {

@@ -116,6 +116,16 @@ namespace Tiny.Metadata
             }
         }
 
+        public IReadOnlyList<CustomAttribute> CustomAttributes
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
         public bool IsPublic
         {
             get

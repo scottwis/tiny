@@ -171,6 +171,7 @@
     <Compile Include="Interop\Win32\ShareMode.cs" />
     <Compile Include="Interop\Win32\UnsafeWin32MemoryMap.cs" />
     <Compile Include="Interop\Win32\Win32Platform.cs" />
+    <Compile Include="Metadata\ArrayMarshalInfo.cs" />
     <Compile Include="Metadata\ArrayType.cs" />
     <Compile Include="Metadata\Assembly.cs" />
     <Compile Include="Metadata\CallingConvention.cs" />
@@ -256,6 +257,7 @@
     <Compile Include="Metadata\ModifiedType.cs" />
     <Compile Include="Metadata\Module.cs" />
     <Compile Include="Metadata\ModuleCollection.cs" />
+    <Compile Include="Metadata\NativeType.cs" />
     <Compile Include="Metadata\NestedTypeInfo.cs" />
     <Compile Include="Metadata\Parameter.cs" />
     <Compile Include="Metadata\Project.cs" />

@@ -31,12 +31,13 @@ using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
 {
-    public unsafe sealed class FieldDefinition : IMemberDefinition
+    public unsafe sealed class FieldDefinition : IMemberDefinitionInternal
     {
         volatile string m_name;
         readonly FieldRow * m_pRow;
         readonly TypeDefinition m_declaringType;
         volatile Type m_fieldType;
+        volatile IReadOnlyList<CustomAttribute> m_customAttributes;
 
         internal FieldDefinition(FieldRow * pRow, TypeDefinition declaringType)
         {
@@ -67,10 +68,15 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 var b = new StringBuilder();
-                DeclaringType.GetFullName(b);
-                b.AppendFormat(".{0}", Name);
+                ((IMemberDefinitionInternal) this).GetFullName(b);
                 return b.ToString();
             }
+        }
+
+        void IMemberDefinitionInternal.GetFullName(StringBuilder b)
+        {
+            DeclaringType.GetFullName(b);
+            b.AppendFormat(".{0}", Name);
         }
 
         public TypeDefinition DeclaringType
@@ -105,8 +111,14 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                if (m_customAttributes == null)
+                {
+                    var attributes = m_declaringType.Module.PEFile.LoadCustomAttributes(MetadataTable.Field, m_pRow);
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_customAttributes, attributes, null);
+                    #pragma warning restore 420
+                }
+                return m_customAttributes;
             }
         }
 
@@ -115,8 +127,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.FieldAccessMask) == FieldAttributes.Public;
             }
         }
 
@@ -125,8 +136,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.FieldAccessMask) == FieldAttributes.Private;
             }
         }
 
@@ -135,8 +145,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.FieldAccessMask) == FieldAttributes.Family;
             }
         }
 
@@ -145,8 +154,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.FieldAccessMask) == FieldAttributes.FamAndAssembly;
             }
         }
 
@@ -155,8 +163,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.FieldAccessMask) == FieldAttributes.FamOrAssembly;
             }
         }
 
@@ -165,8 +172,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.FieldAccessMask) == FieldAttributes.Assembly;
             }
         }
 
@@ -175,8 +181,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.SpecialName) != 0;
             }
         }
 
@@ -185,8 +190,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.RTSpecialName) != 0;
             }
         }
 
@@ -195,8 +199,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.FieldAccessMask) == FieldAttributes.CompilerControlled;
             }
         }
 
@@ -243,18 +246,37 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.Static) != 0;
             }
         }
 
-        public uint RVA
+        public bool IsConst
         {
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return (m_pRow->Flags & FieldAttributes.Literal) != 0;
+            }
+        }
+
+        public bool IsReadonly
+        {
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & FieldAttributes.InitOnly) != 0;
+            }
+        }
+
+        public uint? RVA
+        {
+            get
+            {
+                CheckDisposed();
+                if ((m_pRow->Flags & FieldAttributes.HasFieldRVA) != 0) {
+                    return m_declaringType.Module.GetRVA(m_pRow);
+                }
+                return null;
             }
         }
 

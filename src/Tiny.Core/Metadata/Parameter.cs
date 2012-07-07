@@ -23,13 +23,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+
 namespace Tiny.Metadata
 {
     public class Parameter
     {
-        internal Parameter(Type parseType)
+        internal Parameter(Type type)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         //TODO: Finish defining this class
@@ -38,8 +41,9 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
 
@@ -47,9 +51,37 @@ namespace Tiny.Metadata
         {
             get
             {
+                CheckDisposed();
                 //TODO: Implement this
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
+
+        public IReadOnlyList<CustomAttribute> CustomAttributes
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        public MarshalInfo MarshalInfo
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        void CheckDisposed()
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
     }
 }

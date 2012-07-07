@@ -38,6 +38,7 @@ namespace Tiny.Metadata
         Type, ITypeContainer, IMutableTypeContainer, IGenericParameterScope, IMemberDefinitionInternal
     {
         volatile bool m_didSetParent;
+        volatile bool m_didSetBase;
         volatile TypeDefinition m_parent;
         readonly TypeDefRow* m_pRow;
         volatile IReadOnlyList<TypeDefinition> m_nestedTypes;
@@ -291,7 +292,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                if (m_baseType == null) {
+                if (! m_didSetBase) {
                     var token = m_pRow->GetExtendsToken(Module.PEFile);
                     if (!token.IsNull) {
                         var baseType = new TypeReference(token, Module);
@@ -299,6 +300,7 @@ namespace Tiny.Metadata
                         Interlocked.CompareExchange(ref m_baseType, baseType, null);
                         #pragma warning restore 420
                     }
+                    m_didSetBase = true;
                 }
                 return BaseType;
             }
@@ -410,13 +412,7 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 if (m_customAttributes == null) {
-                    var attributes = Module.PEFile.LoadIndirectChildren(
-                        new HasCustomAttribute(MetadataTable.TypeDef, MetadataTable.TypeDef.RowIndex(m_pRow, Module.PEFile)),
-                        MetadataTable.CustomAttribute,
-                        pRow=>((CustomAttributeRow *)pRow)->GetParent(Module.PEFile),
-                        pRow=>new CustomAttribute((CustomAttributeRow *)pRow, Module.PEFile)
-                    );
-
+                    var attributes = Module.PEFile.LoadCustomAttributes(MetadataTable.TypeDef, m_pRow);
                     #pragma warning disable 420
                     Interlocked.CompareExchange(ref m_customAttributes, attributes, null);
                     #pragma warning restore 420

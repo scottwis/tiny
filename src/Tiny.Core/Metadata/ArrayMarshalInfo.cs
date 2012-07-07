@@ -1,4 +1,4 @@
-// MarshalInfo.cs
+// ArrayMarshalInfo.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -25,18 +25,32 @@
 
 namespace Tiny.Metadata
 {
-    public class MarshalInfo
+    public class ArrayMarshalInfo : MarshalInfo
     {
-        readonly NativeType m_nativeType;
+        readonly NativeType m_elementType;
+        readonly int? m_paramNum;
+        readonly int? m_numParams;
 
-        public MarshalInfo(NativeType nativeType)
+        public ArrayMarshalInfo(NativeType elementType, int? paramNum, int? numParams) : base(NativeType.Array)
         {
-            m_nativeType = nativeType.CheckDefined("nativeType");
+            m_elementType = elementType;
+            m_paramNum = paramNum;
+            m_numParams = numParams;
         }
 
-        public NativeType NativeType
+        public NativeType ElementType
         {
-            get { return m_nativeType; }
+            get { return m_elementType; }
+        }
+
+        public int? ParameterNumber
+        {
+            get { return m_paramNum; }
+        }
+
+        public int? NumberOfParameters
+        {
+            get { return m_numParams; }
         }
     }
 }

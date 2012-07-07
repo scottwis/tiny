@@ -1,4 +1,4 @@
-// MarshalInfo.cs
+// NativeType.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -25,18 +25,26 @@
 
 namespace Tiny.Metadata
 {
-    public class MarshalInfo
+    //# Defines an enum representing the "NATIVE_TYPE" constants used in marshaling descriptors.
+    //# Reference: Ecma-335 Spec, 5th Edtion, Partition II § 23.4
+    public enum NativeType
     {
-        readonly NativeType m_nativeType;
-
-        public MarshalInfo(NativeType nativeType)
-        {
-            m_nativeType = nativeType.CheckDefined("nativeType");
-        }
-
-        public NativeType NativeType
-        {
-            get { return m_nativeType; }
-        }
+        Boolean = 0x02,
+        I1 = 0x03,
+        U1 = 0x04,
+        I2 = 0x05,
+        U2 = 0x06,
+        I4 = 0x07,
+        U4 = 0x08,
+        I8 = 0x09,
+        U8 = 0x0a,
+        R4 = 0x0b,
+        R8 = 0x0c,
+        LpStr = 0x14,
+        LpWStr = 0x15,
+        Int = 0x1f,
+        Uint = 0x20,
+        Func = 0x26,
+        Array = 0x2a
     }
 }

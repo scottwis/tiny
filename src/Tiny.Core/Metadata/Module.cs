@@ -231,5 +231,22 @@ namespace Tiny.Metadata
         {
             get { return m_assembly; }
         }
+
+        public IReadOnlyList<CustomAttribute> CustomAttributes
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        internal uint? GetRVA(FieldRow* pRow)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
     }
 }

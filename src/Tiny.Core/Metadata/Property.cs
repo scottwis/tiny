@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Tiny.Metadata.Layout;
 
@@ -133,6 +134,22 @@ namespace Tiny.Metadata
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
+        }
+
+        public IReadOnlyList<CustomAttribute> CustomAttributes
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        void CheckDisposed()
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
         }
     }
 }

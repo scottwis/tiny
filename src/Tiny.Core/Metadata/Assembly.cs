@@ -182,6 +182,21 @@ namespace Tiny.Metadata
             }
         }
 
+        public Project Project
+        {
+            get { return m_project; }
+        }
+
+        public IReadOnlyList<CustomAttribute> CustomAttributes
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
         public void Dispose()
         {
             if (m_peFile != null) {
@@ -196,11 +211,6 @@ namespace Tiny.Metadata
             m_peFile = null;
             m_assemblyRow = null;
             m_project = null;
-        }
-
-        public Project Project
-        {
-            get { return m_project; }
         }
     }
 }

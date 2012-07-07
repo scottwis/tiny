@@ -894,6 +894,16 @@ namespace Tiny.Metadata.Layout
             return ret;
         }
 
+        public LiftedList<CustomAttribute> LoadCustomAttributes(MetadataTable parentTable, void * parentRow)
+        {
+            return Module.PEFile.LoadIndirectChildren(
+                new HasCustomAttribute(parentTable, GetRowIndex(parentTable, parentRow)),
+                MetadataTable.CustomAttribute,
+                pRow => ((CustomAttributeRow*)pRow)->GetParent(this),
+                pRow => new CustomAttribute((CustomAttributeRow*)pRow, this)
+            );
+        }
+
         private IntPtr GetRowSafe(ZeroBasedIndex index, MetadataTable table)
         {
             return (IntPtr) GetRow(index, table);
