@@ -23,6 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Tiny.Metadata
 {
     //# Defines an enum representing the "NATIVE_TYPE" constants used in marshaling descriptors.
@@ -46,5 +48,33 @@ namespace Tiny.Metadata
         Uint = 0x20,
         Func = 0x26,
         Array = 0x2a
+    }
+
+    public static class NativeTypeExtensions
+    {
+        public static bool IsIntrinsic(this NativeType nativeType)
+        {
+            switch (nativeType) {
+                case NativeType.Boolean:
+                case NativeType.I1:
+                case NativeType.U1:
+                case NativeType.I2:
+                case NativeType.U2:
+                case NativeType.I4:
+                case NativeType.U4:
+                case NativeType.I8:
+                case NativeType.U8:
+                case NativeType.R4:
+                case NativeType.R8:
+                case NativeType.LpStr:
+                case NativeType.LpWStr:
+                case NativeType.Int:
+                case NativeType.Uint:
+                case NativeType.Func:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

@@ -101,6 +101,25 @@ namespace Tiny.Metadata.Layout
                 | ((uint)ReadByte());
         }
 
+        uint? TryReadUInt()
+        {
+            if (m_enumerator.MoveNext()) {
+                var b0 = m_enumerator.Current;
+                if ((b0 & 0x80) == 0x00) {
+                    return b0;
+                }
+                if ((b0 & 0xC0) == 0x80) {
+                    return ((b0 & ~0x80U) << 8) | ReadByte();
+                }
+                return
+                    ((b0 & ~0xC0U) << 24)
+                    | (((uint) ReadByte()) << 16)
+                    | (((uint) ReadByte()) << 8)
+                    | ((uint) ReadByte());
+            }
+            return null;
+        }
+
         int ReadInt()
         {
             //TODO: Implement this
@@ -292,18 +311,14 @@ namespace Tiny.Metadata.Layout
                 if (((NativeType)elementType).IsIntrinsic()) {
                     var paramNum = TryReadUInt();
                     var numElements = TryReadUInt();
-                    return new ArrayMarshalInfo((NativeType)elementType, paramNum, numElements);
+                    return new ArrayMarshalInfo((NativeType)elementType, checked((int?)paramNum), checked((int?)numElements));
                 }
-                else {
-                    throw new InvalidOperationException("Unable to parse marhsal descriptor: the array element type is not an intrinsic type.");
-                }
+                throw new InvalidOperationException("Unable to parse marhsal descriptor: the array element type is not an intrinsic type.");
             }
-            else if (((NativeType)b).IsIntrinsic()) {
+            if (((NativeType)b).IsIntrinsic()) {
                 return new MarshalInfo((NativeType) b);
             }
-            else {
-                throw new InvalidOperationException("Unable to parse marshal descriptor");
-            }
+            throw new InvalidOperationException("Unable to parse marshal descriptor");
         }
 
         public void Dispose()
