@@ -30,6 +30,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>WIN32;TINY_64</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Windows' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,6 +50,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>WIN32;TINY_64</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Mac' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,6 +72,7 @@
     <DefineConstants>__APPLE__;posix;TINY_64</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <IsPosix>true</IsPosix>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Mac' ">
     <DebugSymbols>true</DebugSymbols>
@@ -91,6 +94,7 @@
     <DefineConstants>__APPLE__;posix;TINY_64</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <IsPosix>true</IsPosix>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64-Linux' ">
     <DebugSymbols>true</DebugSymbols>
@@ -112,6 +116,7 @@
     <DefineConstants>linux;TINY_64;posix</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <IsPosix>true</IsPosix>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86-Linux' ">
     <DebugSymbols>true</DebugSymbols>
@@ -133,6 +138,7 @@
     <DefineConstants>linux;TINY_64;posix</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <IsPosix>true</IsPosix>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\bin\$(Platform)\$(Configuration)</OutputPath>
@@ -151,6 +157,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyAttributes.cs" />
+    <Compile Include="Collections\BufferWrapper.cs" />
     <Compile Include="Collections\LiftedList.cs" />
     <Compile Include="Collections\LiftedValueTypeList.cs" />
     <Compile Include="Collections\ReadonlyListBase.cs" />

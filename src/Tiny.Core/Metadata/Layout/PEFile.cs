@@ -496,6 +496,20 @@ namespace Tiny.Metadata.Layout
             }
         }
 
+        StreamHeader* BlobStream
+        {
+            get
+            {
+                //If there is no #String stream, then we should not try to read from it.
+                if (m_streams == null || m_streams.Length <= (int)StreamID.Blob)
+                {
+                    return null;
+                }
+
+                return m_streams[(int)StreamID.Blob];
+            }
+        }
+
         public bool IsDisposed
         {
             get { return m_pData == null; }
@@ -696,8 +710,31 @@ namespace Tiny.Metadata.Layout
         public IReadOnlyList<byte> ReadBlob(uint offset)
         {
             CheckDisposed();
-            //TODO: Implement this
-            throw new NotImplementedException();
+            CheckDisposed();
+            if (StringStream == null || offset > BlobStream->Size) {
+                throw new ArgumentOutOfRangeException("offset", "Invalid blog offset.");
+            }
+            var pBlob = ((byte*)m_metadataRoot + BlobStream->Offset) + offset;
+            var b0 = *pBlob;
+            uint length;
+            
+            if ((b0 & 0x80) == 0x00) {
+                length = b0;
+                ++pBlob;
+            }
+            else if ((b0 & 0xC0) == 0x80) {
+                length = ((b0 & ~0x80U) << 8) | *(pBlob + 1);
+                pBlob += 2;
+            }
+            else {
+                length = 
+                    ((b0 & ~0xC0U) << 24)
+                    | (((uint)*(pBlob + 1)) << 16)
+                    | (((uint)*(pBlob + 2)) << 8)
+                    | ((uint)*(pBlob + 3));
+                pBlob += 4;
+            }
+            return new BufferWrapper(pBlob, checked((int)length));
         }
 
         public Guid ReadGuid(uint offset)
