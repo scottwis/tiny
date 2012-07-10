@@ -38,6 +38,8 @@ namespace Tiny.Metadata
         readonly TypeDefinition m_declaringType;
         volatile Type m_fieldType;
         volatile IReadOnlyList<CustomAttribute> m_customAttributes;
+        volatile MarshalInfo m_marshalInfo;
+        volatile bool m_didSetMarshalInfo;
 
         internal FieldDefinition(FieldRow * pRow, TypeDefinition declaringType)
         {
@@ -226,8 +228,31 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                if (! m_didSetMarshalInfo) {
+                    var peFile = DeclaringType.Module.PEFile;
+                    var index = MetadataTable.FieldMarshal.Find(
+                        new HasFieldMarshal(
+                            MetadataTable.Field,
+                            MetadataTable.Field.RowIndex(m_pRow, peFile)
+                        ),
+                        pRow => ((FieldMarshalRow*)pRow)->GetParent(peFile),
+                        peFile
+                    );
+
+                    if (index >= 0) {
+                        var marshalInfo = SignatureParser.ParseMarshalDescriptor(peFile.ReadBlob(
+                            ((FieldMarshalRow*) MetadataTable.FieldMarshal.GetRow(index, peFile))->GetNativeTypeOffset(
+                                peFile
+                            )
+                        ));
+
+                        #pragma warning disable 420
+                        Interlocked.CompareExchange(ref m_marshalInfo, marshalInfo, null);
+                        #pragma warning restore 420
+                    }
+                    m_didSetMarshalInfo = true;
+                }
+                return m_marshalInfo;
             }
         }
 

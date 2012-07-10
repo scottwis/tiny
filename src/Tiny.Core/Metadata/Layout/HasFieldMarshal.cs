@@ -36,6 +36,14 @@ namespace Tiny.Metadata.Layout
             m_index = index;
         }
 
+        public HasFieldMarshal(MetadataTable table, ZeroBasedIndex index)
+        {
+            if (table != MetadataTable.Field && table != MetadataTable.Param) {
+                throw new ArgumentOutOfRangeException("table");
+            }
+            m_index = ((OneBasedIndex) index) | ((table == MetadataTable.Param ? 1u : 0u) << 1);
+        }
+
         public bool IsNull
         {
             get { return ((m_index & ~0x1U) >> 1) == 0; }

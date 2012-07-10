@@ -96,7 +96,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;linux;TINY_64</DefineConstants>
+    <DefineConstants>DEBUG;linux;TINY_64;posix</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -109,7 +109,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>linux;TINY_64</DefineConstants>
+    <DefineConstants>linux;TINY_64;posix</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <IsPosix>true</IsPosix>
   </PropertyGroup>
@@ -117,7 +117,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;linux;TINY_64</DefineConstants>
+    <DefineConstants>DEBUG;linux;TINY_64;posix</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -130,7 +130,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>linux;TINY_64</DefineConstants>
+    <DefineConstants>linux;TINY_64;posix</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <IsPosix>true</IsPosix>
   </PropertyGroup>
