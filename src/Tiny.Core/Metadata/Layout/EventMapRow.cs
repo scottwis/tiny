@@ -47,9 +47,9 @@ namespace Tiny.Metadata.Layout
             fixed (EventMapRow* pThis = &this) {
                 var pEventList = (byte*) pThis + MetadataTable.TypeDef.IndexSize(peFile);
                 if (MetadataTable.Event.IndexSize(peFile) == 2) {
-                    return new OneBasedIndex(*(ushort*) pThis);
+                    return new OneBasedIndex(*(ushort*) pEventList);
                 }
-                return new OneBasedIndex(*(uint*) pThis);
+                return new OneBasedIndex(*(uint*)pEventList);
             }
         }
     }
