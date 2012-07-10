@@ -23,10 +23,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Tiny.Metadata.Layout
 {
     //# An enum representing the flag values of the [FieldRow.Flags][Flags] property
     //# in a row in the [MetadataTable.Field][Field] table in a managed PE file.
+    [Flags]
     enum FieldAttributes : ushort
     {
         //===========================================================

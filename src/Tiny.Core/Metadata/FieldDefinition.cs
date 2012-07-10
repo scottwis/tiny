@@ -256,16 +256,6 @@ namespace Tiny.Metadata
             }
         }
 
-        public IReadOnlyList<byte> InitialValue
-        {
-            get
-            {
-                CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
-            }
-        }
-
         public bool IsStatic
         {
             get

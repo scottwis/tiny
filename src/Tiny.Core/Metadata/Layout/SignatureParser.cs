@@ -61,6 +61,13 @@ namespace Tiny.Metadata.Layout
             }
         }
 
+        public static Method ParseMethodSignature(IReadOnlyList<byte> signature, MethodDefinition targetMethod)
+        {
+            using (var parser = new SignatureParser(signature, targetMethod)) {
+                return parser.ParseMethodSignature();
+            }
+        }
+
         public static MarshalInfo ParseMarshalDescriptor(IReadOnlyList<byte> signature)
         {
             using (var parser = new SignatureParser(signature)) {
@@ -209,10 +216,13 @@ namespace Tiny.Metadata.Layout
 
         Type ParseGenericTypeParameter()
         {
-            if (!(m_genericParameterScope is TypeDefinition)) {
-                throw new InvalidOperationException("Generic method parameter not expected!");
+            if ((m_genericParameterScope is MethodDefinition)) {
+                return m_genericParameterScope.DeclaringType.GenericParameters[checked((int) ReadUInt())];
             }
-            return m_genericParameterScope.GenericParameters[checked((int)ReadUInt())];
+            if (m_genericParameterScope is TypeDefinition) {
+                return m_genericParameterScope.GenericParameters[checked((int)ReadUInt())];
+            }
+            throw new InvalidOperationException("Generic type parameter not expected.");
         }
 
         Type ParseGenericMethodParameter()

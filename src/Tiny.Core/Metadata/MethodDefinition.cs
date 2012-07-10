@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using Tiny.Collections;
 using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
@@ -37,6 +38,9 @@ namespace Tiny.Metadata
         readonly TypeDefinition m_declaringType;
         readonly MethodDefRow* m_pRow;
         volatile string m_name;
+        volatile IReadOnlyList<CustomAttribute> m_customAttributes;
+        volatile IReadOnlyList<GenericParameter> m_genericParameters;
+        volatile Method m_signature;
 
         internal MethodDefinition(MethodDefRow * pRow, TypeDefinition declaringType)
         {
@@ -111,7 +115,6 @@ namespace Tiny.Metadata
         {
             get
             {
-                CheckDisposed();
                 return m_declaringType;
             }
         }
@@ -121,8 +124,13 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                if (m_customAttributes == null) {
+                    var attributes = Module.PEFile.LoadCustomAttributes(MetadataTable.MethodDef, m_pRow);
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_customAttributes, attributes, null);
+                    #pragma warning restore 420
+                }
+                return m_customAttributes;
             }
         }
 
@@ -218,7 +226,11 @@ namespace Tiny.Metadata
 
         public bool IsCompilerControlled
         {
-            get { return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.CompilerControlled; }
+            get
+            {
+                CheckDisposed();
+                return (m_pRow->Flags & MethodAttributes.MemberAccessMask) == MethodAttributes.CompilerControlled;
+            }
         }
 
         public IReadOnlyList<GenericParameter> GenericParameters
@@ -226,8 +238,26 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                if (m_genericParameters == null) {
+                    var rows = Module.GetGenericParameterRows(
+                        new TypeOrMethodDef(
+                            MetadataTable.MethodDef,
+                            MetadataTable.MethodDef.RowIndex(m_pRow, Module.PEFile)
+                        )
+                    );
+
+                    var genericParameters = new LiftedList<GenericParameter>(
+                        rows.Count,
+                        index => (void*) rows[index],
+                        pRow => new GenericParameter((GenericParameterRow*) pRow, Module.PEFile, this),
+                        () => Module.PEFile.IsDisposed
+                    );
+
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_genericParameters, genericParameters, null);
+                    #pragma warning restore 420
+                }
+                return m_genericParameters;
             }
         }
 
@@ -236,8 +266,19 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return DeclaringType.Module;
+            }
+        }
+
+        private void LoadSignature()
+        {
+            if (m_signature == null) {
+                var peFile = DeclaringType.Module.PEFile;
+                var bytes = peFile.ReadBlob(m_pRow->GetSignatureOffset(peFile));
+                var signature = SignatureParser.ParseMethodSignature(bytes, this);
+                #pragma warning disable 420
+                Interlocked.CompareExchange(ref m_signature, signature, null);
+                #pragma warning restore 420
             }
         }
 
@@ -246,8 +287,8 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                LoadSignature();
+                return m_signature.ReturnType;
             }
         }
 
@@ -401,6 +442,28 @@ namespace Tiny.Metadata
         public MethodCodeType CodeType
         {
             get { return (MethodCodeType) (m_pRow->ImplFlags & (MethodImplAttributes.CodeTypeMask)); }
+        }
+
+        //# If the method is an event accessor, returns the event it is associated with,
+        //# and null otherwise.
+        public Event AssociatedEvent
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
+
+        //# If the method is a property accessor, returns the property it is associated with,
+        //# and null otherwise.
+        public Property AssociatedProperty
+        {
+            get
+            {
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
         }
     }
 }
