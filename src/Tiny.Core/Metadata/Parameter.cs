@@ -25,13 +25,27 @@
 
 using System;
 using System.Collections.Generic;
+using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
 {
-    public class Parameter
+    public unsafe class Parameter
     {
         internal Parameter(Type type)
         {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
+        internal Parameter(ParamRow* pRow, Type returnType)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
+
+        internal Parameter(ParamRow* pRow, Parameter signatureParam)
+        {
+            //TODO: Implement this
             throw new NotImplementedException();
         }
 

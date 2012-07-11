@@ -50,7 +50,6 @@ namespace Tiny.Metadata.Layout
             else {
                 s_peSignature = (((int)(byte)'P')<< 24) | (((int)(byte)'E') << 16);
             }
-
         }
 
         IUnsafeMemoryMap m_memoryMap;
@@ -951,6 +950,45 @@ namespace Tiny.Metadata.Layout
                 yield return GetRowSafe(i.ToZB(), MetadataTable.GenericParam);
             }
         }
+
+        public LiftedList<T> LoadDirectChildren<T>(
+            MetadataTable childTable,
+            GetTokenDelegate tokenSelector,
+            CreateObjectDelegate<T> factory,
+            MetadataTable parentTable,
+            void* parentRow
+        ) where T : class
+        {
+            factory.CheckNotNull("factory");
+            return LoadDirectChildren(childTable, tokenSelector, (pRow, index)=>factory(pRow), parentTable, parentRow);
+        }
+
+        public LiftedList<T> LoadDirectChildren<T>(
+            MetadataTable childTable,
+            GetTokenDelegate tokenSelector,
+            CreateObjectDelegateEX<T> factory,
+            MetadataTable parentTable,
+            void* parentRow
+        ) where T : class
+        {
+            var firstMemberIndex = (ZeroBasedIndex)tokenSelector(parentRow);
+            ZeroBasedIndex lastMemberIndex;
+            var tableIndex = GetRowIndex(parentTable, parentRow);
+            if (tableIndex == GetRowCount(parentTable) - 1) {
+                lastMemberIndex = new ZeroBasedIndex(GetRowCount(childTable));
+            }
+            else {
+                lastMemberIndex = (ZeroBasedIndex)tokenSelector(GetRow(tableIndex + 1, parentTable));
+            }
+            var ret = new LiftedList<T>(
+                (lastMemberIndex - firstMemberIndex).Value,
+                index => GetRow(firstMemberIndex + index, childTable),
+                factory,
+                () => IsDisposed
+            );
+            return ret;
+        }
+
 
         public void Dispose()
         {

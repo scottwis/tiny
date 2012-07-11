@@ -41,6 +41,8 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<CustomAttribute> m_customAttributes;
         volatile IReadOnlyList<GenericParameter> m_genericParameters;
         volatile Method m_signature;
+        volatile IReadOnlyList<Parameter> m_parameters;
+        volatile Parameter m_returnTypeParameter;
 
         internal MethodDefinition(MethodDefRow * pRow, TypeDefinition declaringType)
         {
@@ -297,9 +299,60 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                LoadSignature();
+
+                if (m_parameters == null) {
+                    var peFile = DeclaringType.Module.PEFile;
+                    var firstMemberIndex = (ZeroBasedIndex) m_pRow->GetParamListIndex(peFile);
+                    ZeroBasedIndex lastMemberIndex;
+                    var tableIndex = MetadataTable.MethodDef.RowIndex(m_pRow, peFile);
+                    if (tableIndex == MetadataTable.MethodDef.RowCount(peFile) - 1) {
+                        lastMemberIndex = new ZeroBasedIndex(MetadataTable.Param.RowCount(peFile));
+                    }
+                    else {
+                        lastMemberIndex = (ZeroBasedIndex) (((MethodDefRow*) MetadataTable.MethodDef.GetRow(
+                            tableIndex + 1,
+                            peFile
+                        ))->GetParamListIndex(peFile));
+                    }
+
+                    var hasReturnTypeParameter = false;
+
+                    if ((lastMemberIndex - firstMemberIndex) > 0) {
+                        var pFirstParam = (ParamRow*) MetadataTable.Param.GetRow(firstMemberIndex, peFile);
+                        hasReturnTypeParameter = pFirstParam->Sequence == 0;
+                    }
+
+                    IReadOnlyList<Parameter> parameters = new LiftedList<Parameter>(
+                        (lastMemberIndex - firstMemberIndex).Value,
+                        index => MetadataTable.Param.GetRow(firstMemberIndex + index, peFile),
+                        (pRow, index) => {
+                            if (index == 0 && hasReturnTypeParameter) {
+                                return new Parameter((ParamRow*) pRow, m_signature.ReturnType);
+                            }
+                            if (hasReturnTypeParameter) {
+                                return new Parameter((ParamRow*) pRow, m_signature.Parameters[index - 1]);
+                            }
+                            return new Parameter((ParamRow*) pRow, m_signature.Parameters[index]);
+                        },
+                        () => peFile.IsDisposed
+                    );
+
+                    if (hasReturnTypeParameter) {
+                        #pragma warning disable 420
+                        Interlocked.CompareExchange(ref m_returnTypeParameter, parameters[0], null);
+                        #pragma warning restore 420
+                        parameters = parameters.SubList(1);
+                    }
+
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_parameters, parameters, null);
+                    #pragma warning restore 420
+                }
+
+                return m_parameters;
             }
+            
         }
 
         public override bool HasThis

@@ -172,45 +172,24 @@ namespace Tiny.Metadata
             }
         }
 
-        delegate OneBasedIndex GetTokenDelegate(void* pRow, PEFile peFile);
-
-        LiftedList<T> GetMembers<T>(
+        //TODO: Factor GetMembers into a general helper in PEFile, so that it can also be used by
+        //MethodDefinition.
+        LiftedList<T> LoadDirectChildren<T>(
             MetadataTable childTable,
             GetTokenDelegate tokenSelector,
             CreateObjectDelegate<T> createObject
         ) where T : class
         {
-            return GetMembers(childTable, tokenSelector, createObject, MetadataTable.TypeDef, m_pRow);
-        }
-
-        LiftedList<T> GetMembers<T>(
-            MetadataTable childTable,
-            GetTokenDelegate tokenSelector,
-            CreateObjectDelegate<T> createObject,
-            MetadataTable parentTable,
-            void* parentRow
-        ) where T : class
-        {
-            var firstMemberIndex = (ZeroBasedIndex)tokenSelector(parentRow, Module.PEFile);
-            ZeroBasedIndex lastMemberIndex;
-            var peFile = m_module.PEFile;
-            var tableIndex = parentTable.RowIndex(parentRow, peFile);
-            if (tableIndex == parentTable.RowCount(peFile) - 1) {
-                lastMemberIndex = new ZeroBasedIndex(childTable.RowCount(peFile));
-            }
-            else {
-                lastMemberIndex = (ZeroBasedIndex)tokenSelector(parentTable.GetRow(tableIndex + 1, peFile), peFile);
-            }
-            var fields = new LiftedList<T>(
-                (lastMemberIndex - firstMemberIndex).Value,
-                index => childTable.GetRow(firstMemberIndex + index, peFile),
+            return Module.PEFile.LoadDirectChildren(
+                childTable,
+                tokenSelector,
                 createObject,
-                () => Module.PEFile.IsDisposed
+                MetadataTable.TypeDef,
+                m_pRow
             );
-            return fields;
         }
 
-        IReadOnlyList<T> GetMembersIndirect<T>(
+        IReadOnlyList<T> LoadDirectChildrenFromMap<T>(
             MetadataTable mapTable,
             MetadataTable childTable,
             UnsafeSelector<OneBasedIndex> parentSelector,
@@ -235,7 +214,7 @@ namespace Tiny.Metadata
                 ret = new List<T>(0).AsReadOnly();
             }
             else {
-                ret = GetMembers(
+                ret = Module.PEFile.LoadDirectChildren(
                     childTable,
                     tokenSelector,
                     factory,
@@ -253,9 +232,10 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 if (m_fields == null) {
-                    var fields = GetMembers(
+                    var peFile = Module.PEFile;
+                    var fields = LoadDirectChildren(
                         MetadataTable.Field,
-                        (pRow, peFile)=>((TypeDefRow *)pRow)->GetFieldListToken(peFile),
+                        (pRow)=>((TypeDefRow *)pRow)->GetFieldListToken(peFile),
                         x => new FieldDefinition((FieldRow*)x, this)
                     );
                     #pragma warning disable 420
@@ -273,9 +253,10 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 if (m_methods == null) {
-                    var methods = GetMembers(
+                    var peFile = Module.PEFile;
+                    var methods = LoadDirectChildren(
                         MetadataTable.MethodDef,
-                        (pRow, peFile) => ((TypeDefRow*)pRow)->GetMethodListToken(peFile),
+                        (pRow) => ((TypeDefRow*)pRow)->GetMethodListToken(peFile),
                         pRow => new MethodDefinition((MethodDefRow*)pRow, this)
                     );
                     #pragma warning disable 420
@@ -340,10 +321,11 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 if (m_events == null) {
-                    var events = GetMembersIndirect(
+                    var peFile = Module.PEFile;
+                    var events = LoadDirectChildrenFromMap(
                         MetadataTable.EventMap, 
-                        MetadataTable.Event, pRow => ((EventMapRow*) pRow)->GetParent(Module.PEFile),
-                        (pRow, peFile) => ((EventMapRow*) pRow)->GetEventListIndex(peFile),
+                        MetadataTable.Event, pRow => ((EventMapRow*) pRow)->GetParent(peFile),
+                        (pRow) => ((EventMapRow*)pRow)->GetEventListIndex(peFile),
                         pRow => new Event((EventRow*) pRow, this)
                     );
 
@@ -362,11 +344,12 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 if (m_properties == null) {
-                    var properties = GetMembersIndirect(
+                    var peFile = Module.PEFile;
+                    var properties = LoadDirectChildrenFromMap(
                         MetadataTable.PropertyMap,
                         MetadataTable.Property,
-                        pRow => ((PropertyMapRow*) pRow)->GetParent(Module.PEFile),
-                        (pRow, peFile) => ((PropertyMapRow*) pRow)->GetPropertyListIndex(peFile),
+                        pRow => ((PropertyMapRow*) pRow)->GetParent(peFile),
+                        (pRow) => ((PropertyMapRow*) pRow)->GetPropertyListIndex(peFile),
                         pRow => new Property((PropertyRow*) pRow, this)
                     );
 

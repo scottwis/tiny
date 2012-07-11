@@ -31,12 +31,13 @@ namespace Tiny.Collections
 {
     public unsafe delegate void* GetRowDelegate(int index);
     public unsafe delegate T CreateObjectDelegate<out T>(void* pRow);
+    public unsafe delegate T CreateObjectDelegateEX<out T>(void* pRow, int index);
 
     public sealed unsafe class LiftedList<T> : ReadonlyListBase<T> where T : class
     {
         // ReSharper disable InconsistentNaming
         readonly GetRowDelegate FetchRow;
-        readonly CreateObjectDelegate<T> CreateObject;
+        readonly CreateObjectDelegateEX<T> CreateObject;
         readonly Func<bool> IsDisposed;
         // ReSharper restore InconsistentNaming
 
@@ -47,11 +48,21 @@ namespace Tiny.Collections
             GetRowDelegate rowFectcher,
             CreateObjectDelegate<T> factory,
             Func<bool> disposedChecker
+        ) : this(itemCount, rowFectcher, (pRow, index)=>factory(pRow), disposedChecker)
+        {
+            factory.CheckNotNull("factory");
+        }
+
+        public LiftedList(
+            int itemCount,
+            GetRowDelegate rowFetcher,
+            CreateObjectDelegateEX<T>  factory,
+            Func<bool> disposedChecker 
         )
         {
             itemCount.CheckGTE(0, "itemCount");
 
-            FetchRow = rowFectcher.CheckNotNull("rowFetcher");
+            FetchRow = rowFetcher.CheckNotNull("rowFetcher");
             CreateObject = factory.CheckNotNull("factory");
             IsDisposed = disposedChecker.CheckNotNull("disposedChecker");
 
@@ -98,7 +109,7 @@ namespace Tiny.Collections
         void LoadObject(int index)
         {
             if (m_array[index] == null) {
-                var obj = CreateObject(FetchRow(index));
+                var obj = CreateObject(FetchRow(index), index);
                 Interlocked.CompareExchange(ref m_array[index], obj, null);
             }
         }

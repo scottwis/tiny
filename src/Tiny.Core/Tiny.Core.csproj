@@ -162,6 +162,7 @@
     <Compile Include="Collections\LiftedValueTypeList.cs" />
     <Compile Include="Collections\ReadonlyListBase.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
+    <Compile Include="Collections\SubList.cs" />
     <Compile Include="FluentAsserts.cs" />
     <Compile Include="InternalErrorException.cs" />
     <Compile Include="Interop\IUnsafeMemoryMap.cs" />
@@ -218,6 +219,7 @@
     <Compile Include="Metadata\Layout\DllCharacteristics.cs" />
     <Compile Include="Metadata\Layout\FileAttributes.cs" />
     <Compile Include="Metadata\Layout\FileFormat.cs" />
+    <Compile Include="Metadata\Layout\GetTokenDelegate.cs" />
     <Compile Include="Metadata\Layout\HasCustomAttribute.cs" />
     <Compile Include="Metadata\Layout\HasFieldMarshal.cs" />
     <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
@@ -233,6 +235,8 @@
     <Compile Include="Metadata\Layout\MethodDefRow.cs" />
     <Compile Include="Metadata\Layout\MethodImplAttributes.cs" />
     <Compile Include="Metadata\Layout\OneBasedIndex.cs" />
+    <Compile Include="Metadata\Layout\ParamAttributes.cs" />
+    <Compile Include="Metadata\Layout\ParamRow.cs" />
     <Compile Include="Metadata\Layout\PropertyAttributes.cs" />
     <Compile Include="Metadata\Layout\PropertyMapRow.cs" />
     <Compile Include="Metadata\Layout\PropertyRow.cs" />

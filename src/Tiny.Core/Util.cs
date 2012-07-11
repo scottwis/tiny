@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using Tiny.Collections;
 using Tiny.Metadata.Layout;
 
 namespace Tiny
@@ -129,6 +130,16 @@ namespace Tiny
         internal static ZeroBasedIndex ToZB(this int value)
         {
             return new ZeroBasedIndex(value);
+        }
+
+        public static IReadOnlyList<T> SubList<T>(this IReadOnlyList<T> list, int startIndex)
+        {
+            return new SubList<T>(list, startIndex);
+        }
+
+        public static IReadOnlyList<T> SubList<T>(this IReadOnlyList<T> list, int startIndex, int length)
+        {
+            return new SubList<T>(list, startIndex, length);
         }
     }
 }
