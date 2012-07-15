@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Tiny.Collections
 {
@@ -13,14 +12,22 @@ namespace Tiny.Collections
 
         public SubList(IReadOnlyList<T> wrapped, int startIndex)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            m_wrapped = wrapped.CheckNotNull("wrapped");
+            if (startIndex > wrapped.Count) {
+                startIndex = wrapped.Count;
+            }
+            m_startIndex = startIndex.CheckGTE(0, "startIndex");
+            m_count = wrapped.Count - startIndex;
         }
 
         public SubList(IReadOnlyList<T> wrapped, int startIndex, int length)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            m_wrapped = wrapped.CheckNotNull("wrapped");
+            if (startIndex > wrapped.Count) {
+                startIndex = wrapped.Count;
+            }
+            m_startIndex = startIndex.CheckGTE(0, "startIndex");
+            length.CheckGTE(0, "length");
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -52,51 +59,55 @@ namespace Tiny.Collections
             }
         }
 
-        //TODO: Finish implementing this
         public bool Contains(T item)
         {
-            throw new NotImplementedException();
+            return IndexOf(item) >= 0;
         }
 
         public bool IsReadOnly
         {
-            get { throw new System.NotImplementedException(); }
+            get { return true; }
         }
 
         public int IndexOf(T item)
         {
-            throw new System.NotImplementedException();
+            for (int i = 0; i < m_count; ++i) {
+                if (EqualityComparer<T>.Default.Equals(this[i], item)) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         void ICollection<T>.Add(T item)
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The collection is read only.");
         }
 
         void ICollection<T>.Clear()
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The collection is read only.");
         }
 
         bool ICollection<T>.Remove(T item)
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The collection is read only.");
         }
 
         void IList<T>.Insert(int index, T item)
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The collection is read only.");
         }
 
         void IList<T>.RemoveAt(int index)
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The collection is read only.");
         }
 
         T IList<T>.this[int index]
         {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
+            get { return this[index]; }
+            set { throw new NotSupportedException("The collection is read only."); }
         }
     }
 }
