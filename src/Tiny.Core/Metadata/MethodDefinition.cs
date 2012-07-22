@@ -360,8 +360,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return m_signature.HasThis;
             }
         }
 
@@ -370,8 +369,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return m_signature.ExplicitThis;
             }
         }
 
@@ -380,8 +378,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return m_signature.CallingConvention;
             }
         }
 
@@ -391,16 +388,6 @@ namespace Tiny.Metadata
             {
                 CheckDisposed();
                 return GenericParameters.Count;
-            }
-        }
-
-        public IReadOnlyList<Method> ImplementedMethods
-        {
-            get
-            {
-                CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
             }
         }
 

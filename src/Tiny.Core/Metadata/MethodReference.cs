@@ -25,11 +25,17 @@
 
 using System;
 using System.Collections.Generic;
+using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
 {
     public sealed class MethodReference : Method
     {
+        internal MethodReference(MethodDefOrRef methodDefOrRef)
+        {
+            throw new NotImplementedException();
+        }
+
         //TODO: Finish defining this class
 
         public override string Name

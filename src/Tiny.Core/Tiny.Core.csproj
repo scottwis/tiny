@@ -166,6 +166,8 @@
     <Compile Include="FluentAsserts.cs" />
     <Compile Include="InternalErrorException.cs" />
     <Compile Include="Interop\IUnsafeMemoryMap.cs" />
+    <Compile Include="Metadata\InstructionFlags.cs" />
+    <Compile Include="Metadata\Opcode.cs" />
     <Compile Include="Interop\NativePlatform.cs" />
     <Compile Include="Interop\Posix\ErrnoExtensions.cs" />
     <Compile Include="Interop\Posix\PosixException.cs" />
@@ -197,6 +199,7 @@
     <Compile Include="Metadata\Layout\EventAttributes.cs" />
     <Compile Include="Metadata\Layout\EventMapRow.cs" />
     <Compile Include="Metadata\Layout\EventRow.cs" />
+    <Compile Include="Metadata\Layout\ExceptionClauseFlags.cs" />
     <Compile Include="Metadata\Layout\FieldAttributes.cs" />
     <Compile Include="Metadata\Layout\FieldLayoutRow.cs" />
     <Compile Include="Metadata\Layout\FieldMarshalRow.cs" />
@@ -222,8 +225,11 @@
     <Compile Include="Metadata\Layout\GetTokenDelegate.cs" />
     <Compile Include="Metadata\Layout\HasCustomAttribute.cs" />
     <Compile Include="Metadata\Layout\HasFieldMarshal.cs" />
+    <Compile Include="Metadata\Layout\IExceptionClause.cs" />
+    <Compile Include="Metadata\Layout\IExceptionHeader.cs" />
     <Compile Include="Metadata\Layout\ImageCharacteristics.cs" />
     <Compile Include="Metadata\Layout\ImageSubsystem.cs" />
+    <Compile Include="Metadata\Layout\IMethodHeader.cs" />
     <Compile Include="Metadata\Layout\InterfaceImplRow.cs" />
     <Compile Include="Metadata\Layout\IToken.cs" />
     <Compile Include="Metadata\Layout\MachineType.cs" />
@@ -232,8 +238,12 @@
     <Compile Include="Metadata\Layout\MetadataTableHeader.cs" />
     <Compile Include="Metadata\Layout\MetadataToken.cs" />
     <Compile Include="Metadata\Layout\MethodAttributes.cs" />
+    <Compile Include="Metadata\Layout\MethodBodyFlags.cs" />
+    <Compile Include="Metadata\Layout\MethodDataSectionFlags.cs" />
+    <Compile Include="Metadata\Layout\MethodDefOrRef.cs" />
     <Compile Include="Metadata\Layout\MethodDefRow.cs" />
     <Compile Include="Metadata\Layout\MethodImplAttributes.cs" />
+    <Compile Include="Metadata\Layout\MethodImplRow.cs" />
     <Compile Include="Metadata\Layout\OneBasedIndex.cs" />
     <Compile Include="Metadata\Layout\ParamAttributes.cs" />
     <Compile Include="Metadata\Layout\ParamRow.cs" />
@@ -241,6 +251,7 @@
     <Compile Include="Metadata\Layout\PropertyMapRow.cs" />
     <Compile Include="Metadata\Layout\PropertyRow.cs" />
     <Compile Include="Metadata\Layout\ZeroBasedIndex.cs" />
+    <Compile Include="Metadata\MethodImplementation.cs" />
     <Compile Include="Metadata\MethodSignature.cs" />
     <Compile Include="Metadata\Layout\ModuleRow.cs" />
     <Compile Include="Metadata\Layout\NestedClassRow.cs" />

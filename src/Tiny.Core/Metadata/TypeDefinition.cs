@@ -53,6 +53,7 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<Property> m_properties;
         volatile IReadOnlyList<GenericParameter> m_genericParameters;
         volatile IReadOnlyList<CustomAttribute> m_customAttributes;
+        volatile IReadOnlyList<MethodImplementation> m_explicitImplementations;
 
         internal TypeDefinition(TypeDefRow * pRow, Module module) : base(TypeKind.TypeDefinition)
         {
@@ -401,6 +402,27 @@ namespace Tiny.Metadata
                     #pragma warning restore 420
                 }
                 return m_customAttributes;
+            }
+        }
+
+        public IReadOnlyList<MethodImplementation> ExplicitMethodImplementations
+        {
+            get
+            {
+                CheckDisposed();
+                if (m_explicitImplementations != null) {
+                    var peFile = Module.PEFile;
+                    var explicitImplementations = peFile.LoadIndirectChildren(
+                        (OneBasedIndex)MetadataTable.TypeDef.RowIndex(m_pRow, peFile),
+                        MetadataTable.MethodImpl,
+                        pRow => ((MethodImplRow*)pRow)->GetClass(peFile),
+                        pRow => new MethodImplementation((MethodImplRow*)pRow, peFile)
+                    );
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_explicitImplementations, explicitImplementations, null);
+                    #pragma warning restore 420
+                }
+                return m_explicitImplementations;
             }
         }
 
