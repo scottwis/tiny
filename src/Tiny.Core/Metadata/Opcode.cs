@@ -68,7 +68,7 @@ namespace Tiny.Metadata
         Ceq,
         Cgt,
         CgtUn,
-        Ckfinite,
+        CkFinite,
         Clt,
         CltUn,
         Constrained, 

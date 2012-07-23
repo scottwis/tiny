@@ -59,7 +59,37 @@ namespace Tiny.Metadata.Layout
             LookFor(0x43).Then(SetOpcode(Opcode.BleUn, "ble.un")).Then(ParseBranchTarget32()),
             LookFor(0x36).Then(SetOpcode(Opcode.BleUn, "ble.un.s")).Then(ParseBranchTarget8()),
             LookFor(0x3F).Then(SetOpcode(Opcode.Blt, "blt")).Then(ParseBranchTarget32()),
-            LookFor(0x32).Then(SetOpcode(Opcode.Blt, "blt.s")).Then(ParseBranchTarget8())
+            LookFor(0x32).Then(SetOpcode(Opcode.Blt, "blt.s")).Then(ParseBranchTarget8()),
+            LookFor(0x40).Then(SetOpcode(Opcode.BltUn, "blt.un")).Then(ParseBranchTarget32()),
+            LookFor(0x33).Then(SetOpcode(Opcode.BltUn, "blt.un.s")).Then(ParseBranchTarget8()),
+            LookFor(0x38).Then(SetOpcode(Opcode.Br, "br")).Then(ParseBranchTarget32()),
+            LookFor(0x2B).Then(SetOpcode(Opcode.Br, "br.s")).Then(ParseBranchTarget8()),
+            LookFor(0x1).Then(SetOpcode(Opcode.Break, "break")),
+            LookFor(0x39).Then(SetOpcode(Opcode.BrFalse, "brfalse")).Then(ParseBranchTarget32()),
+            LookFor(0x2C).Then(SetOpcode(Opcode.BrFalse, "brfalse.s")).Then(ParseBranchTarget8()),
+            LookFor(0x3A).Then(SetOpcode(Opcode.BrTrue, "brtrue")).Then(ParseBranchTarget32()),
+            LookFor(0x2D).Then(SetOpcode(Opcode.BrTrue, "brtrue.s")).Then(ParseBranchTarget8()),
+            LookFor(0x28).Then(SetOpcode(Opcode.Call, "call")).Then(ParseMethod()),
+            LookFor(0x29).Then(SetOpcode(Opcode.CallI, "calli")).Then(ParseMethod()),
+            LookFor(new byte[] {0xFE, 0x01}).Then(SetOpcode(Opcode.Ceq, "ceq")),
+            LookFor(new byte[] {0xFE, 0x02}).Then(SetOpcode(Opcode.Cgt, "cgt")),
+            LookFor(new byte[] {0xFE, 0x03}).Then(SetOpcode(Opcode.CgtUn, "cgt.un")),
+            LookFor(0xC3).Then(SetOpcode(Opcode.CkFinite, "ckfinite")),
+            LookFor(new byte[] {0xFe, 0x04}).Then(SetOpcode(Opcode.Clt, "clt")),
+            LookFor(new byte[] {0xFe, 0x04}).Then(SetOpcode(Opcode.CltUn, "clt.un")),
+            LookFor(0x67).Then(SetOpcode(Opcode.Conv, "conv.i1")).Then(SetOperand(CLRType.I1)),
+            LookFor(0x68).Then(SetOpcode(Opcode.Conv, "conv.i2")).Then(SetOperand(CLRType.I2)),
+            LookFor(0x69).Then(SetOpcode(Opcode.Conv, "conv.i4")).Then(SetOperand(CLRType.I4)),
+            LookFor(0x6A).Then(SetOpcode(Opcode.Conv, "conv.i8")).Then(SetOperand(CLRType.I8)),
+            LookFor(0x6B).Then(SetOpcode(Opcode.Conv, "conv.r4")).Then(SetOperand(CLRType.R4)),
+            LookFor(0x6C).Then(SetOpcode(Opcode.Conv, "conv.r8")).Then(SetOperand(CLRType.R8)),
+            LookFor(0xD2).Then(SetOpcode(Opcode.Conv, "conv.u1")).Then(SetOperand(CLRType.U1)),
+            LookFor(0xD1).Then(SetOpcode(Opcode.Conv, "conv.u2")).Then(SetOperand(CLRType.U2)),
+            LookFor(0x6D).Then(SetOpcode(Opcode.Conv, "conv.u4")).Then(SetOperand(CLRType.U4)),
+            LookFor(0x6E).Then(SetOpcode(Opcode.Conv, "conv.u8")).Then(SetOperand(CLRType.U8)),
+            LookFor(0xD3).Then(SetOpcode(Opcode.Conv, "conv.i")).Then(SetOperand(CLRType.NativeInteger)),
+            LookFor(0xE0).Then(SetOpcode(Opcode.Conv, "conv.u")).Then(SetOperand(CLRType.UnsignedNativeInteger)),
+            LookFor(0x76).Then(SetOpcode(Opcode.Conv, "conv.r.un")).Then(SetOperand(CLRType.NativeFloat))
 
             //TODO: Finish this
         );
@@ -104,7 +134,17 @@ namespace Tiny.Metadata.Layout
             throw new NotImplementedException();
         }
 
+        static IParser<byte, InstructionParseState, InstructionParseState> SetOperand(Object operand)
+        {
+            throw new NotImplementedException();
+        }
+
         static IParser<byte, InstructionParseState, InstructionParseState> ParseType()
+        {
+            throw new NotImplementedException();
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseMethod()
         {
             throw new NotImplementedException();
         }
