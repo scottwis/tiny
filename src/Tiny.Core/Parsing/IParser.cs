@@ -1,4 +1,4 @@
-// InstructionFlags.cs
+﻿// IParser.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,19 +23,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-namespace Tiny.Metadata
+namespace Tiny.Parsing
 {
-    [Flags]
-    public enum InstructionFlags : byte
+    //# An interface for a combinator parser with look ahead that converts an
+    //# IParseState<TInput, TSourceState> to an IParseState<TInput, TResultState>
+    interface IParser<TInput, in TSourceState, out TResultState>
     {
-        SkipTypeCheck = 0x01,
-        SkipRangeCheck = 0x02,
-        SkipNullCheck = 0x04,
-        ReadOnly = 0x08,
-        TailCall = 0x10,
-        Unaligned = 0x20,
-        Volatile = 0x40
+        //# The look ahead to acquire before attempting to parse input using this parser.
+        //# It is up to individual combinators to figure out how to use this data. For example,
+        //# [Parsers.Table] takes a set of parsers with unique LookAhead values and generates a look-up table
+        //# based parser. Many combinators, such as [Parsers.Then] will ignore this value.
+        TInput LookAhead { get;  }
+
+        //# Parses the given input, if it can be accepted by this parser, and returns the new parse state.
+        //# If the input can't be accepted by this parser, null is returned.
+        IParseState<TInput, TResultState> Parse(IParseState<TInput, TSourceState> state);
     }
 }

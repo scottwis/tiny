@@ -132,14 +132,19 @@ namespace Tiny
             return new ZeroBasedIndex(value);
         }
 
-        public static IReadOnlyList<T> SubList<T>(this IReadOnlyList<T> list, int startIndex)
+        internal static ISubList<T> SubList<T>(this IReadOnlyList<T> list, int startIndex)
         {
             return new SubList<T>(list, startIndex);
         }
 
-        public static IReadOnlyList<T> SubList<T>(this IReadOnlyList<T> list, int startIndex, int length)
+        internal static ISubList<T> SubList<T>(this IReadOnlyList<T> list, int startIndex, int length)
         {
             return new SubList<T>(list, startIndex, length);
+        }
+
+        internal static ISubList<T> Expand<T>(this ISubList<T> list, int increment)
+        {
+            return new SubList<T>(list.Wrapped, list.StartIndex, list.Count + increment.CheckGTE(0, "increment"));
         }
     }
 }
