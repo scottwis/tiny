@@ -37,7 +37,7 @@ namespace Tiny.Metadata.Layout
             LookFor(new byte[] {0xFE, 0x19}).Then(SetOpcode(Opcode.No, "no")).Then(ParseSkipFlags()).Then(ParseNestedInstruction()),
             LookFor(new byte[] {0xFE, 0x1E}).Then(SetOpcode(Opcode.Readonly, "readonly")).Then(ParseNestedInstruction()),
             LookFor(new byte[] {0xFE, 0x14}).Then(SetOpcode(Opcode.Tail, "tail")).Then(ParseNestedInstruction()),
-            LookFor(new byte[] {0xFE, 0x12}).Then(SetOpcode(Opcode.Unaligned, "unaligned")).Then(ParseByteOperand()).Then(ParseNestedInstruction()),
+            LookFor(new byte[] {0xFE, 0x12}).Then(SetOpcode(Opcode.Unaligned, "unaligned")).Then(ParseByteAsInt()).Then(ParseNestedInstruction()),
             LookFor(new byte[] {0xFE, 0x13}).Then(SetOpcode(Opcode.Volatile, "volatile")).Then(ParseNestedInstruction()),
             LookFor(0x58).Then(SetOpcode(Opcode.Add, "add")),
             LookFor(0xD6).Then(SetOpcode(Opcode.AddOvf, "add.ovf")),
@@ -118,14 +118,14 @@ namespace Tiny.Metadata.Layout
             LookFor(0xDC).Then(SetOpcode(Opcode.EndFinally, "endfinally")),
             LookFor(new byte[] {0xFE, 0x18}).Then(SetOpcode(Opcode.InitBlk, "initblk")),
             LookFor(0x27).Then(SetOpcode(Opcode.Jmp, "jmp")).Then(ParseMethod()),
-            LookFor(new byte[] {0xFE, 0x09}).Then(SetOpcode(Opcode.LdArg, "ldarg")).Then(ParseUShortOperand()),
-            LookFor(0x0E).Then(SetOpcode(Opcode.LdArg, "ldarg.s")).Then(ParseByteOperand()),
+            LookFor(new byte[] {0xFE, 0x09}).Then(SetOpcode(Opcode.LdArg, "ldarg")).Then(ParseUShortAsInt()),
+            LookFor(0x0E).Then(SetOpcode(Opcode.LdArg, "ldarg.s")).Then(ParseByteAsInt()),
             LookFor(0x02).Then(SetOpcode(Opcode.LdArg, "ldarg.0")).Then(SetOperand(0)),
             LookFor(0x03).Then(SetOpcode(Opcode.LdArg, "ldarg.1")).Then(SetOperand(1)),
             LookFor(0x04).Then(SetOpcode(Opcode.LdArg, "ldarg.2")).Then(SetOperand(2)),
             LookFor(0x05).Then(SetOpcode(Opcode.LdArg, "ldarg.3")).Then(SetOperand(3)),
-            LookFor(new byte[] {0xFE, 0xA}).Then(SetOpcode(Opcode.LdArgA, "ldarga")).Then(ParseUShortOperand()),
-            LookFor(new byte[] {0x0F}).Then(SetOpcode(Opcode.LdArgA, "ldarga.s")).Then(ParseByteOperand()),
+            LookFor(new byte[] {0xFE, 0xA}).Then(SetOpcode(Opcode.LdArgA, "ldarga")).Then(ParseUShortAsInt()),
+            LookFor(new byte[] {0x0F}).Then(SetOpcode(Opcode.LdArgA, "ldarga.s")).Then(ParseByteAsInt()),
             LookFor(0x20).Then(SetOpcode(Opcode.Ldc, "ldc.i4")).Then(ParseIntOperand()),
             LookFor(0x21).Then(SetOpcode(Opcode.Ldc, "ldc.i8")).Then(ParseLongOperand()),
             LookFor(0x22).Then(SetOpcode(Opcode.Ldc, "ldc.r4")).Then(ParseSingleOperand()),
@@ -140,8 +140,8 @@ namespace Tiny.Metadata.Layout
             LookFor(0x1D).Then(SetOpcode(Opcode.Ldc, "ldc.i4.7")).Then(SetOperand(7)),
             LookFor(0x1E).Then(SetOpcode(Opcode.Ldc, "ldc.i4.8")).Then(SetOperand(8)),
             LookFor(0x15).Then(SetOpcode(Opcode.Ldc, "ldc.i4.m1")).Then(SetOperand(-1)),
-            LookFor(0x1F).Then(SetOpcode(Opcode.Ldc, "ldc.i4.s")).Then(ParseSByteOperand()),
-            LookFor(new byte[] {0xFE,0x06}).Then(SetOpcode(Opcode.LdFtn,"ldftn")).Then(ParseByteOperand()),
+            LookFor(0x1F).Then(SetOpcode(Opcode.Ldc, "ldc.i4.s")).Then(ParseSByteAsInt()),
+            LookFor(new byte[] {0xFE,0x06}).Then(SetOpcode(Opcode.LdFtn,"ldftn")).Then(ParseByteAsInt()),
             LookFor(0x46).Then(SetOpcode(Opcode.LdInd, "ldind.i1")).Then(SetOperand(CLRType.I1)),
             LookFor(0x48).Then(SetOpcode(Opcode.LdInd, "ldind.i2")).Then(SetOperand(CLRType.I2)),
             LookFor(0x4A).Then(SetOpcode(Opcode.LdInd, "ldind.i4")).Then(SetOperand(CLRType.I4)),
@@ -153,7 +153,35 @@ namespace Tiny.Metadata.Layout
             LookFor(0x4C).Then(SetOpcode(Opcode.LdInd, "ldind.u8")).Then(SetOperand(CLRType.U8)),
             LookFor(0x4F).Then(SetOpcode(Opcode.LdInd, "ldind.r8")).Then(SetOperand(CLRType.R8)),
             LookFor(0x4D).Then(SetOpcode(Opcode.LdInd, "ldind.i")).Then(SetOperand(CLRType.NativeInteger)),
-            LookFor(0x50).Then(SetOpcode(Opcode.LdInd, "ldind.ref"))
+            LookFor(0x50).Then(SetOpcode(Opcode.LdInd, "ldind.ref")),
+            LookFor(new byte[] {0xFE, 0x0C}).Then(SetOpcode(Opcode.LdLoc,"ldloc")).Then(ParseUShortAsInt()),
+            LookFor(0x11).Then(SetOpcode(Opcode.LdLoc, "ldloc.s")).Then(ParseByteAsInt()),
+            LookFor(0x06).Then(SetOpcode(Opcode.LdLoc,"ldloc.0")).Then(SetOperand(0)),
+            LookFor(0x07).Then(SetOpcode(Opcode.LdLoc,"ldloc.1")).Then(SetOperand(1)),
+            LookFor(0x08).Then(SetOpcode(Opcode.LdLoc, "ldloc.2")).Then(SetOperand(2)),
+            LookFor(0x09).Then(SetOpcode(Opcode.LdLoc, "ldloc.3")).Then(SetOperand(3)),
+            LookFor(new byte[] {0xFE,0x0D}).Then(SetOpcode(Opcode.LdLocA,"ldloca")).Then(ParseUShortAsInt()),
+            LookFor(0x12).Then(SetOpcode(Opcode.LdLocA, "ldloca.s")).Then(ParseByteAsInt()),
+            LookFor(0x14).Then(SetOpcode(Opcode.LdNull,"ldnull")),
+            LookFor(0xDD).Then(SetOpcode(Opcode.Leave, "leave")).Then(ParseBranchTarget32()),
+            LookFor(0xDE).Then(SetOpcode(Opcode.Leave, "leave.s")).Then(ParseBranchTarget8()),
+            LookFor(new byte[] {0xFE,0x0F}).Then(SetOpcode(Opcode.LocAlloc, "localloc")),
+            LookFor(0x5A).Then(SetOpcode(Opcode.Mul,"mul")),
+            LookFor(0xD8).Then(SetOpcode(Opcode.MulOvf, "mul.ovf")),
+            LookFor(0xD9).Then(SetOpcode(Opcode.MulOvfUn, "mul.ovf.un")),
+            LookFor(0x65).Then(SetOpcode(Opcode.Neg,"neg")),
+            LookFor(0x00).Then(SetOpcode(Opcode.Nop,"nop")),
+            LookFor(0x66).Then(SetOpcode(Opcode.Not,"not")),
+            LookFor(0x60).Then(SetOpcode(Opcode.Or, "or")),
+            LookFor(0x26).Then(SetOpcode(Opcode.Pop, "pop")),
+            LookFor(0x5D).Then(SetOpcode(Opcode.Rem, "rem")),
+            LookFor(0x5E).Then(SetOpcode(Opcode.RemUn, "rem.un")),
+            LookFor(0x2A).Then(SetOpcode(Opcode.Ret, "ret")),
+            LookFor(0x62).Then(SetOpcode(Opcode.Shl, "shl")),
+            LookFor(0x63).Then(SetOpcode(Opcode.Shr, "shr")),
+            LookFor(0x64).Then(SetOpcode(Opcode.ShrUn, "shr.un")),
+            LookFor(new byte[] {0xFE,0x0B}).Then(SetOpcode(Opcode.StArg, "starg")).Then(ParseUShortAsInt()),
+            LookFor(0x10).Then(SetOpcode(Opcode.StArg, "starg.s").Then(ParseByteAsInt())
         );
 
         static IParser<byte, InstructionParseState, Instruction> Grammar(
@@ -222,17 +250,17 @@ namespace Tiny.Metadata.Layout
             throw new NotImplementedException();
         }
 
-        static IParser<byte, InstructionParseState, InstructionParseState> ParseByteOperand()
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseByteAsInt()
         {
             throw new NotImplementedException();
         }
 
-        static IParser<byte, InstructionParseState, InstructionParseState> ParseSByteOperand()
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseSByteAsInt()
         {
             throw new NotImplementedException();
         }
 
-        static IParser<byte, InstructionParseState, InstructionParseState> ParseUShortOperand()
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseUShortAsInt()
         {
             throw new NotImplementedException();
         }
