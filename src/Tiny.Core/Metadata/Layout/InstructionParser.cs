@@ -181,7 +181,7 @@ namespace Tiny.Metadata.Layout
             LookFor(0x63).Then(SetOpcode(Opcode.Shr, "shr")),
             LookFor(0x64).Then(SetOpcode(Opcode.ShrUn, "shr.un")),
             LookFor(new byte[] {0xFE,0x0B}).Then(SetOpcode(Opcode.StArg, "starg")).Then(ParseUShortAsInt()),
-            LookFor(0x10).Then(SetOpcode(Opcode.StArg, "starg.s").Then(ParseByteAsInt())
+            LookFor(0x10).Then(SetOpcode(Opcode.StArg, "starg.s")).Then(ParseByteAsInt())
         );
 
         static IParser<byte, InstructionParseState, Instruction> Grammar(
