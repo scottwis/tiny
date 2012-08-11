@@ -25,6 +25,7 @@
 
 #if WIN32
 using System;
+using JetBrains.Annotations;
 
 namespace Tiny.Interop.Win32
 {

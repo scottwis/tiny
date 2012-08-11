@@ -25,13 +25,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
 {
     public sealed class MethodReference : Method
     {
-        internal MethodReference(MethodDefOrRef methodDefOrRef)
+        internal MethodReference(IToken methodDefOrRef)
         {
             throw new NotImplementedException();
         }
@@ -105,6 +106,11 @@ namespace Tiny.Metadata
                 //TODO: Implement this
                 throw new NotImplementedException();
             }
+        }
+
+        internal void GetFullName(StringBuilder b)
+        {
+            throw new NotImplementedException();
         }
     }
 }

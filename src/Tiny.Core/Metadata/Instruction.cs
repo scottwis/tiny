@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 
 namespace Tiny.Metadata
@@ -141,14 +142,27 @@ namespace Tiny.Metadata
         //# the modified instruction (i.e. "no nullcheck tail callvirt Foo.Bar()").
         public override string ToString()
         {
-            var f = m_prettyPrint as Func<String>;
+            var f = m_prettyPrint as Action<StringBuilder>;
             if (f != null) {
-                var pretty = f();
+                var builder = new StringBuilder();
+                f(builder);
+                var pretty = builder.ToString();
                 #pragma warning disable 420
                 Interlocked.CompareExchange(ref m_prettyPrint, pretty, null);
                 #pragma warning restore 420
             }
             return m_prettyPrint.ToString();
+        }
+
+        internal void ToString(StringBuilder builder)
+        {
+            var f = m_prettyPrint as Action<StringBuilder>;
+            if (f != null) {
+                f(builder);
+            }
+            else {
+                builder.Append(m_prettyPrint);
+            }
         }
 
         //# If the instruction is a prefixed instruction, returns the instruction being modified. For example, given a

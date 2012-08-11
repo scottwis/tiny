@@ -146,6 +146,29 @@ namespace Tiny
         {
             return new SubList<T>(list.Wrapped, list.StartIndex, list.Count + increment.CheckGTE(0, "increment"));
         }
+
+        public static Action<T> Then<T>(this Action<T> first, Action<T> second)
+        {
+            if (first == null) {
+                return second;
+            }
+            if (second == null) {
+                return first;
+            }
+            return x => {
+                first(x);
+                second(x);
+            };
+        }
+
+        public static uint ReadLittleEndianUInt(this IReadOnlyList<byte> bytes)
+        {
+            return 
+                (uint) bytes[0] 
+                | ((uint) bytes[1] << 8) 
+                | ((uint) bytes[2] << 16) 
+                | ((uint) bytes[3] << 24);
+        }
     }
 }
 

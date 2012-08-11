@@ -134,7 +134,7 @@ namespace Tiny.Metadata
         StElem,
         StFld,
         StInd,
-        Stloc,
+        StLoc,
         StObj,
         StsFld,
         Sub,

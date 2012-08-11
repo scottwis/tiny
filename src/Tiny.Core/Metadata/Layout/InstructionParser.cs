@@ -26,6 +26,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Tiny.Parsing;
 
 namespace Tiny.Metadata.Layout
@@ -153,7 +154,7 @@ namespace Tiny.Metadata.Layout
             LookFor(0x4C).Then(SetOpcode(Opcode.LdInd, "ldind.u8")).Then(SetOperand(CLRType.U8)),
             LookFor(0x4F).Then(SetOpcode(Opcode.LdInd, "ldind.r8")).Then(SetOperand(CLRType.R8)),
             LookFor(0x4D).Then(SetOpcode(Opcode.LdInd, "ldind.i")).Then(SetOperand(CLRType.NativeInteger)),
-            LookFor(0x50).Then(SetOpcode(Opcode.LdInd, "ldind.ref")),
+            LookFor(0x50).Then(SetOpcode(Opcode.LdInd, "ldind.ref")).Then(SetOperand(CLRType.Object)),
             LookFor(new byte[] {0xFE, 0x0C}).Then(SetOpcode(Opcode.LdLoc,"ldloc")).Then(ParseUShortAsInt()),
             LookFor(0x11).Then(SetOpcode(Opcode.LdLoc, "ldloc.s")).Then(ParseByteAsInt()),
             LookFor(0x06).Then(SetOpcode(Opcode.LdLoc,"ldloc.0")).Then(SetOperand(0)),
@@ -181,68 +182,234 @@ namespace Tiny.Metadata.Layout
             LookFor(0x63).Then(SetOpcode(Opcode.Shr, "shr")),
             LookFor(0x64).Then(SetOpcode(Opcode.ShrUn, "shr.un")),
             LookFor(new byte[] {0xFE,0x0B}).Then(SetOpcode(Opcode.StArg, "starg")).Then(ParseUShortAsInt()),
-            LookFor(0x10).Then(SetOpcode(Opcode.StArg, "starg.s")).Then(ParseByteAsInt())
+            LookFor(0x10).Then(SetOpcode(Opcode.StArg, "starg.s")).Then(ParseByteAsInt()),
+            LookFor(0x52).Then(SetOpcode(Opcode.StInd, "stind.i1")).Then(SetOperand(CLRType.I1)),
+            LookFor(0x53).Then(SetOpcode(Opcode.StInd, "stind.i2")).Then(SetOperand(CLRType.I2)),
+            LookFor(0x54).Then(SetOpcode(Opcode.StInd, "stind.i4")).Then(SetOperand(CLRType.I4)),
+            LookFor(0x55).Then(SetOpcode(Opcode.StInd, "stind.i8")).Then(SetOperand(CLRType.I8)),
+            LookFor(0x56).Then(SetOpcode(Opcode.StInd, "stind.r4")).Then(SetOperand(CLRType.R4)),
+            LookFor(0x57).Then(SetOpcode(Opcode.StInd, "stind.r8")).Then(SetOperand(CLRType.R8)),
+            LookFor(0xDF).Then(SetOpcode(Opcode.StInd, "stind.i")).Then(SetOperand(CLRType.NativeInteger)),
+            LookFor(0x51).Then(SetOpcode(Opcode.StInd, "stind.ref")).Then(SetOperand(CLRType.Object)),
+            LookFor(new byte[] {0xFE, 0x0E}).Then(SetOpcode(Opcode.StInd, "stloc")).Then(ParseUShortAsInt()),
+            LookFor(0x13).Then(SetOpcode(Opcode.StLoc, "stloc.c")).Then(ParseByteAsInt()),
+            LookFor(0x0A).Then(SetOpcode(Opcode.StLoc, "stloc.0")).Then(SetOperand(0)),
+            LookFor(0x0B).Then(SetOpcode(Opcode.StLoc, "stloc.1")).Then(SetOperand(1)),
+            LookFor(0x0C).Then(SetOpcode(Opcode.StLoc, "stloc.2")).Then(SetOperand(2)),
+            LookFor(0x0D).Then(SetOpcode(Opcode.StLoc, "stloc.3")).Then(SetOperand(3)),
+            LookFor(0x59).Then(SetOpcode(Opcode.Sub, "sub")),
+            LookFor(0xDA).Then(SetOpcode(Opcode.Sub, "sub.ovf")),
+            LookFor(0xDB).Then(SetOpcode(Opcode.Sub, "sub.ovf.un")),
+            LookFor(0x45).Then(SetOpcode(Opcode.Switch, "switch")).Then(ParseSwitchTable()),
+            LookFor(0x61).Then(SetOpcode(Opcode.Xor, "xor")),
+            LookFor(0x8C).Then(SetOpcode(Opcode.Box, "box")).Then(ParseType()),
+            LookFor(0x6F).Then(SetOpcode(Opcode.CallVirt, "callvirt")).Then(ParseMethod()),
+            LookFor(0x74).Then(SetOpcode(Opcode.CastClass, "castclass")).Then(ParseType()),
+            LookFor(0x70).Then(SetOpcode(Opcode.CpObj, "cpbj")).Then(ParseType()),
+            LookFor(new byte[] {0xFE, 0x15}).Then(SetOpcode(Opcode.InitObj, "initobj")).Then(ParseType()),
+            LookFor(0xA3).Then(SetOpcode(Opcode.LdElem, "ldelem")).Then(ParseType()),
+            LookFor(0x90).Then(SetOpcode(Opcode.LdElem, "ldelem.i1")).Then(SetOperand(CLRType.I1)),
+            LookFor(0x92).Then(SetOpcode(Opcode.LdElem, "ldelem.i2")).Then(SetOperand(CLRType.I2)),
+            LookFor(0x94).Then(SetOpcode(Opcode.LdElem, "ldelem.i4")).Then(SetOperand(CLRType.I4)),
+            LookFor(0x96).Then(SetOpcode(Opcode.LdElem, "ldelem.i8")).Then(SetOperand(CLRType.I8)),
+            LookFor(0x91).Then(SetOpcode(Opcode.LdElem, "ldelem.u1")).Then(SetOperand(CLRType.U1)),
+            LookFor(0x93).Then(SetOpcode(Opcode.LdElem, "ldelem.u2")).Then(SetOperand(CLRType.U2)),
+            LookFor(0x95).Then(SetOpcode(Opcode.LdElem, "ldelem.u4")).Then(SetOperand(CLRType.U4)),
+            LookFor(0x98).Then(SetOpcode(Opcode.LdElem, "ldelem.r4")).Then(SetOperand(CLRType.R4)),
+            LookFor(0x99).Then(SetOpcode(Opcode.LdElem, "ldelem.r8")).Then(SetOperand(CLRType.R8)),
+            LookFor(0x97).Then(SetOpcode(Opcode.LdElem, "ldelem.i")).Then(SetOperand(CLRType.NativeInteger)),
+            LookFor(0x9A).Then(SetOpcode(Opcode.LdElem, "ldelem.ref")).Then(SetOperand(CLRType.Object)),
+            LookFor(0x8F).Then(SetOpcode(Opcode.LdElemA, "ldelema")).Then(ParseType()),
+            LookFor(0x7B).Then(SetOpcode(Opcode.LdFld, "ldfld")).Then(ParseField()),
+            LookFor(0x7C).Then(SetOpcode(Opcode.LdFldA, "ldflda")).Then(ParseField()),
+            LookFor(0x8E).Then(SetOpcode(Opcode.LdLen, "ldlen")),
+            LookFor(0x71).Then(SetOpcode(Opcode.LdObj, "ldobj")).Then(ParseType()),
+            LookFor(0x7E).Then(SetOpcode(Opcode.LdSFld, "ldsfld")).Then(ParseField()),
+            LookFor(0x7F).Then(SetOpcode(Opcode.LdSFldA, "ldsflda")).Then(ParseField()),
+            LookFor(0x72).Then(SetOpcode(Opcode.LdStr, "ldstr")).Then(ParseStringLiteral()),
+            LookFor(0xD0).Then(SetOpcode(Opcode.LdToken, "ldtoken")).Then(ParseToken()),
+            LookFor(new byte[] {0xFE, 0x07}).Then(SetOpcode(Opcode.LdVirtFtn, "ldvirtftn")).Then(ParseMethod()),
+            LookFor(0xC6).Then(SetOpcode(Opcode.MkRefAny, "mkrefany")).Then(ParseType()),
+            LookFor(0x8D).Then(SetOpcode(Opcode.NewArr, "mkrefany")).Then(ParseType()),
+            LookFor(0x73).Then(SetOpcode(Opcode.NewObj, "newobj")).Then(ParseMethod()),
+            LookFor(new byte[] {0xFE, 0x1D}).Then(SetOpcode(Opcode.RefAnyType, "refanytype")),
+            LookFor(0xC2).Then(SetOpcode(Opcode.RefAnyVal, "refanyval")).Then(ParseType()),
+            LookFor(new byte[] {0xFe, 0x1A}).Then(SetOpcode(Opcode.Rethrow, "rethrow")),
+            LookFor(new byte[] {0xFe, 0x1C}).Then(SetOpcode(Opcode.SizeOf, "sizeof")).Then(ParseType()),
+            LookFor(0xA4).Then(SetOpcode(Opcode.StElem, "stelem")).Then(ParseType()),
+            LookFor(0x9C).Then(SetOpcode(Opcode.StElem, "stelem.i1")).Then(SetOperand(CLRType.I1)),
+            LookFor(0x9D).Then(SetOpcode(Opcode.StElem, "stelem.i2")).Then(SetOperand(CLRType.I2)),
+            LookFor(0x9E).Then(SetOpcode(Opcode.StElem, "stelem.i1")).Then(SetOperand(CLRType.I4)),
+            LookFor(0x9F).Then(SetOpcode(Opcode.StElem, "stelem.i1")).Then(SetOperand(CLRType.I8)),
+            LookFor(0xA0).Then(SetOpcode(Opcode.StElem, "stelem.i1")).Then(SetOperand(CLRType.R4)),
+            LookFor(0xA1).Then(SetOpcode(Opcode.StElem, "stelem.i1")).Then(SetOperand(CLRType.R8)),
+            LookFor(0x9B).Then(SetOpcode(Opcode.StElem, "stelem.i1")).Then(SetOperand(CLRType.NativeInteger)),
+            LookFor(0xA2).Then(SetOpcode(Opcode.StElem, "stelem.i1")).Then(SetOperand(CLRType.Object)),
+            LookFor(0x7D).Then(SetOpcode(Opcode.StFld, "stfld")).Then(ParseField()),
+            LookFor(0x81).Then(SetOpcode(Opcode.StObj, "stobj")).Then(ParseType()),
+            LookFor(0x80).Then(SetOpcode(Opcode.StsFld, "stsfld")).Then(ParseField()),
+            LookFor(0x7A).Then(SetOpcode(Opcode.Throw, "throw")),
+            LookFor(0x79).Then(SetOpcode(Opcode.Unbox, "unbox")).Then(ParseType()),
+            LookFor(0xA5).Then(SetOpcode(Opcode.UnboxAny, "unbox.any")).Then(ParseType())
         );
 
         static IParser<byte, InstructionParseState, Instruction> Grammar(
             params IParser<byte, InstructionParseState, InstructionParseState>[] parsers
         )
         {
-            throw new NotImplementedException();
+            var tableParser = CreateTableParser(parsers);
+            return new FunctionalParser<byte, InstructionParseState, Instruction>(
+                startState=> {
+                    var endState = tableParser.Parse(startState);
+                    if (endState == null) {
+                        return null;
+                    }
+                    return ParseState.Create(
+                        endState.ConsumedInput,
+                        endState.RemainingInput,
+                        CreateInstruction(endState.Result)
+                    );
+                },
+                tableParser.LookAhead
+            );
         }
 
         static IParser<byte,InstructionParseState, InstructionParseState> LookFor(byte b)
         {
-            return LookFor(new[] {b});
+            return Consume(b);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> LookFor(byte[] bytes)
         {
-            return new LookAheadWrapper<byte, InstructionParseState, InstructionParseState>(
-                Consume(bytes),
-                bytes
-            );
+            return new LookAheadWrapper<byte, InstructionParseState, InstructionParseState>(bytes);
         }
 
-        static IParser<byte, InstructionParseState, InstructionParseState> Consume(IEnumerable<byte> bytes)
+        static IParser<byte, InstructionParseState, InstructionParseState> CreateTableParser(
+            IEnumerable<IParser<byte, InstructionParseState, InstructionParseState>> parsers
+        )
         {
-            return bytes.Aggregate(ID(), (l, r) => l.Then(Consume(r)));
+            var q = (from p in parsers group p by p.LookAhead).Select(x => {
+                if (x.Count() > 1) {
+                    return Consume(x.Key).Then(CreateTableParser(x.Select(y =>
+                    {
+                        var w = x.AssumeIs<LookAheadWrapper<byte, InstructionParseState, InstructionParseState>>();
+                        return w.SubList(1);
+                    })));
+                }
+                else {
+                    return x.First();
+                }
+            });
+
+            return TableParser.Create((byte) 0, q);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> Consume(byte b)
         {
-            throw new NotImplementedException();
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input)=> {
+                    if (input == null || input.RemainingInput.Count == 0 || input.RemainingInput[0] != b) {
+                        return null;
+                    }
+                    return ParseState.Create(input.ConsumedInput.Expand(1), input.RemainingInput.SubList(1), input.Result);
+                },
+                b
+            );
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ID()
         {
-            throw new NotImplementedException();
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input) => input,
+                (byte)0
+            );
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> SetOpcode(Opcode opcode, String pretty)
         {
-            throw new NotImplementedException();
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input) => {
+                    if (input == null) {
+                        return null;
+                    }
+                    var result = input.Result;
+                    result.Opcode = opcode;
+                    result.PrettyPrint = builder => builder.Append(pretty);
+                    return ParseState.Create(input.ConsumedInput, input.RemainingInput, result);
+                },
+                (byte)0
+            );
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> SetOperand(Object operand)
         {
-            //Should set the operand to the given constant value, but should not modify the instruction encoding.
-            throw new NotImplementedException();
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input) => {
+                    if (input == null) {
+                        return null;
+                    }
+                    var result = input.Result;
+                    result.Operand = operand;
+                    return ParseState.Create(input.ConsumedInput, input.RemainingInput, result);
+                },
+                (byte)0
+            );
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseToken<TOperand>(
+            Func<MetadataToken, InstructionParseState, TOperand> factory, 
+            Action<TOperand, StringBuilder> prettyPrinter
+        )
+        {
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input) =>{
+                    if (input == null || input.RemainingInput.Count < 4) {
+                        return null;
+                    }
+                    var result = input.Result;
+                    var operand = factory(
+                        new MetadataToken(new OneBasedIndex(
+                            input.RemainingInput.ReadLittleEndianUInt()
+                        )),
+                        input.Result
+                    );
+                    result.Operand = factory;
+                    result.PrettyPrint = result.PrettyPrint.Then(builder =>builder.Append(" ")).Then(builder=>prettyPrinter(operand, builder));
+                    return ParseState.Create(input.ConsumedInput.Expand(4), input.RemainingInput.SubList(4), result);
+                },
+                (byte)0
+            );
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseField()
+        {
+            return ParseToken((t, i) => new FieldReference(t), (f, b) => f.GetFullName(b));
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseType()
         {
-            throw new NotImplementedException();
+            return ParseToken((t, i) => new TypeReference(t, i.Module), (t, b) => t.GetFullName(b));
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseMethod()
         {
-            throw new NotImplementedException();
+            return ParseToken((t, i) => new MethodReference(t), (m, b) => m.GetFullName(b));
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseNestedInstruction()
         {
-            throw new NotImplementedException();
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input)=> {
+                    var output = s_parser.Parse(input);
+                    var result = input.Result;
+                    result.NestedInstruction = output.Result;
+                    result.PrettyPrint = result.PrettyPrint.Then(b => b.Append(" ")).Then(
+                        b => output.Result.ToString(b)
+                    );
+                    return ParseState.Create(output.ConsumedInput, output.RemainingInput, result);
+                },
+                (byte)0
+            );
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseSkipFlags()
@@ -291,6 +458,29 @@ namespace Tiny.Metadata.Layout
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseBranchTarget8()
+        {
+            throw new NotImplementedException();
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseSwitchTable()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseStringLiteral()
+        {
+            //TODO: Parse an offset into the string heap, and read the data into a string.
+            throw new NotImplementedException();
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseToken()
+        {
+            //TODO: Parse an offset into the string heap, and read the data into a string.
+            throw new NotImplementedException();
+        }
+
+        static Instruction CreateInstruction(InstructionParseState state)
         {
             throw new NotImplementedException();
         }

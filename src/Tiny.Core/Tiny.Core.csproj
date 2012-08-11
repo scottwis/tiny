@@ -167,8 +167,10 @@
     <Compile Include="FluentAsserts.cs" />
     <Compile Include="InternalErrorException.cs" />
     <Compile Include="Interop\IUnsafeMemoryMap.cs" />
+    <Compile Include="Metadata\FieldReference.cs" />
     <Compile Include="Metadata\Layout\InstructionParser.cs" />
     <Compile Include="Metadata\Layout\InstructionParseState.cs" />
+    <Compile Include="Parsing\ParseState.cs" />
     <Compile Include="Metadata\Opcode.cs" />
     <Compile Include="Interop\NativePlatform.cs" />
     <Compile Include="Interop\Posix\ErrnoExtensions.cs" />
@@ -294,10 +296,12 @@
     <Compile Include="Metadata\TypeKind.cs" />
     <Compile Include="Metadata\TypeReference.cs" />
     <Compile Include="Metadata\WellKnownTypeID.cs" />
+    <Compile Include="Parsing\FunctionalParser.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Parsing\IParseState.cs" />
     <Compile Include="Parsing\LookAheadWrapper.cs" />
     <Compile Include="Parsing\Parsers.cs" />
+    <Compile Include="Parsing\TableParser.cs" />
     <Compile Include="ResharperAnnotations.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>

@@ -26,12 +26,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Tiny.Collections
 {
     class SubList<T> : ISubList<T>, IList<T>
     {
-        readonly IReadOnlyList<T> m_wrapped;
+        [NotNull] readonly IReadOnlyList<T> m_wrapped;
         readonly int m_startIndex;
         readonly int m_count;
 
