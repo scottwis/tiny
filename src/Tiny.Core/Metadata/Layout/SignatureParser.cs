@@ -39,6 +39,7 @@ namespace Tiny.Metadata.Layout
         readonly IEnumerator<byte> m_enumerator;
         readonly Module m_module;
         readonly IGenericParameterScope m_genericParameterScope;
+        int m_readCount;
 
         SignatureParser(IReadOnlyList<byte> signature, IGenericParameterScope scope)
         {
@@ -75,6 +76,15 @@ namespace Tiny.Metadata.Layout
             }
         }
 
+        public static uint ParseLength(IReadOnlyList<byte> blob, out int bytesRead)
+        {
+            using (var parser = new SignatureParser(blob)) {
+                var ret = parser.ReadUInt();
+                bytesRead = parser.m_readCount;
+                return ret;
+            }
+        }
+
         Type ParseFieldSignature()
         {
             ReadByte(FIELD);
@@ -84,6 +94,9 @@ namespace Tiny.Metadata.Layout
         byte ReadByte()
         {
             m_enumerator.MoveNext().Assume("Unexpected end of signature.");
+            checked {
+                ++m_readCount;
+            }
             return m_enumerator.Current;
         }
 
@@ -111,6 +124,9 @@ namespace Tiny.Metadata.Layout
         uint? TryReadUInt()
         {
             if (m_enumerator.MoveNext()) {
+                checked {
+                    ++m_readCount;
+                }
                 var b0 = m_enumerator.Current;
                 if ((b0 & 0x80) == 0x00) {
                     return b0;
@@ -129,7 +145,41 @@ namespace Tiny.Metadata.Layout
 
         int ReadInt()
         {
-            //TODO: Implement this
+            /*var b0 = ReadByte();
+            if ((b0 & 0x80) == 0x00) {
+                //Treating b0 as a 7 bit integer, rotate it to the right by 1 position.
+                //C# doesn't have a rotate operator, so we simulate it using a right shift and an or.
+                var tmp = (b0 >> 1) | (b0 & 1) << 6;
+                //Then coy bit 6 into bit 7 (sign extend 7 bits to 8 bits), and then finally sign extend 1 byte to 4 bytes.
+                return (sbyte) (tmp | ((b0 & 1) << 7));
+            }
+            if ((b0 & 0xC0) == 0x80) {
+                var b1 = ReadByte();
+                //Reconstruct the 14 bit value stored in b0 and b1 by combining them into 2 bytes and rotating
+                //right by 1 bit.
+                var combinedResults = (((b0 & ~0x80) << 8 | b1) >> 1) & ((b1 & 1) << 13);
+                //Sign extend the result to 32 bits, first by sign extending the 14 bit result to a 16 bit result
+                //(by copying bit 13 to bits 14 and 15), and then sign extend the 16 bit result to a 32 bit result
+                //(by doing a cast). 
+                return (short) (ushort) (combinedResults | ((b1 & 1) << 14) | ((b1 & 1) << 15));
+            }
+            else {
+                var b1 = ReadByte();
+                var b2 = ReadByte();
+                var b3 = ReadByte();
+
+                //Reconstruct the 29 bit value stored in b0, b1, b2, and b3, by combining them into 4 bytes
+                //and rotating right by 1 bit.
+                var combinedResults = ((
+                    ((b0 & ~0xC0U) << 24)
+                    | (b1 << 16)
+                    | (b2 << 8)
+                    | b3
+                ) >> 1) | ((b3 & 1) << 28);
+
+                //Sign extend the result from 29 bits to 32 bits by copying bit 28 to bits 29, 30, and 31.
+                return (int)(uint)(combinedResults | ((b3 & 1) << 29) | ((b3 & 1) << 30) | ((b3 & 1) << 31));
+            }*/
             throw new NotImplementedException();
         }
 

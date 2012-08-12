@@ -481,6 +481,25 @@ namespace Tiny.Metadata.Layout
             return new string((sbyte*) pString, 0, length);
         }
 
+        public String ReadUserString(uint offset)
+        {
+            if (UserStringsStream == null || offset > UserStringsStream->Size) {
+                throw new ArgumentOutOfRangeException("offset", "Invalid blog offset.");
+            }
+            var pBlob = ((byte*)m_metadataRoot + UserStringsStream->Offset) + offset;
+            var bufferWrapper = new BufferWrapper(pBlob, (int)(BlobStream->Size - offset));
+            int bytesRead;
+            var length = SignatureParser.ParseLength(bufferWrapper, out bytesRead);
+            if (length > checked(UserStringsStream->Size - offset - bytesRead.AssumeGTE(0))) {
+                throw new InvalidOperationException("String has invalid size");
+            }
+            if (length == 0) {
+                return "";
+            }
+            var pStr = (char*) (pBlob + bytesRead);
+            return new string(pStr, 0, NativePlatform.Default.WcsLen(pStr, (int)length / 2));
+        }
+
         StreamHeader * StringStream
         {
             get
@@ -498,13 +517,25 @@ namespace Tiny.Metadata.Layout
         {
             get
             {
-                //If there is no #String stream, then we should not try to read from it.
-                if (m_streams == null || m_streams.Length <= (int)StreamID.Blob)
-                {
+                //If there is no #Blob stream, then we should not try to read from it.
+                if (m_streams == null || m_streams.Length <= (int)StreamID.Blob) {
                     return null;
                 }
 
                 return m_streams[(int)StreamID.Blob];
+            }
+        }
+
+        StreamHeader* UserStringsStream
+        {
+            get
+            {
+                //If there is no #US stream, then we should not try to read from it.
+                if (m_streams == null || m_streams.Length <= (int)StreamID.UserStrings) {
+                    return null;
+                }
+
+                return m_streams[(int)StreamID.UserStrings];
             }
         }
 
@@ -708,31 +739,17 @@ namespace Tiny.Metadata.Layout
         public IReadOnlyList<byte> ReadBlob(uint offset)
         {
             CheckDisposed();
-            CheckDisposed();
-            if (StringStream == null || offset > BlobStream->Size) {
+            if (BlobStream == null || offset > BlobStream->Size) {
                 throw new ArgumentOutOfRangeException("offset", "Invalid blog offset.");
             }
             var pBlob = ((byte*)m_metadataRoot + BlobStream->Offset) + offset;
-            var b0 = *pBlob;
-            uint length;
-            
-            if ((b0 & 0x80) == 0x00) {
-                length = b0;
-                ++pBlob;
+            var bufferWrapper = new BufferWrapper(pBlob, (int)(BlobStream->Size - offset));
+            int bytesRead;
+            var length = SignatureParser.ParseLength(bufferWrapper, out bytesRead);
+            if (length > checked(BlobStream->Size - offset - bytesRead.AssumeGTE(0))) {
+                throw new InvalidOperationException("Blob has invalid size");
             }
-            else if ((b0 & 0xC0) == 0x80) {
-                length = ((b0 & ~0x80U) << 8) | *(pBlob + 1);
-                pBlob += 2;
-            }
-            else {
-                length = 
-                    ((b0 & ~0xC0U) << 24)
-                    | (((uint)*(pBlob + 1)) << 16)
-                    | (((uint)*(pBlob + 2)) << 8)
-                    | ((uint)*(pBlob + 3));
-                pBlob += 4;
-            }
-            return new BufferWrapper(pBlob, checked((int)length));
+            return new BufferWrapper(pBlob + bytesRead, (int)length);
         }
 
         public Guid ReadGuid(uint offset)

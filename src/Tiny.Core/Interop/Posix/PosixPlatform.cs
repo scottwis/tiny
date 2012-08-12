@@ -37,7 +37,7 @@ namespace Tiny.Interop.Posix
         [DllImport("libc", EntryPoint="strnlen", CallingConvention=CallingConvention.Cdecl)]
         [return:MarshalAs(UnmanagedType.SysUInt)]
         public static extern UIntPtr StrNLen(byte * pData, UIntPtr maxCount);
-        
+
         public override IUnsafeMemoryMap MemoryMapFile(string fileName)
         {
             int file = Syscall.open(fileName, OpenFlags.O_RDONLY);
@@ -85,10 +85,20 @@ namespace Tiny.Interop.Posix
             }
         }
 
-        public override int StrLen(byte* pName, int maxLength)
+        public override int StrLen( * pStr, int maxLength)
         {
             maxLength.CheckGTE(0, "maxLength");
-            return checked((int)StrNLen(pName, (UIntPtr)maxLength));
+            return checked((int)StrNLen(pStr, (UIntPtr)maxLength));
+        }
+
+        public override int WcsLen(char * pStr, int maxLength)
+        {
+            int ret = 0;
+            if (pStr && maxLength >= 0) {
+                for  (; maxLength && *pStr; ++pStr, --maxLength, ++ret) {
+                }
+            }
+            return ret;
         }
     }
 }

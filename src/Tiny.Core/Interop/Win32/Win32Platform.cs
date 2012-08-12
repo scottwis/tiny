@@ -86,6 +86,13 @@ namespace Tiny.Interop.Win32
             UIntPtr maxCount
         );
 
+        [DllImport("msvcr110.dll", EntryPoint = "wcsnlen", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.SysUInt)]
+        public static extern UIntPtr WcsNLen(
+            char* pData,
+            UIntPtr maxCount
+        );
+
         public override IUnsafeMemoryMap MemoryMapFile(string fileName)
         {
             fileName.AssumeNotNull();
@@ -155,6 +162,12 @@ namespace Tiny.Interop.Win32
         {
             maxLength.CheckGTE(0, "maxLength");
             return checked((int)StrNLen(pData, (UIntPtr) maxLength));
+        }
+
+        public override int WcsLen(char * pData, int maxLength)
+        {
+            maxLength.CheckGTE(0, "maxLength");
+            return checked((int)WcsNLen(pData, (UIntPtr)maxLength));
         }
     }
 }

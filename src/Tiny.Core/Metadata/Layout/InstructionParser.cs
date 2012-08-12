@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Tiny.Collections;
 using Tiny.Parsing;
 
 namespace Tiny.Metadata.Layout
@@ -267,7 +268,7 @@ namespace Tiny.Metadata.Layout
                     return ParseState.Create(
                         endState.ConsumedInput,
                         endState.RemainingInput,
-                        CreateInstruction(endState.Result)
+                        CreateInstruction(endState)
                     );
                 },
                 tableParser.LookAhead
@@ -361,23 +362,14 @@ namespace Tiny.Metadata.Layout
             Action<TOperand, StringBuilder> prettyPrinter
         )
         {
-            return FunctionalParser.Create(
-                (IParseState<byte, InstructionParseState> input) =>{
-                    if (input == null || input.RemainingInput.Count < 4) {
-                        return null;
-                    }
-                    var result = input.Result;
-                    var operand = factory(
-                        new MetadataToken(new OneBasedIndex(
-                            input.RemainingInput.ReadLittleEndianUInt()
-                        )),
-                        input.Result
-                    );
-                    result.Operand = factory;
-                    result.PrettyPrint = result.PrettyPrint.Then(builder =>builder.Append(" ")).Then(builder=>prettyPrinter(operand, builder));
-                    return ParseState.Create(input.ConsumedInput.Expand(4), input.RemainingInput.SubList(4), result);
-                },
-                (byte)0
+            return ParseFixedSizeOperand(
+                input=>factory(
+                    new MetadataToken(new OneBasedIndex(input.RemainingInput.ReadLittleEndianUInt())),
+                    input.Result
+                ),
+                4,
+                prettyPrinter.After((v,b)=>b.Append(" ")),
+                v=>true
             );
         }
 
@@ -388,7 +380,7 @@ namespace Tiny.Metadata.Layout
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseType()
         {
-            return ParseToken((t, i) => new TypeReference(t, i.Module), (t, b) => t.GetFullName(b));
+            return ParseToken((t, i) => new TypeReference(t, i.MethodDefinition.Module), (t, b) => t.GetFullName(b));
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseMethod()
@@ -401,7 +393,10 @@ namespace Tiny.Metadata.Layout
             return FunctionalParser.Create(
                 (IParseState<byte, InstructionParseState> input)=> {
                     var output = s_parser.Parse(input);
-                    var result = input.Result;
+                    if (output == null) {
+                        return null;
+                    }
+                    var result = input.AssumeNotNull().Result;
                     result.NestedInstruction = output.Result;
                     result.PrettyPrint = result.PrettyPrint.Then(b => b.Append(" ")).Then(
                         b => output.Result.ToString(b)
@@ -414,75 +409,239 @@ namespace Tiny.Metadata.Layout
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseSkipFlags()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(
+                l => (SkipFlags)l[0],
+                1,
+                (flags, builder) => flags.ToSequence().Print(builder, " | ", ".{", "}", (s, b) => b.Append(s))
+            );
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseFixedSizeOperand<T>(
+            Func<IReadOnlyList<byte>, T> f,
+            int bytesNeeded
+        )
+        {
+            return ParseFixedSizeOperand(f, bytesNeeded, (v, b) => b.AppendFormat(" {0}", v));
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseFixedSizeOperand<T>(
+            Func<IReadOnlyList<byte>, T> f,
+            int bytesNeeded,
+            Action<T, StringBuilder> prettyPrint
+        )
+        {
+            return ParseFixedSizeOperand(f, bytesNeeded, prettyPrint, v => true);
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseFixedSizeOperand<T>(
+            Func<IReadOnlyList<byte>, T> f,
+            int bytesNeeded, 
+            Action<T, StringBuilder> prettyPrint,
+            Func<T, bool> predicate
+        )
+        {
+            return ParseFixedSizeOperand(input => f(input.RemainingInput), bytesNeeded, prettyPrint, predicate);
+        }
+
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseFixedSizeOperand<T>(
+            Func<IParseState<byte, InstructionParseState>, T> f,
+            int bytesNeeded, 
+            Action<T, StringBuilder> prettyPrint,
+            Func<T, bool> predicate
+        )
+        {
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input) => {
+                    if (input == null || input.RemainingInput.Count < bytesNeeded) {
+                        return null;
+                    }
+                    var result = input.Result;
+                    var operand = f(input);
+                    if (!predicate(operand)) {
+                        return null;
+                    }
+                    result.Operand = operand;
+                    result.PrettyPrint = result.PrettyPrint.Then(b=>prettyPrint(operand,b));
+                    return ParseState.Create(input.ConsumedInput.Expand(bytesNeeded), input.RemainingInput.SubList(bytesNeeded), result);
+                },
+                (byte)0
+            );
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseByteAsInt()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(l => (int)l[0], 1);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseSByteAsInt()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(l => (int)(sbyte)l[0], 1);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseUShortAsInt()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(l=>(int)l.ReadLittleEndianUShort(),2);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseIntOperand()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(l=>l.ReadLittleEndianInt(), 4);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseLongOperand()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(l => l.ReadLittleEndianLong(), 8);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseSingleOperand()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(l => l.ReadLittleEndianSingle(), 4);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseDoubleOperand()
         {
-            throw new NotImplementedException();
+            return ParseFixedSizeOperand(l => l.ReadLittleEndianDouble(), 4);
+        }
+
+        
+        static IParser<byte, InstructionParseState, InstructionParseState> ParseBranchTarget(
+            Func<IReadOnlyList<byte>, int> offsetParser,
+            int bytesNeeded
+        )
+        {
+            int offset = 0;
+            return ParseFixedSizeOperand(
+                input => {
+                    offset = offsetParser(input.RemainingInput);
+                    var context = input.Result.InstructionContext;
+                    //We return a lazy value for the operand (a lamba that computes the operand when evaluated).
+                    //This is because we need to have finished parsing all instructions before we can represent the
+                    //target of a branch as an instruction, particularly for forward branches.
+                    return (Func<object>)(() => input.Result.MethodDefinition.FindInstruction(
+                        context.Offset + context.Size + offset
+                    ));
+                },
+                bytesNeeded,
+                // ReSharper disable ImplicitlyCapturedClosure
+                (v, b) => b.AppendFormat(" {0}", offset),
+                // ReSharper restore ImplicitlyCapturedClosure
+                v => true
+            );
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseBranchTarget32()
         {
-            throw new NotImplementedException();
+            return ParseBranchTarget(l => l.ReadLittleEndianInt(), 4);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseBranchTarget8()
         {
-            throw new NotImplementedException();
+            return ParseBranchTarget(l => (sbyte)l[0], 1);
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseSwitchTable()
         {
-            throw new NotImplementedException();
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input) => {
+                    if (input == null || input.RemainingInput.Count < 4) {
+                        return null;
+                    }
+                    var n = checked((int)input.RemainingInput.ReadLittleEndianUInt());
+                    if (input.RemainingInput.Count < checked((n + 1)*4)) {
+                        return null;
+                    }
+                    var results = input.Result;
+                    var operand = GetSwitchTargets(input, n);
+                    results.Operand = operand;
+
+                    var targets = Enumerable.Range(1, n).Select(x => input.RemainingInput.SubList(x*4).ReadLittleEndianInt());
+                    results.PrettyPrint.Then(b => targets.Print(b, ",", " ", ""));
+                    return ParseState.Create(
+                        input.ConsumedInput.Expand((n + 1) * 4),
+                        input.RemainingInput.SubList((n + 1) * 4),
+                        results
+                    );
+                },
+                (byte)0
+            );
         }
 
+        static LiftedList<Instruction> GetSwitchTargets(IParseState<byte, InstructionParseState> input, int n)
+        {
+            var remainingInput = input.RemainingInput;
+            var methodDefinition = input.Result.MethodDefinition;
+            var context = input.Result.InstructionContext;
+            var operand = new LiftedList<Instruction>(
+                n,
+                index => {
+                    var target = remainingInput.SubList(checked((index + 1)*4)).ReadLittleEndianInt();
+                    return methodDefinition.FindInstruction(context.Offset + context.Size + target);
+                }
+            );
+            return operand;
+        }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseStringLiteral()
         {
-            //TODO: Parse an offset into the string heap, and read the data into a string.
-            throw new NotImplementedException();
+            return FunctionalParser.Create(
+                (IParseState<byte, InstructionParseState> input) => {
+                    if (input == null) {
+                        return null;
+                    }
+                    var results = input.Result;
+                    var peFile = results.MethodDefinition.Module.PEFile;
+                    var size = (int)StreamID.UserStrings.IndexSize(peFile);
+                    if (input.RemainingInput.Count < size) {
+                        return null;
+                    }
+                    uint index;
+                    if (size == 2) {
+                        index = input.RemainingInput.ReadLittleEndianUShort();
+                    }
+                    else {
+                        index = input.RemainingInput.ReadLittleEndianUInt();
+                    }
+                    var operand = peFile.ReadUserString(index);
+                    results.Operand = operand;
+                    results.PrettyPrint = results.PrettyPrint.Then(b => b.AppendFormat(" {0}", operand.Escape()));
+                    return ParseState.Create(input.ConsumedInput.Expand(size), input.RemainingInput.SubList(size), results);
+                },
+                (byte)0
+            );
         }
 
         static IParser<byte, InstructionParseState, InstructionParseState> ParseToken()
         {
-            //TODO: Parse an offset into the string heap, and read the data into a string.
-            throw new NotImplementedException();
+            return ParseToken(
+                (t, input) => t,
+                (t, b) => b.Append(t)
+            );
         }
 
-        static Instruction CreateInstruction(InstructionParseState state)
+        static Instruction CreateInstruction(IParseState<Byte,InstructionParseState> state)
+        {
+            var results = state.Result;
+            results.InstructionContext.Size = state.ConsumedInput.Count;
+            return new Instruction(
+                results.Opcode, 
+                results.InstructionContext.Offset, 
+                results.InstructionContext.Size, 
+                results.Operand, 
+                state.ConsumedInput, 
+                ()=> {
+                    var b = new StringBuilder();
+                    results.PrettyPrint(b);
+                    return b.ToString();
+                },
+                results.NestedInstruction
+            );
+        }
+
+        public static SortedDictionary<int, Instruction> Parse(IReadOnlyList<byte> buffer, MethodDefinition method)
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

@@ -93,6 +93,26 @@ namespace Tiny
         public static void Print<T>(
             this IEnumerable<T> items,
             StringBuilder builder,
+            String seperator
+        )
+        {
+            Print(items, builder, seperator, null, null,(v, b) => b.Append(v));
+        }
+
+        public static void Print<T>(
+            this IEnumerable<T> items,
+            StringBuilder builder,
+            String seperator,
+            String prefix,
+            String suffix
+        )
+        {
+            Print(items, builder, seperator, prefix, suffix, (v, b) => b.Append(v));
+        }
+
+        public static void Print<T>(
+            this IEnumerable<T> items,
+            StringBuilder builder,
             String seperator,
             String prefix,
             String suffix,
@@ -161,6 +181,29 @@ namespace Tiny
             };
         }
 
+        public static Action<T1, T2> Then<T1, T2>(this Action<T1, T2> first, Action<T1, T2> second) {
+            if (first == null) {
+                return second;
+            }
+            if (second == null) {
+                return first;
+            }
+            return (x,y) => {
+                first(x, y);
+                second(x, y);
+            };
+        }
+
+        public static Action<T> After<T>(this Action<T> second, Action<T> first)
+        {
+            return first.Then(second);
+        }
+
+        public static Action<T1, T2> After<T1, T2>(this Action<T1, T2> second, Action<T1, T2> first)
+        {
+            return first.Then(second);
+        }
+
         public static uint ReadLittleEndianUInt(this IReadOnlyList<byte> bytes)
         {
             return 
@@ -168,6 +211,51 @@ namespace Tiny
                 | ((uint) bytes[1] << 8) 
                 | ((uint) bytes[2] << 16) 
                 | ((uint) bytes[3] << 24);
+        }
+
+        public static int ReadLittleEndianInt(this IReadOnlyList<byte> bytes)
+        {
+            return (int) ReadLittleEndianUInt(bytes);
+        }
+
+        public static unsafe float ReadLittleEndianSingle(this IReadOnlyList<byte> bytes)
+        {
+            var v = ReadLittleEndianUInt(bytes);
+            return *(float*) &v;
+        }
+
+        public static unsafe double ReadLittleEndianDouble(this IReadOnlyList<byte> bytes)
+        {
+            var v = ReadLittleEndianULong(bytes);
+            return *(double*)&v;
+        }
+
+        public static ulong ReadLittleEndianULong(this IReadOnlyList<byte> bytes)
+        {
+            return
+                (ulong) bytes[0]
+                | ((ulong) bytes[1] << 8)
+                | ((ulong) bytes[2] << 16)
+                | ((ulong) bytes[3] << 24)
+                | ((ulong) bytes[4] << 32)
+                | ((ulong) bytes[5] << 40)
+                | ((ulong) bytes[6] << 48)
+                | ((ulong) bytes[7] << 56);
+        } 
+
+        public static long ReadLittleEndianLong(this IReadOnlyList<byte> bytes)
+        {
+            return (long) ReadLittleEndianULong(bytes);
+        }
+
+        public static ushort ReadLittleEndianUShort(this IReadOnlyList<byte> bytes)
+        {
+            return (ushort)(bytes[0] | (bytes[1] << 8));
+        }
+
+        public static string Escape(this String s)
+        {
+            throw new NotImplementedException();
         }
     }
 }

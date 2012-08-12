@@ -51,27 +51,6 @@ namespace Tiny.Metadata
             int size,
             object operand,
             IReadOnlyList<byte> encoding,
-            String prettyPrint
-        )
-        {
-            m_opcode = opcode.CheckDefined("opcode");
-            m_offset = offset.CheckGTE(0, "offset");
-            m_size = size.CheckGTE(1, "size");
-            m_operand = operand;
-            m_encoding = encoding;
-            m_prettyPrint = prettyPrint.CheckNotNull("prettyPrint");
-        }
-
-        //# Creates an instruction instance. Note that if [operand] is of type Func<Object> the value of [Operand] will
-        //# be computed lazyily from the return value of the function. However, the value returned from
-        //# `((Func<Object>)operand)()` cannot its self be a Func<Object>. If it is, calling [Operand] will result in
-        //# an exception.
-        internal Instruction(
-            Opcode opcode,
-            int offset,
-            int size,
-            object operand,
-            IReadOnlyList<byte> encoding,
             Func<String> prettyPrint,
             Instruction modifiedInstruction
         )

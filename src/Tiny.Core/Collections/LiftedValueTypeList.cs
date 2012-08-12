@@ -29,7 +29,7 @@ using Tiny;
 
 namespace Tiny.Collections
 {
-    public static unsafe class LiftedValueTypeList
+    static unsafe class LiftedValueTypeList
     {
         public static LiftedValueTypeList<T> Create<T>(
             int itemCount,
@@ -52,7 +52,7 @@ namespace Tiny.Collections
 
         readonly int m_itemCount;
 
-        public LiftedValueTypeList(
+        internal LiftedValueTypeList(
             int itemCount,
             GetRowDelegate rowFectcher,
             CreateObjectDelegate<T> factory, 

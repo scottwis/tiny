@@ -49,5 +49,6 @@ namespace Tiny.Interop
         public abstract IUnsafeMemoryMap MemoryMapFile(string fileName);
 
         public abstract int StrLen(byte* pStr, int maxLength);
+        public abstract int WcsLen(char* pStr, int maxLength);
     }
 }

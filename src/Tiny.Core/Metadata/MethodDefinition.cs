@@ -505,5 +505,11 @@ namespace Tiny.Metadata
                 throw new NotImplementedException();
             }
         }
+
+        internal Instruction FindInstruction(int offset)
+        {
+            //TODO: Implement this
+            throw new NotImplementedException();
+        }
     }
 }

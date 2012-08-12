@@ -29,21 +29,22 @@ using System.Threading;
 
 namespace Tiny.Collections
 {
-    public unsafe delegate void* GetRowDelegate(int index);
-    public unsafe delegate T CreateObjectDelegate<out T>(void* pRow);
-    public unsafe delegate T CreateObjectDelegateEX<out T>(void* pRow, int index);
+    unsafe delegate void* GetRowDelegate(int index);
+    unsafe delegate T CreateObjectDelegate<out T>(void* pRow);
+    unsafe delegate T CreateObjectDelegateEX<out T>(void* pRow, int index);
 
     public sealed unsafe class LiftedList<T> : ReadonlyListBase<T> where T : class
     {
         // ReSharper disable InconsistentNaming
-        readonly GetRowDelegate FetchRow;
-        readonly CreateObjectDelegateEX<T> CreateObject;
+        /*readonly GetRowDelegate FetchRow;
+        readonly CreateObjectDelegateEX<T> CreateObject;*/
+        readonly Func<int, T> CreateObject;
         readonly Func<bool> IsDisposed;
         // ReSharper restore InconsistentNaming
 
         readonly T[] m_array;
 
-        public LiftedList(
+        internal LiftedList(
             int itemCount,
             GetRowDelegate rowFectcher,
             CreateObjectDelegate<T> factory,
@@ -53,7 +54,7 @@ namespace Tiny.Collections
             factory.CheckNotNull("factory");
         }
 
-        public LiftedList(
+        internal LiftedList(
             int itemCount,
             GetRowDelegate rowFetcher,
             CreateObjectDelegateEX<T>  factory,
@@ -62,10 +63,23 @@ namespace Tiny.Collections
         {
             itemCount.CheckGTE(0, "itemCount");
 
-            FetchRow = rowFetcher.CheckNotNull("rowFetcher");
-            CreateObject = factory.CheckNotNull("factory");
+            rowFetcher.CheckNotNull("rowFetcher");
+            factory.CheckNotNull("factory");
+            CreateObject = (index)=>factory(rowFetcher(index), index);
             IsDisposed = disposedChecker.CheckNotNull("disposedChecker");
 
+            m_array = new T[itemCount];
+        }
+
+        public LiftedList(int itemCount,Func<int, T> factory) : this(itemCount, factory, ()=>false)
+        {
+        }
+
+        public LiftedList(int itemCount,Func<int, T> factory,Func<bool> disposedChecker)
+        {
+            itemCount.CheckGTE(0, "itemCount");
+            IsDisposed = disposedChecker.CheckNotNull("disposedChecker");
+            CreateObject = factory.CheckNotNull("factory");
             m_array = new T[itemCount];
         }
 
@@ -109,7 +123,7 @@ namespace Tiny.Collections
         void LoadObject(int index)
         {
             if (m_array[index] == null) {
-                var obj = CreateObject(FetchRow(index), index);
+                var obj = CreateObject(index);
                 Interlocked.CompareExchange(ref m_array[index], obj, null);
             }
         }
