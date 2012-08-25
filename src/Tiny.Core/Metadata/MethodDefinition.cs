@@ -46,6 +46,8 @@ namespace Tiny.Metadata
         volatile Parameter m_returnTypeParameter;
         volatile SortedDictionary<int, Instruction> m_instructions;
         volatile IReadOnlyList<Instruction> m_body;
+        volatile IReadOnlyList<Event> m_associatedEvents;
+        volatile IReadOnlyList<Property> m_associatedProperties;
 
         internal MethodDefinition(MethodDefRow * pRow, TypeDefinition declaringType)
         {
@@ -419,15 +421,15 @@ namespace Tiny.Metadata
         void EnsureInstructionsParsed()
         {
             if (m_instructions == null && m_pRow->RVA != 0) {
-                var pHeader = (byte*)this.DeclaringType.Module.PEFile.FindRVA(m_pRow->RVA);
-                IMethodHeader header = null;
+                var pHeader = (byte*)DeclaringType.Module.PEFile.FindRVA(m_pRow->RVA);
+                IMethodHeader header;
                 if ((*pHeader & 0x3) == (int)MethodHeaderFlags.FatFormat) {
                     header = new FatMethodHeaderWrapper((FatMethodHeader*)pHeader);
                 }
                 else {
                     header = new TinyMethodHeaderWrapper((TinyMethodHeader*)pHeader);
                 }
-                var instructions = InstructionParser.Parse(new BufferWrapper((byte*)pHeader + header.Size, header.CodeSize), this);
+                var instructions = InstructionParser.Parse(new BufferWrapper(pHeader + header.Size, header.CodeSize), this);
                 #pragma warning disable 420
                 Interlocked.CompareExchange(ref m_instructions, instructions, null);
                 #pragma warning restore 420
@@ -516,31 +518,77 @@ namespace Tiny.Metadata
             get { return (MethodCodeType) (m_pRow->ImplFlags & (MethodImplAttributes.CodeTypeMask)); }
         }
 
-        //# If the method is an event accessor, returns the event it is associated with,
-        //# and null otherwise.
-        public Event AssociatedEvent
+        //# Returns the set of events the method is associated with. If the method is not an event accessor, the
+        //# returned list will be empty.
+        //# NOTE: Typically, there will be at most 1 element in this list. However, I
+        //# couldn't find anything in the ECMA 335 spec that required an accessor to only be associated with
+        //# a single event.
+        public IReadOnlyList<Event> AssociatedEvent
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                LoadAssociations();
+                return m_associatedEvents;
             }
         }
 
-        //# If the method is a property accessor, returns the property it is associated with,
-        //# and null otherwise.
-        public Property AssociatedProperty
+        //# Returns the set of properties the method is associated with. If the method is not a property accessor, the
+        //# returned list will be empty.
+        //# NOTE: Typically, there will be at most 1 element in this list. However, I
+        //# couldn't find anything in the ECMA 335 spec that required an accessor to only be associated with
+        //# a single property.
+        public IReadOnlyList<Property> AssociatedProperties
         {
             get
             {
-                //TODO: Implement this
-                throw new NotImplementedException();
+                CheckDisposed();
+                LoadAssociations();
+                return m_associatedProperties;
+            }
+        }
+
+        void LoadAssociations()
+        {
+            if (m_associatedEvents == null) {
+                var associations = Module.GetAssociations(MetadataTable.MethodDef.RowIndex(m_pRow, Module.PEFile));
+                ((int)MetadataTable.Event).AssumeLT((int)MetadataTable.Property);
+
+                var firstProperty =associations.LeastUpperBound(
+                    x => ((MethodSemanticsRow*) x)->GetAssosication(Module.PEFile).Table, 
+                    MetadataTable.Event
+                );
+                var eventRows = associations.SubList(0, firstProperty);
+                var propertyRows = associations.SubList(firstProperty);
+
+                var associatedEvents = new LiftedList<Event>(
+                    eventRows.Count,
+                    index => DeclaringType.Events[
+                        (((MethodSemanticsRow*)eventRows[index])->GetAssosication(Module.PEFile).Index
+                        - DeclaringType.FirstEventIndex).Value
+                    ],
+                    () => Module.PEFile.IsDisposed
+                );
+
+                var associatedProperties = new LiftedList<Property>(
+                    propertyRows.Count,
+                    index => DeclaringType.Properties[
+                        (((MethodSemanticsRow*)propertyRows[index])->GetAssosication(Module.PEFile).Index
+                        - DeclaringType.FirstPropertyIndex).Value
+                    ],
+                    () => Module.PEFile.IsDisposed
+                );
+                #pragma warning disable 420
+                Interlocked.CompareExchange(ref m_associatedEvents, associatedEvents, null);
+                Interlocked.CompareExchange(ref m_associatedProperties, associatedProperties, null);
+                #pragma warning restore 420
             }
         }
 
         internal Instruction FindInstruction(int offset)
         {
-            throw new NotImplementedException();
+            EnsureInstructionsParsed();
+            return m_instructions[offset];
         }
     }
 }

@@ -89,7 +89,7 @@ namespace Tiny.Metadata
         //# define operands in addition to the instruction being modified, so [Operand] is reserved for that use). See
         //# [ModifiedInstruction] for more info.
         //#
-        //# Note: For branch instructions this will include the branch target.
+        //# Note: For branch instructions this will return the branch target.
         public object Operand
         {
             get

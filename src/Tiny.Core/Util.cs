@@ -257,6 +257,54 @@ namespace Tiny
         {
             throw new NotImplementedException();
         }
+
+        public static int LeastUpperBound<T>(this IReadOnlyList<T> list, T value, Comparer<T>  comparer)
+        {
+            return LeastUpperBound(list, x => x, value, comparer);
+        }
+
+        public static int LeastUpperBound<T>(this IReadOnlyList<T> list, T value)
+        {
+            return LeastUpperBound(list, x => x, value);
+        }
+
+        public static int LeastUpperBound<T,R>(this IReadOnlyList<T> list, Func<T,R> selector, R value)
+        {
+            return LeastUpperBound(list, selector, value, Comparer<R>.Default);
+        }
+
+        public static int LeastUpperBound<T,R>(this IReadOnlyList<T> list, Func<T,R> selector, R value, Comparer<R> comparer)
+        {
+            list.CheckNotNull("list");
+            selector.CheckNotNull("selector");
+
+            if (list.Count == 0) {
+                return 1;
+            }
+            var min = 0;
+            var max = list.Count - 1;
+            var last = max;
+            
+            while (min < last && max != min) {
+                var mid = (max - min) / 2 + min;
+                var comp = comparer.Compare(value, selector(list[mid]));
+                if (comp < 0) {
+                    max = mid;
+                }
+                else {
+                    min = mid + 1;
+                }
+
+            }
+
+            if (min > last) {
+                return last + 1;
+            }
+            if (max < last || comparer.Compare(value, selector(list[max])) > 0) {
+                return max;
+            }
+            return last + 1;
+        }
     }
 }
 

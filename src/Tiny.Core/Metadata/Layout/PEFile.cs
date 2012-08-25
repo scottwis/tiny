@@ -33,7 +33,8 @@ using Tiny.Interop;
 
 namespace Tiny.Metadata.Layout
 {
-    //# Provides a thread-safe, read-only representation of a managed PEFile, loaded via memory-mapped IO.
+    //# Provides a (mostly) thread-safe, read-only representation of a managed PEFile, loaded via memory-mapped IO.
+    //# Note: the [Dispose] method is not thread safe. It should not be called while the object is in use by other threads.
     sealed unsafe class PEFile : IDisposable
     {
         //# The size of the MSDosStub in a PE header, in bytes.
@@ -843,7 +844,7 @@ namespace Tiny.Metadata.Layout
         //# [table] : The metadata table to search.
         //# [value] : The value to search for.
         //# [selector]
-        //#     A function that projects the desired sort field(s) from the rows of the table. The table must be sorted\
+        //#     A function that projects the desired sort field(s) from the rows of the table. The table must be sorted
         //#     by selector.
         public ZeroBasedIndex LeastUpperBound<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
         {
@@ -855,34 +856,11 @@ namespace Tiny.Metadata.Layout
                 throw new InvalidOperationException(string.Format("The table '{0}' is not sorted", table));
             }
 
-            if (GetRowCount(table) == 0) {
-                return 1.ToZB();
-            }
-
-            var min = 0.ToZB();
-            var max = GetRowCount(table).ToZB() - 1;
-            var last = max;
-            var comparer = Comparer<T>.Default;
-
-            while (min < last && max != min) {
-                var mid = (max - min)/2 + min;
-                var comp = comparer.Compare(value, selector(GetRow(mid, table)));
-                if (comp < 0) {
-                    max = mid;
-                }
-                else {
-                    min = mid + 1;
-                }
-
-            }
-
-            if (min > last) {
-                return last + 1;
-            }
-            if (max < last || comparer.Compare(value, selector(GetRow(max, table))) > 0) {
-                return max;
-            }
-            return last + 1;
+            return new TableWrapper(table, this).LeastUpperBound(
+                x => selector((void*) x), 
+                value, 
+                Comparer<T>.Default
+            ).ToZB();
         }
 
         public ZeroBasedIndex Find<T>(MetadataTable table, T value, UnsafeSelector<T> selector)
@@ -961,10 +939,11 @@ namespace Tiny.Metadata.Layout
             return (IntPtr) GetRow(index, table);
         }
 
-        public IEnumerable<IntPtr> GenericParameterRows()
+        public IEnumerable<IntPtr> GetRowsSafe(MetadataTable table)
         {
-            for (int i = 0; i < GetRowCount(MetadataTable.GenericParam); ++i) {
-                yield return GetRowSafe(i.ToZB(), MetadataTable.GenericParam);
+            for (int i = 0; i < GetRowCount(table); ++i)
+            {
+                yield return GetRowSafe(i.ToZB(), table);
             }
         }
 
@@ -1004,6 +983,28 @@ namespace Tiny.Metadata.Layout
                 () => IsDisposed
             );
             return ret;
+        }
+
+        public ISubList<T> LoadDirectChildren<T>(
+            MetadataTable childTable,
+            GetTokenDelegate tokenSelector,
+            MetadataTable parentTable,
+            void* parentRow,
+            IReadOnlyList<T> sourceList
+        ) where T : class
+        {
+            var firstMemberIndex = (ZeroBasedIndex)tokenSelector(parentRow);
+            ZeroBasedIndex lastMemberIndex;
+            var tableIndex = GetRowIndex(parentTable, parentRow);
+            if (tableIndex == GetRowCount(parentTable) - 1)
+            {
+                lastMemberIndex = new ZeroBasedIndex(GetRowCount(childTable));
+            }
+            else
+            {
+                lastMemberIndex = (ZeroBasedIndex)tokenSelector(GetRow(tableIndex + 1, parentTable));
+            }
+            return sourceList.SubList(firstMemberIndex.Value, (lastMemberIndex - firstMemberIndex).Value);
         }
 
         public void * FindRVA(uint rva)

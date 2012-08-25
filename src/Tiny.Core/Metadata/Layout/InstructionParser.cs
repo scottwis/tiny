@@ -652,7 +652,7 @@ namespace Tiny.Metadata.Layout
                     output.RemainingInput.SubList(0, 0),
                     output.RemainingInput, 
                     new InstructionParseState(
-                        state.Result.InstructionContext.Offset + state.Result.InstructionContext.Offset, 
+                        state.Result.InstructionContext.Offset + output.ConsumedInput.Count, 
                         method
                     )
                 );

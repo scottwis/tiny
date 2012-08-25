@@ -46,6 +46,12 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<TypeDefinition> m_allTypes;
         volatile IReadOnlyDictionary<TypeOrMethodDef, IReadOnlyList<IntPtr>> m_genericParameterRows;
 
+        //# Maps a method def index to a list of it's associated rows in the method semantics table
+        volatile IReadOnlyDictionary<ZeroBasedIndex, IReadOnlyList<IntPtr>> m_semanticsMap;
+        //# Maps a "has semantics" coded index (a reference to either a property or event index) to a list of
+        //# it's associated rows in the method semantics table.
+        volatile IReadOnlyDictionary<HasSemantics, IReadOnlyList<IntPtr>> m_inverseSemanticsMap;
+
         private Module(Assembly assembly, ModuleRow* moduleRow, PEFile peFile)
         {
             m_lockObject = new object();
@@ -210,7 +216,7 @@ namespace Tiny.Metadata
                 lock (m_lockObject) {
                     if (m_genericParameterRows == null) {
                         m_genericParameterRows = (
-                            from p in PEFile.GenericParameterRows()
+                            from p in PEFile.GetRowsSafe(MetadataTable.GenericParam)
                             group p by ((GenericParameterRow *)p)->GetOwner(PEFile)
                         ).ToDictionary(x=>x.Key, x=>x.ToList().AsReadOnly() as IReadOnlyList<IntPtr>);
                     }
@@ -248,5 +254,36 @@ namespace Tiny.Metadata
             throw new NotImplementedException();
         }
 
+        private void LoadMethodSemantics()
+        {
+            m_semanticsMap = (
+                from row in PEFile.GetRowsSafe(MetadataTable.MethodSemantics)
+                let table = ((MethodSemanticsRow*)row)->GetAssosication(PEFile).Table
+                orderby table
+                group row by (ZeroBasedIndex)((MethodSemanticsRow*)row)->GetMethodIndex(PEFile)
+            ).ToDictionary(x=>x.Key, x=>x.ToList().AsReadOnly() as IReadOnlyList<IntPtr>).AsReadOnly();
+
+            m_inverseSemanticsMap = (
+                from row in PEFile.GetRowsSafe(MetadataTable.MethodSemantics)
+                group row by ((MethodSemanticsRow*)row)->GetAssosication(PEFile)
+            ).ToDictionary(x => x.Key, x => x.ToList().AsReadOnly() as IReadOnlyList<IntPtr>).AsReadOnly();
+        }
+
+        //# Returns a list of MethodSemantic rows associated with the method located at the given index.S
+        internal IReadOnlyList<IntPtr> GetAssociations(ZeroBasedIndex methodIndex)
+        {
+            CheckDisposed();
+            if (m_semanticsMap == null) {
+                lock(m_lockObject) {
+                    if (m_semanticsMap == null) {
+                        LoadMethodSemantics();
+                    }
+                }
+            }
+
+            IReadOnlyList<IntPtr> ret;
+            m_semanticsMap.AssumeNotNull().TryGetValue(methodIndex, out ret);
+            return ret ?? new List<IntPtr>(0).AsReadOnly();
+        }
     }
 }

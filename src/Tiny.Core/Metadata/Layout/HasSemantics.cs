@@ -1,4 +1,4 @@
-// HasFieldMarshal.cs
+﻿// HasSemantics.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -27,21 +27,13 @@ using System;
 
 namespace Tiny.Metadata.Layout
 {
-    struct HasFieldMarshal : IToken
+    struct HasSemantics : IToken
     {
         readonly OneBasedIndex m_index;
 
-        public HasFieldMarshal(OneBasedIndex index)
+        public HasSemantics(OneBasedIndex index)
         {
             m_index = index;
-        }
-
-        public HasFieldMarshal(MetadataTable table, ZeroBasedIndex index)
-        {
-            if (table != MetadataTable.Field && table != MetadataTable.Param) {
-                throw new ArgumentOutOfRangeException("table");
-            }
-            m_index = ((OneBasedIndex) index) | ((table == MetadataTable.Param ? 1u : 0u) << 1);
         }
 
         public bool IsNull
@@ -56,9 +48,9 @@ namespace Tiny.Metadata.Layout
                 CheckNull();
                 switch ((m_index & ~0x1U).Value) {
                     case 0:
-                        return MetadataTable.Field;
+                        return MetadataTable.Event;
                     case 1:
-                        return MetadataTable.Param;
+                        return MetadataTable.Property;
                     default:
                         throw new InvalidOperationException("Invalid metadata table.");
                 }

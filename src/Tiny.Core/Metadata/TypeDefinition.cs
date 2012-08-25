@@ -315,6 +315,15 @@ namespace Tiny.Metadata
             }
         }
 
+        internal ZeroBasedIndex FirstEventIndex
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
+            }
+        }
         //# The set of events defined by the type.
         public IReadOnlyList<Event> Events
         {
@@ -335,6 +344,16 @@ namespace Tiny.Metadata
                     #pragma warning restore 420
                 }
                 return m_events;
+            }
+        }
+
+        internal ZeroBasedIndex FirstPropertyIndex
+        {
+            get
+            {
+                CheckDisposed();
+                //TODO: Implement this
+                throw new NotImplementedException();
             }
         }
 

@@ -173,10 +173,14 @@
     <Compile Include="Metadata\Layout\FatExceptionHeader.cs" />
     <Compile Include="Metadata\Layout\FatMethodHeader.cs" />
     <Compile Include="Metadata\Layout\FatMethodHeaderWrapper.cs" />
+    <Compile Include="Metadata\Layout\HasSemantics.cs" />
     <Compile Include="Metadata\Layout\IMethodHeaderWrapper.cs" />
     <Compile Include="Metadata\Layout\InstructionParser.cs" />
     <Compile Include="Metadata\Layout\InstructionParseState.cs" />
     <Compile Include="Metadata\Layout\MethodHeader.Flags.cs" />
+    <Compile Include="Metadata\Layout\MethodSemanticsAttributes.cs" />
+    <Compile Include="Metadata\Layout\MethodSemanticsRow.cs" />
+    <Compile Include="Metadata\Layout\TableWrapper.cs" />
     <Compile Include="Metadata\Layout\TinyExceptionClause.cs" />
     <Compile Include="Metadata\Layout\TinyExceptionHeader.cs" />
     <Compile Include="Metadata\Layout\TinyMethodHeader.cs" />
