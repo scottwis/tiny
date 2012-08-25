@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using BclExtras.Collections;
 
 namespace Tiny.Metadata.Layout
 {
@@ -13,6 +11,12 @@ namespace Tiny.Metadata.Layout
         public Action<StringBuilder> PrettyPrint;
         public object Operand;
         public Instruction NestedInstruction;
+
+        public InstructionParseState(int offset, MethodDefinition method) : this()
+        {
+            MethodDefinition = method;
+            InstructionContext = new InstructionContext(offset);
+        }
     }
 
     class InstructionContext

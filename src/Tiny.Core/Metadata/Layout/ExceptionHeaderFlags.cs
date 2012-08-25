@@ -1,4 +1,4 @@
-// ExceptionClauseFlags.cs
+// ExceptionHeaderFlags.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,13 +23,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Tiny.Metadata.Layout
 {
-    enum ExceptionClauseFlags : ushort
+    [Flags]
+    enum ExceptionHeaderFlags : byte
     {
-        Exception = 0,
-        Filter = 0x1,
-        Finally = 0x2,
-        Fault = 0x4
+        EHTable = 0x1,
+        OptILTable = 0x2,
+        FatFormat = 0x3,
+        MoreSects = 0x4
     }
 }

@@ -1006,6 +1006,15 @@ namespace Tiny.Metadata.Layout
             return ret;
         }
 
+        public void * FindRVA(uint rva)
+        {
+            SectionHeader* pHeader = FindSection(rva);
+            if (pHeader != null) {
+                return checked(pHeader->PointerToRawData + m_pData + (rva - pHeader->VirtualAddress));
+            }
+            return null;
+        }
+
 
         public void Dispose()
         {

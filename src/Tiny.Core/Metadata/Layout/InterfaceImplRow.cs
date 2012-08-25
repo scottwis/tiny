@@ -32,7 +32,7 @@ namespace Tiny.Metadata.Layout
     {
         public OneBasedIndex GetClass(PEFile peFile)
         {
-            fixed (InterfaceImplRow * pThis = &this) {
+            fixed (InterfaceImplRow* pThis = &this) {
                 if (MetadataTable.TypeDef.IndexSize(peFile) == 2) {
                     return new OneBasedIndex(*(ushort*) pThis);
                 }
@@ -42,7 +42,7 @@ namespace Tiny.Metadata.Layout
 
         public TypeDefOrRef GetInterface(PEFile peFile)
         {
-            fixed (InterfaceImplRow * pThis = &this) {
+            fixed (InterfaceImplRow* pThis = &this) {
                 var pInterface = (byte*) pThis + MetadataTable.TypeDef.IndexSize(peFile);
                 uint index;
                 if (CodedIndex.TypeDefOrRef.IndexSize(peFile) == 2) {

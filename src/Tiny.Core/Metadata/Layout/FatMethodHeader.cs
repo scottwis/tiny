@@ -1,4 +1,4 @@
-// ExceptionClauseFlags.cs
+﻿// FatMethodHeader.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,13 +23,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Runtime.InteropServices;
+
 namespace Tiny.Metadata.Layout
 {
-    enum ExceptionClauseFlags : ushort
+    [StructLayout(LayoutKind.Explicit)]
+    struct FatMethodHeader
     {
-        Exception = 0,
-        Filter = 0x1,
-        Finally = 0x2,
-        Fault = 0x4
+        [FieldOffset(0)] readonly ushort m_flagsAndSize;
+        [FieldOffset(2)] readonly ushort m_maxStack;
+        [FieldOffset(4)] readonly uint m_codeSize;
+        [FieldOffset(8)] readonly MetadataToken m_localVarSigToken;
+
+        public MethodHeaderFlags Flags
+        {
+            get { return (MethodHeaderFlags) (0x0FFF & m_flagsAndSize) ; }
+        }
+
+        public int Size
+        {
+            get
+            {
+                return ((0xF000 & m_flagsAndSize) >> 10);
+            }
+        }
+
+        public int MaxStack
+        {
+            get { return m_maxStack; }
+        }
+
+        public int CodeSize
+        {
+            get { return checked((int)m_codeSize); }
+        }
+
+        public MetadataToken LocalVarSigToken
+        {
+            get { return m_localVarSigToken; }
+        }
     }
 }

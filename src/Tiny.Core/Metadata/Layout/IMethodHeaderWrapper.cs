@@ -1,4 +1,4 @@
-// ExceptionClauseFlags.cs
+﻿// IMethodHeaderWrapper.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -25,11 +25,12 @@
 
 namespace Tiny.Metadata.Layout
 {
-    enum ExceptionClauseFlags : ushort
+    interface IMethodHeader
     {
-        Exception = 0,
-        Filter = 0x1,
-        Finally = 0x2,
-        Fault = 0x4
+        MethodHeaderFlags Flags { get;  }
+        int Size { get;  }
+        int MaxStack { get;  }
+        int CodeSize { get;  }
+        MetadataToken LocalVarSigToken { get;  }
     }
 }

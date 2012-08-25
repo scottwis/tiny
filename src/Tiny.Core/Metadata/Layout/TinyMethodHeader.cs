@@ -1,4 +1,4 @@
-﻿// IExceptionHeader.cs
+﻿// TinyMethodHeader.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,14 +23,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Tiny.Metadata.Layout
 {
-    interface IExceptionHeader
+    [StructLayout(LayoutKind.Explicit)]
+    struct TinyMethodHeader
     {
-        MethodDataSectionFlags Flags { get; }
-        uint DataSize { get; }
-        IReadOnlyList<IExceptionClause> Clauses { get; }
+        [FieldOffset(0)]
+        readonly byte m_value;
+
+        public MethodHeaderFlags Flags
+        {
+            get { return (MethodHeaderFlags) (m_value & 0x3); }
+        }
+
+        public int CodeSize
+        {
+            get { return ((m_value & 0xFC) >> 2); }
+        }
     }
 }

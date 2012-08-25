@@ -1,4 +1,4 @@
-// ExceptionClauseFlags.cs
+﻿// TinyExceptionClause.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,13 +23,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Runtime.InteropServices;
+
 namespace Tiny.Metadata.Layout
 {
-    enum ExceptionClauseFlags : ushort
+    [StructLayout(LayoutKind.Explicit)]
+    struct TinyExceptionClause
     {
-        Exception = 0,
-        Filter = 0x1,
-        Finally = 0x2,
-        Fault = 0x4
+        [FieldOffset(0)] public readonly ExceptionClauseFlags Flags;
+        [FieldOffset(2)] public readonly ushort TryOffset;
+        [FieldOffset(4)] public readonly byte TryLength;
+        [FieldOffset(5)] public readonly ushort HandlerOffset;
+        [FieldOffset(7)] public readonly byte HandlerLength;
+        [FieldOffset(8)] public readonly MetadataToken ClassToken;
+        [FieldOffset(8)] public readonly uint FilterOffset;
     }
 }

@@ -1,4 +1,4 @@
-﻿// IMethodHeader.cs
+// MethodHeaderFlags.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -25,12 +25,11 @@
 
 namespace Tiny.Metadata.Layout
 {
-    interface IMethodHeader
+    enum MethodHeaderFlags : ushort
     {
-        MethodBodyFlags Flags { get; }
-        uint CodeSize { get;  }
-        uint HeaderSize { get;  }
-        uint MaxStack { get;  }
-        MetadataToken LocalVariableSignatureToken { get;  }
+        FatFormat = 0x3,
+        TinyFormat = 0x2,
+        MoreSections = 0x8,
+        InitLocal = 0x10
     }
 }

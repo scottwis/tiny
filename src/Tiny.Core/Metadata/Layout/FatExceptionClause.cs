@@ -1,4 +1,4 @@
-// MethodBodyFlags.cs
+﻿// FatExceptionClause.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,13 +23,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Runtime.InteropServices;
+
 namespace Tiny.Metadata.Layout
 {
-    enum MethodBodyFlags : byte
+    [StructLayout(LayoutKind.Explicit)]
+    struct FatExceptionClause
     {
-        FatFormat = 0x3,
-        TinyFormat = 0x2,
-        MoreSections = 0x8,
-        InitLocal = 0x10
+        [FieldOffset(0)] public readonly ExceptionClauseFlags Flags;
+        [FieldOffset(4)] public readonly uint TryOffset;
+        [FieldOffset(8)] public readonly uint TryLength;
+        [FieldOffset(12)] public readonly uint HandlerOffset;
+        [FieldOffset(16)] public readonly uint HandlerLength;
+        [FieldOffset(20)] public readonly MetadataToken ClassToken;
+        [FieldOffset(20)] public readonly uint FilterOffset;
     }
 }

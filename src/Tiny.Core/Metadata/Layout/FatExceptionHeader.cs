@@ -1,4 +1,4 @@
-// ExceptionClauseFlags.cs
+﻿// FatExceptionHeader.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -23,13 +23,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Runtime.InteropServices;
+
 namespace Tiny.Metadata.Layout
 {
-    enum ExceptionClauseFlags : ushort
+    [StructLayout(LayoutKind.Explicit)]
+    struct FatExceptionHeader
     {
-        Exception = 0,
-        Filter = 0x1,
-        Finally = 0x2,
-        Fault = 0x4
+        [FieldOffset(0)] readonly uint m_flagsAndSize;
+
+        public ExceptionHeaderFlags Flags
+        {
+            get { return (ExceptionHeaderFlags) (m_flagsAndSize & 0xFF); }
+        }
+
+        public int DataSize
+        {
+            get { return (int) ((m_flagsAndSize & 0xFFFFFF00) >> 8); }
+        }
     }
 }

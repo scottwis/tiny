@@ -1,4 +1,4 @@
-// ExceptionClauseFlags.cs
+﻿// FatMethodHeaderWrapper.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -25,11 +25,38 @@
 
 namespace Tiny.Metadata.Layout
 {
-    enum ExceptionClauseFlags : ushort
+    unsafe class FatMethodHeaderWrapper : IMethodHeader
     {
-        Exception = 0,
-        Filter = 0x1,
-        Finally = 0x2,
-        Fault = 0x4
+        readonly FatMethodHeader* m_pHeader;
+
+        public FatMethodHeaderWrapper(FatMethodHeader* pHeader)
+        {
+            m_pHeader = (FatMethodHeader *)FluentAsserts.CheckNotNull((void *)pHeader, "pHeader");
+        }
+
+        public int Size
+        {
+            get { return m_pHeader->Size; }
+        }
+
+        public MethodHeaderFlags Flags
+        {
+            get { return m_pHeader->Flags; }
+        }
+
+        public int MaxStack
+        {
+            get { return m_pHeader->MaxStack; }
+        }
+
+        public int CodeSize
+        {
+            get { return m_pHeader->CodeSize; }
+        }
+
+        public MetadataToken LocalVarSigToken
+        {
+            get { return m_pHeader->LocalVarSigToken; }
+        }
     }
 }

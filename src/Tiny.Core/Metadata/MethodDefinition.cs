@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -43,6 +44,8 @@ namespace Tiny.Metadata
         volatile Method m_signature;
         volatile IReadOnlyList<Parameter> m_parameters;
         volatile Parameter m_returnTypeParameter;
+        volatile SortedDictionary<int, Instruction> m_instructions;
+        volatile IReadOnlyList<Instruction> m_body;
 
         internal MethodDefinition(MethodDefRow * pRow, TypeDefinition declaringType)
         {
@@ -396,8 +399,38 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                EnsureInstructionsParsed();
+                if (m_body == null && m_instructions != null) {
+                    IReadOnlyList<Instruction> body = m_instructions.Values.ToList().AsReadOnly();
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_body, body, null);
+                    #pragma warning restore 420
+                }
+
+                if (m_body == null) {
+                    #pragma warning disable 420
+                    Interlocked.CompareExchange(ref m_body, new List<Instruction>(0).AsReadOnly(), null);
+                    #pragma warning restore 420
+                }
+                return m_body;
+            }
+        }
+
+        void EnsureInstructionsParsed()
+        {
+            if (m_instructions == null && m_pRow->RVA != 0) {
+                var pHeader = (byte*)this.DeclaringType.Module.PEFile.FindRVA(m_pRow->RVA);
+                IMethodHeader header = null;
+                if ((*pHeader & 0x3) == (int)MethodHeaderFlags.FatFormat) {
+                    header = new FatMethodHeaderWrapper((FatMethodHeader*)pHeader);
+                }
+                else {
+                    header = new TinyMethodHeaderWrapper((TinyMethodHeader*)pHeader);
+                }
+                var instructions = InstructionParser.Parse(new BufferWrapper((byte*)pHeader + header.Size, header.CodeSize), this);
+                #pragma warning disable 420
+                Interlocked.CompareExchange(ref m_instructions, instructions, null);
+                #pragma warning restore 420
             }
         }
 
@@ -406,8 +439,7 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                //TODO: Implement this
-                throw new NotImplementedException();
+                return Body.Count > 0;
             }
         }
 
@@ -508,7 +540,6 @@ namespace Tiny.Metadata
 
         internal Instruction FindInstruction(int offset)
         {
-            //TODO: Implement this
             throw new NotImplementedException();
         }
     }

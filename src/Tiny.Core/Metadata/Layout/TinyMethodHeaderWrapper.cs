@@ -1,4 +1,4 @@
-// IExceptionClause.cs
+﻿// TinyMethodHeaderWrapper.cs
 //  
 // Author:
 //     Scott Wisniewski <scott@scottdw2.com>
@@ -25,14 +25,38 @@
 
 namespace Tiny.Metadata.Layout
 {
-    interface IExceptionClause
+    unsafe class TinyMethodHeaderWrapper : IMethodHeader
     {
-        ExceptionClauseFlags Flags { get;  }
-        uint TryOffset { get;  }
-        uint TryLength { get; }
-        uint HandlerOffset { get;  }
-        uint HandlerLength { get;  }
-        MetadataToken ClassToken { get;  }
-        uint FilterOffset { get;  }
+        readonly TinyMethodHeader* m_pHeader;
+
+        public TinyMethodHeaderWrapper(TinyMethodHeader* pHeader)
+        {
+            m_pHeader = (TinyMethodHeader *)FluentAsserts.CheckNotNull((void *)pHeader, "pHeader");
+        }
+
+        public MethodHeaderFlags Flags
+        {
+            get { return m_pHeader->Flags; }
+        }
+
+        public int Size
+        {
+            get { return 1; }
+        }
+
+        public int MaxStack
+        {
+            get { return 8; }
+        }
+
+        public int CodeSize
+        {
+            get { return m_pHeader->CodeSize; }
+        }
+
+        public MetadataToken LocalVarSigToken
+        {
+            get { return new MetadataToken(); }
+        }
     }
 }

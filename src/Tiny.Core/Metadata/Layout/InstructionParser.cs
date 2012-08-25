@@ -639,9 +639,25 @@ namespace Tiny.Metadata.Layout
 
         public static SortedDictionary<int, Instruction> Parse(IReadOnlyList<byte> buffer, MethodDefinition method)
         {
-            throw new NotImplementedException();
+            var state = ParseState.Create(buffer.SubList(0, 0), buffer.SubList(0), new InstructionParseState(0, method));
+            var ret = new SortedDictionary<int, Instruction>();
+
+            while (state.RemainingInput.Count > 0) {
+                var output = s_parser.Parse(state);
+                if (output == null) {
+                    throw new InvalidOperationException("Unexpected failure when parsing instruction.");
+                }
+                ret.Add(state.Result.InstructionContext.Offset, output.Result);
+                state = ParseState.Create(
+                    output.RemainingInput.SubList(0, 0),
+                    output.RemainingInput, 
+                    new InstructionParseState(
+                        state.Result.InstructionContext.Offset + state.Result.InstructionContext.Offset, 
+                        method
+                    )
+                );
+            }
+            return ret;
         }
-
-
     }
 }
