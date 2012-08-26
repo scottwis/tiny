@@ -4,13 +4,11 @@ using System.Collections.Generic;
 namespace Tiny.Metadata
 {
     [Flags]
-    enum SkipFlags : byte
+    public enum SkipFlags : byte
     {
         TypeCheck = 0x1,
         RangeCheck = 0x2,
-        NullCheck = 0x04,
-
-        VALID_FLAGS = 0x7
+        NullCheck = 0x04
     }
 
     static class SkipFlagsExtensions
