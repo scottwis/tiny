@@ -32,5 +32,14 @@ namespace Tiny.Metadata.Layout
         int MaxStack { get;  }
         int CodeSize { get;  }
         MetadataToken LocalVarSigToken { get;  }
+        unsafe byte* RawHeader { get; }
+    }
+
+    static class MethodHeaderExtensions
+    {
+        public static bool MoreSectionsFollow(this IMethodHeader header)
+        {
+            return (header.Flags & MethodHeaderFlags.MoreSections) != 0;
+        }
     }
 }

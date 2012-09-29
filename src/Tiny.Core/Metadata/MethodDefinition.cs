@@ -48,6 +48,7 @@ namespace Tiny.Metadata
         volatile IReadOnlyList<Instruction> m_body;
         volatile IReadOnlyList<Event> m_associatedEvents;
         volatile IReadOnlyList<Property> m_associatedProperties;
+        volatile IReadOnlyList<ExceptionHandler> m_exceptionHandlers;
 
         internal MethodDefinition(MethodDefRow * pRow, TypeDefinition declaringType)
         {
@@ -421,19 +422,85 @@ namespace Tiny.Metadata
         void EnsureInstructionsParsed()
         {
             if (m_instructions == null && m_pRow->RVA != 0) {
-                var pHeader = (byte*)DeclaringType.Module.PEFile.FindRVA(m_pRow->RVA);
-                IMethodHeader header;
-                if ((*pHeader & 0x3) == (int)MethodHeaderFlags.FatFormat) {
-                    header = new FatMethodHeaderWrapper((FatMethodHeader*)pHeader);
-                }
-                else {
-                    header = new TinyMethodHeaderWrapper((TinyMethodHeader*)pHeader);
-                }
-                var instructions = InstructionParser.Parse(new BufferWrapper(pHeader + header.Size, header.CodeSize), this);
+                var header = GetMethodHeader();
+                var instructions = InstructionParser.Parse(new BufferWrapper(header.RawHeader + header.Size, header.CodeSize), this);
                 #pragma warning disable 420
                 Interlocked.CompareExchange(ref m_instructions, instructions, null);
                 #pragma warning restore 420
             }
+        }
+
+        IMethodHeader GetMethodHeader()
+        {
+            var pHeader = (byte*) DeclaringType.Module.PEFile.FindRVA(m_pRow->RVA);
+            IMethodHeader header;
+            if ((*pHeader & 0x3) == (int) MethodHeaderFlags.FatFormat) {
+                header = new FatMethodHeaderWrapper((FatMethodHeader*) pHeader);
+            }
+            else {
+                header = new TinyMethodHeaderWrapper((TinyMethodHeader*) pHeader);
+            }
+            return header;
+        }
+
+        public IReadOnlyList<ExceptionHandler> ExceptionHandlers
+        {
+            get
+            {
+                CheckDisposed();
+                if (m_exceptionHandlers == null && m_pRow->RVA != 0) {
+                    LoadExceptionHandlers();
+                }
+                return m_exceptionHandlers;
+            }
+        }
+
+        void LoadExceptionHandlers()
+        {
+            var header = GetMethodHeader();
+            IReadOnlyList<ExceptionHandler> exceptionHandlers;
+            if (! header.MoreSectionsFollow()) {
+                exceptionHandlers = (new List<ExceptionHandler>(0)).AsReadOnly();
+            }
+            else {
+                var pExceptionHeader = (byte*) Util.Pad(
+                    ((IntPtr) (header.RawHeader + header.Size + header.CodeSize)),
+                    (IntPtr) 4
+                );
+                var flags = (ExceptionHeaderFlags) (*pExceptionHeader);
+
+                ExceptionHeader exceptionHeader = null;
+                while (
+                    (flags & ExceptionHeaderFlags.EHTable) == 0
+                    && (flags & ExceptionHeaderFlags.MoreSects) != 0
+                ) {
+                    if ((flags & ExceptionHeaderFlags.FatFormat) != 0) {
+                        exceptionHeader = new ExceptionHeader((FatExceptionHeader*) pExceptionHeader);
+                    }
+                    else {
+                        exceptionHeader = new ExceptionHeader((TinyExceptionHeader*) pExceptionHeader);
+                    }
+
+                    pExceptionHeader += exceptionHeader.DataSize;
+                    flags = (ExceptionHeaderFlags) (*pExceptionHeader);
+                }
+
+                exceptionHeader.AssumeNotNull();
+
+                if ((flags & ExceptionHeaderFlags.EHTable) != 0) {
+                    exceptionHandlers = new LiftedList<ExceptionHandler>(
+                        exceptionHeader.NumberOfExceptionClauses,
+                        index => exceptionHeader.GetExceptionHandler(index, Module),
+                        () => Module.PEFile.IsDisposed
+                    );
+                }
+                else {
+                    exceptionHandlers = (new List<ExceptionHandler>(0)).AsReadOnly();
+                }
+            }
+            #pragma warning disable 420
+            Interlocked.CompareExchange(ref m_exceptionHandlers, exceptionHandlers, null);
+            #pragma warning restore 420
         }
 
         public bool HasBody
@@ -589,6 +656,24 @@ namespace Tiny.Metadata
         {
             EnsureInstructionsParsed();
             return m_instructions[offset];
+        }
+
+        public int MaxStack
+        {
+            get
+            {
+                CheckDisposed();
+                return GetMethodHeader().MaxStack;
+            }
+        }
+
+        public bool InitLocals
+        {
+            get
+            {
+                CheckDisposed();
+                return (GetMethodHeader().Flags & MethodHeaderFlags.InitLocal) != 0;
+            }
         }
     }
 }

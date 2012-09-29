@@ -41,5 +41,13 @@ namespace Tiny.Metadata.Layout
         {
             get { return (int) ((m_flagsAndSize & 0xFFFFFF00) >> 8); }
         }
+
+        public int NumberOfExceptionClauses
+        {
+            get
+            {
+                return ((int)DataSize - 4) / 24;
+            }
+        }
     }
 }

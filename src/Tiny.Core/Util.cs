@@ -63,6 +63,16 @@ namespace Tiny
             return checked(((pad - (length%pad))%pad) + length);
         }
 
+        public static ulong Pad(this ulong length, ulong pad)
+        {
+            return checked(((pad - (length % pad)) % pad) + length);
+        }
+
+        public static IntPtr Pad(this IntPtr length, IntPtr pad)
+        {
+            return (IntPtr) Pad((ulong) length, (ulong) pad);
+        }
+
         public static int BitCount(this ulong value)
         {
             //# This code is a little complex, but it is really fast. Ideally we would just use popcnt, but it's not
@@ -273,7 +283,12 @@ namespace Tiny
             return LeastUpperBound(list, selector, value, Comparer<R>.Default);
         }
 
-        public static int LeastUpperBound<T,R>(this IReadOnlyList<T> list, Func<T,R> selector, R value, Comparer<R> comparer)
+        public static int LeastUpperBound<T,R>(
+            this IReadOnlyList<T> list,
+            Func<T,R> selector,
+            R value,
+            Comparer<R> comparer
+        )
         {
             list.CheckNotNull("list");
             selector.CheckNotNull("selector");
@@ -285,7 +300,7 @@ namespace Tiny
             var max = list.Count - 1;
             var last = max;
             
-            while (min < last && max != min) {
+            while (min <= last && max != min) {
                 var mid = (max - min) / 2 + min;
                 var comp = comparer.Compare(value, selector(list[mid]));
                 if (comp < 0) {
@@ -300,10 +315,48 @@ namespace Tiny
             if (min > last) {
                 return last + 1;
             }
-            if (max < last || comparer.Compare(value, selector(list[max])) > 0) {
+            if (max < last || comparer.Compare(value, selector(list[max])) < 0) {
                 return max;
             }
             return last + 1;
+        }
+
+        public static int GreatestLowerBound<T,R>(
+            this IReadOnlyList<T> list,
+            Func<T,R> selector,
+            R value,
+            Comparer<R> comparer
+        )
+        {
+            list.CheckNotNull("list");
+            selector.CheckNotNull("selector");
+
+            if (list.Count == 0) {
+                return -1;
+            }
+            var min = 0;
+            var max = list.Count - 1;
+
+            while (max >= 0 && max != min) {
+                var mid = ((max - min) + 1)/2 + min;
+                var comp = comparer.Compare(value, selector(list[mid]));
+                if (comp <= 0) {
+                    max = min - 1;
+                }
+                else {
+                    min = mid;
+                }
+            }
+
+            if (max < 0) {
+                return -1;
+            }
+
+            if (min > 0 || comparer.Compare(value, selector(list[min])) > 0) {
+                return min;
+            }
+
+            return -1;
         }
     }
 }

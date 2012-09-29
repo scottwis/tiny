@@ -24,6 +24,7 @@
 // THE SOFTWARE.
 
 using System;
+using JetBrains.Annotations;
 using Tiny.Metadata.Layout;
 
 namespace Tiny
@@ -121,16 +122,19 @@ namespace Tiny
         }
 
 
+        [ContractAnnotation("pValue:null=>halt")]
         public static unsafe void* AssumeNotNull(void* pValue)
         {
             return AssumeNotNull(pValue, () => "Unexpected null pValue.");
         }
 
+        [ContractAnnotation("pValue:null=>halt")]
         public static unsafe void* AssumeNotNull(void* pValue, string message)
         {
             return AssumeNotNull(pValue, () => message);
         }
 
+        [ContractAnnotation("pValue:null=>halt")]
         public static unsafe void* AssumeNotNull(void* pValue, Func<string> message)
         {
             if (pValue == null) {
@@ -139,16 +143,19 @@ namespace Tiny
             return pValue;
         }
 
+        [ContractAnnotation("value:null=>halt")]
         public static IntPtr AssumeNotNull(this IntPtr value)
         {
             return AssumeNotNull(value, () => "Unexpected null value.");
         }
 
+        [ContractAnnotation("value:null=>halt")]
         public static IntPtr AssumeNotNull(this IntPtr value, string message)
         {
             return AssumeNotNull(value, () => message);
         }
 
+        [ContractAnnotation("value:null=>halt")]
         public static IntPtr AssumeNotNull(this IntPtr value, Func<string> message)
         {
             if (value == default(IntPtr)) {
@@ -157,16 +164,19 @@ namespace Tiny
             return value;
         }
 
+        [ContractAnnotation("value:null=>halt")]
         public static T AssumeNotNull<T>(this T value) where T : class
         {
             return AssumeNotNull(value, () => "Unexpected null value.");
         }
 
+        [ContractAnnotation("value:null=>halt")]
         public static T AssumeNotNull<T>(this T value, string message) where T : class
         {
             return AssumeNotNull(value, () => message);
         }
 
+        [ContractAnnotation("value:null=>halt")]
         public static T AssumeNotNull<T>(this T value, Func<string> message ) where T : class
         {
             if (value == null) {
@@ -278,6 +288,17 @@ namespace Tiny
                 throw new ArgumentOutOfRangeException(parameterName, String.Format("Expected a value >= {0}", rhs));
             }
             return lhs;
+        }
+
+        public static T CheckInRange<T>(this T value, T min, T max, string parameterName) where T: IComparable<T>
+        {
+            if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0) {
+                throw new ArgumentOutOfRangeException(
+                    parameterName,
+                    String.Format("Expected value >= {0} and <= {1}", min, max)
+                );
+            }
+            return value;
         }
 
         internal static ZeroBasedIndex CheckGTE(this ZeroBasedIndex lhs, int rhs, string parameterName)

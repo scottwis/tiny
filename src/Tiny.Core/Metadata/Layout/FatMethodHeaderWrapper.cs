@@ -58,5 +58,10 @@ namespace Tiny.Metadata.Layout
         {
             get { return m_pHeader->LocalVarSigToken; }
         }
+
+        public byte* RawHeader
+        {
+            get { return (byte *)m_pHeader; }
+        }
     }
 }

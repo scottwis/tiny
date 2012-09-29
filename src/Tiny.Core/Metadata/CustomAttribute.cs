@@ -23,18 +23,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using Tiny.Metadata.Layout;
 
 namespace Tiny.Metadata
 {
     public unsafe class CustomAttribute
     {
+        readonly CustomAttributeRow* m_pRow;
+        readonly PEFile m_peFile;
+
         internal CustomAttribute(CustomAttributeRow * pRow, PEFile peFile)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            m_pRow = (CustomAttributeRow *)FluentAsserts.CheckNotNull((void*) pRow, "pRow");
+            m_peFile = peFile.CheckNotNull("peFile");
         }
-        
+
+        public Method Constructor
+        {
+            get { return new MethodReference(m_pRow->GetConstructor(m_peFile)); }
+        }
     }
 }

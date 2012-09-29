@@ -111,18 +111,8 @@ namespace Tiny.Metadata
             get
             {
                 CheckDisposed();
-                IToken token;
-                if (m_pTinyClause!= null) {
-                    token = m_pTinyClause->ClassToken;
-                }
-                else {
-                    token = m_pFatClause->ClassToken;
-                }
-
-                if (token.IsNull) {
-                    return null;
-                }
-                return new TypeReference(token, m_module);
+                IToken token = m_pTinyClause!= null ? m_pTinyClause->ClassToken : m_pFatClause->ClassToken;
+                return token.IsNull ? null : new TypeReference(token, m_module);
             }
         }
 

@@ -803,37 +803,16 @@ namespace Tiny.Metadata.Layout
             table.CheckDefined("table");
             selector.CheckNotNull("selector");
 
-            if (! IsSorted(table)) {
+            if (!IsSorted(table))
+            {
                 throw new InvalidOperationException(string.Format("The table '{0}' is not sorted", table));
             }
 
-            if (GetRowCount(table) == 0) {
-                return new ZeroBasedIndex(-1);
-            }
-
-            var min = 0.ToZB();
-            var max = GetRowCount(table).ToZB() - 1;
-            var comparer = Comparer<T>.Default;
-
-            while (max > 0 && max != min) {
-                var mid = ((max - min) + 1)/2 + min;
-                var comp = comparer.Compare(value, selector(GetRow(mid, table)));
-                if (comp <= 0) {
-                    max = mid - 1;
-                }
-                else {
-                    min = mid;
-                }
-            }
-
-            if (max < 0) {
-                return (-1).ToZB();
-            }
-
-            if (min > 0 || comparer.Compare(value, selector(GetRow(min, table))) > 0) {
-                return min;
-            }
-            return (-1).ToZB();
+            return new TableWrapper(table, this).GreatestLowerBound(
+                x => selector((void*)x),
+                value,
+                Comparer<T>.Default
+            ).ToZB();
         }
 
         //# Returns the index of the smallest item in [table] strictly greater than (>) [value]. If no such element

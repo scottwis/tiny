@@ -58,5 +58,10 @@ namespace Tiny.Metadata.Layout
         {
             get { return new MetadataToken(); }
         }
+
+        public byte * RawHeader
+        {
+            get { return (byte*)m_pHeader; }
+        }
     }
 }

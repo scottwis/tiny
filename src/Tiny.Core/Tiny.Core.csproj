@@ -170,6 +170,7 @@
     <Compile Include="Metadata\ExceptionHandler.cs" />
     <Compile Include="Metadata\FieldReference.cs" />
     <Compile Include="Metadata\HandlerKind.cs" />
+    <Compile Include="Metadata\Layout\ExceptionHeader.cs" />
     <Compile Include="Metadata\Layout\ExceptionHeaderFlags.cs" />
     <Compile Include="Metadata\Layout\FatExceptionClause.cs" />
     <Compile Include="Metadata\Layout\FatExceptionHeader.cs" />

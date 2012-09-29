@@ -33,5 +33,13 @@ namespace Tiny.Metadata.Layout
         [FieldOffset(0)] public readonly ExceptionHeaderFlags Flags;
         [FieldOffset(1)] public readonly byte DataSize;
         [FieldOffset(2)] public readonly ushort Reserved;
+
+        public int NumberOfExceptionClauses
+        {
+            get
+            {
+                return ((int) DataSize - 4)/12;
+            }
+        }
     }
 }

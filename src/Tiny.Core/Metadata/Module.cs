@@ -131,8 +131,8 @@ namespace Tiny.Metadata
         {
             m_allTypes = new LiftedList<TypeDefinition>(
                 MetadataTable.TypeDef.RowCount(m_peFile),
-                (index) => m_peFile.GetRow(new ZeroBasedIndex(index), MetadataTable.TypeDef),
-                (pRow) => new TypeDefinition((TypeDefRow*)pRow, this),
+                index => m_peFile.GetRow(new ZeroBasedIndex(index), MetadataTable.TypeDef),
+                pRow => new TypeDefinition((TypeDefRow*)pRow, this),
                 () => m_peFile.IsDisposed
             );
 
